@@ -341,6 +341,12 @@ textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 
       <div class="row"><button class="btn primary" id="famSave" type="button">Save</button> <button class="link" id="famNew" type="button">Make a new code</button></div>
     </div>
     <div class="card">
+      <h2>Starter movies</h2>
+      <p class="hint">The site comes with about 190 family favourites so it works straight away. Turn this off to build the library from your own movies instead. Starter movies you’ve added from a list, marked as owned, starred or watched stay.</p>
+      <label class="toggle"><input type="checkbox" id="starterIn"> Include the starter list</label>
+      <p class="small" id="starterNote" style="margin:6px 0 0"></p>
+    </div>
+    <div class="card">
       <h2>Posters, run times &amp; streaming</h2>
       <p class="hint">This uses TMDB, a free movie database (IMDb doesn’t let websites read its data). Paste your free TMDB API key once and every device in the family gets it.</p>
       <input id="tmdbIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="TMDB API key">
@@ -587,7 +593,7 @@ const BUILTIN = RAW.split("\n").map(l => {
 });
 
 // ---------- state ----------
-const state = {people: [], custom: {}, tweaks: {}, watches: {}, info: {}, settings: {tmdb: "", services: []}};
+const state = {people: [], custom: {}, tweaks: {}, watches: {}, info: {}, settings: {tmdb: "", services: [], starter: true}};
 const session = {f: loadFilters(), who: null, cat: null, seen: false, rejected: new Set(), plan: 0, current: null, libCat: "all", watchCat: "all"};
 const canWrite = true;
 
@@ -623,10 +629,15 @@ function allCats() {
   return CATS.concat([...extra].sort().map(catInfo));
 }
 
-function movies() {
-  const list = BUILTIN.map(b => {
+function movies(includeAll) {
+  // with the starter list off, a starter movie only shows once the family has made it theirs
+  const watched = {};
+  Object.keys(state.watches).forEach(id => { watched[state.watches[id].k] = 1; });
+  const list = [];
+  BUILTIN.forEach(b => {
     const tw = state.tweaks[b.k] || {};
-    return Object.assign({}, b, {a: tw.a != null ? tw.a : b.a, star: !!tw.star, hide: !!tw.hide, own: !!tw.own, origA: b.a, info: state.info[b.k] || null});
+    if (!includeAll && !state.settings.starter && !(tw.keep || tw.own || tw.star || watched[b.k])) return;
+    list.push(Object.assign({}, b, {a: tw.a != null ? tw.a : b.a, star: !!tw.star, hide: !!tw.hide, own: !!tw.own, keep: !!tw.keep, origA: b.a, info: state.info[b.k] || null}));
   });
   Object.keys(state.custom).forEach(id => {
     const m = state.custom[id], tw = state.tweaks[m.k] || {};
@@ -634,7 +645,7 @@ function movies() {
   });
   return list;
 }
-function movieByKey(k) { return movies().find(m => m.k === k); }
+function movieByKey(k) { return movies(true).find(m => m.k === k); }
 function watchesOf(k) { return Object.values(state.watches).filter(w => w.k === k).sort((a, b) => a.d < b.d ? 1 : -1); }
 function avgOfWatch(w) { const v = Object.values(w.r || {}); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; }
 function movieAvg(k) {
@@ -709,7 +720,7 @@ function del(col, id) {
   return queued(col + "/" + id, () => ref.delete());
 }
 function savePeople() { return put("meta", "people", {people: state.people}); }
-function saveSettings() { return put("meta", "settings", {tmdb: state.settings.tmdb, services: state.settings.services}); }
+function saveSettings() { return put("meta", "settings", {tmdb: state.settings.tmdb, services: state.settings.services, starter: state.settings.starter}); }
 function failed(err) {
   writeError = (err && err.code) || "unknown";
   setSync(false, "Couldn’t save to the family tracker (" + writeError + "). Saved on this device for now.");
@@ -730,7 +741,7 @@ function cleanCustom(x, id) {
 }
 function cleanSettings(x) {
   x = x || {};
-  return {tmdb: str(x.tmdb, 300).replace(/\s+/g, ""), services: (Array.isArray(x.services) ? x.services : []).filter(v => typeof v === "string").map(v => v.slice(0, 40)).slice(0, 30)};
+  return {starter: x.starter !== false, tmdb: str(x.tmdb, 300).replace(/\s+/g, ""), services: (Array.isArray(x.services) ? x.services : []).filter(v => typeof v === "string").map(v => v.slice(0, 40)).slice(0, 30)};
 }
 function cleanProv(a) {
   return (Array.isArray(a) ? a : []).slice(0, 12).map(p => ({n: str(p && p.n, 40), l: /^\/[\w.-]+$/.test(p && p.l) ? p.l : ""})).filter(p => p.n);
@@ -746,6 +757,7 @@ function cleanTweak(x) {
   if (!x) return null;
   const o = {};
   if (x.own) o.own = true;
+  if (x.keep) o.keep = true;
   if (typeof x.a === "number" && x.a >= 0 && x.a <= 18) o.a = Math.round(x.a);
   if (x.star) o.star = true;
   if (x.hide) o.hide = true;
@@ -1294,7 +1306,7 @@ function renderLibrary() {
       (f === "all" || f === "hidden" || (f === "star" ? m.star : f === "own" ? m.own : f === "svc" ? onOurServices(m) : f === "unseen" ? !watchesOf(m.k).length : m.cats.indexOf(f) > -1)) &&
       (!q || m.t.toLowerCase().indexOf(q) > -1))
     .sort((a, b) => a.t.replace(/^(the|a) /i, "").localeCompare(b.t.replace(/^(the|a) /i, "")));
-  $("libList").innerHTML = list.length ? list.map(m => libRow(m)).join("") : '<p class="empty">No movies match.</p>';
+  $("libList").innerHTML = list.length ? list.map(m => libRow(m)).join("") : (all.length ? '<p class="empty">No movies match.</p>' : '<p class="empty">Your library is empty. Tap “📋 Add a list” and paste in your movies.</p>');
   $("libCount").textContent = list.length + (list.length === 1 ? " movie" : " movies");
 }
 $("search").oninput = () => renderLibrary();
@@ -1314,6 +1326,7 @@ function setTweak(m, change) {
   if (cur.star) doc.star = true;
   if (cur.hide) doc.hide = true;
   if (cur.own) doc.own = true;
+  if (cur.keep) doc.keep = true;
   const id = m.k;
   if (Object.keys(doc).length) put("tweaks", id, doc); else if (state.tweaks[id]) del("tweaks", id);
 }
@@ -1519,7 +1532,9 @@ $("addBtn").onclick = () => {
     const t = $("mT").value.trim();
     if (!t) { $("mWarn").textContent = "Give it a title."; return; }
     if (!chosen.size) { $("mWarn").textContent = "Pick at least one kind so the picker can find it."; return; }
-    if (movies().some(m => m.t.toLowerCase() === t.toLowerCase())) { $("mWarn").textContent = "That one’s already in the library."; return; }
+    const dupe = movies(true).find(m => norm(m.t) === norm(t));
+    if (dupe && dupe.builtin && !movies().some(m => m.k === dupe.k)) { setTweak(dupe, {keep: true, star: $("mStar").checked || dupe.star}); closeSheet(); toast(""); return; }
+    if (dupe) { $("mWarn").textContent = "That one’s already in the library."; return; }
     const id = uid();
     const doc = {t, y: +$("mY").value || 0, r: "", a: age, cats: [...chosen]};
     put("custom", id, doc);
@@ -1530,12 +1545,20 @@ $("addBtn").onclick = () => {
 
 // ---------- add a list ----------
 function parseLine(l) {
-  l = l.replace(/^\s*[-*•\d.)]+\s+/, "").trim();
-  if (!l) return null;
   let y = 0;
+  if (l.indexOf("\t") > -1) {
+    // a row copied from a spreadsheet or the Mac TV app's list view: title first, year somewhere after
+    const cells = l.split("\t").map(c => c.trim()).filter(Boolean);
+    if (!cells.length || /^(name|title)$/i.test(cells[0])) return null;
+    const yc = cells.slice(1).find(c => /^(19|20)\d\d$/.test(c) || /^\d{1,2}\/\d{1,2}\/(19|20)\d\d$/.test(c));
+    if (yc) y = +yc.slice(-4);
+    l = cells[0];
+  }
+  l = l.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "").trim();
+  if (!l) return null;
   const m = /^(.*?)[\s,(\[-]+((?:19|20)\d\d)[)\]]?\s*$/.exec(l);
   if (m && m[1].trim()) { l = m[1].trim(); y = +m[2]; }
-  return {t: l.slice(0, 80), y};
+  return {t: l.slice(0, 80), y: y || 0};
 }
 $("importBtn").onclick = () => {
   const chosen = [];
@@ -1566,7 +1589,7 @@ $("importBtn").onclick = () => {
     if (!lines.length) { $("impWarn").textContent = "Add at least one movie."; return; }
     if (!hasKey && !chosen.length) { $("impWarn").textContent = "Pick at least one kind so the picker can find them."; return; }
     const own = $("impOwn").checked, star = $("impStar").checked;
-    const all = movies();
+    const all = movies(true);
     let added = 0, already = [];
     const toLook = [];
     lines.forEach(L => {
@@ -1574,7 +1597,12 @@ $("importBtn").onclick = () => {
       const ex = all.find(m => norm(m.t) === want && (!L.y || !m.y || m.y === L.y));
       if (ex) {
         already.push(ex.t);
-        if ((own && !ex.own) || (star && !ex.star)) setTweak(ex, {own: own || ex.own, star: star || ex.star});
+        if (ex.builtin && !ex.keep) {
+          // a starter movie: add it to our library rather than making a copy
+          setTweak(ex, {keep: true, own: own || ex.own, star: star || ex.star});
+          added++; already.pop();
+          if (hasKey) toLook.push(Object.assign({}, ex));
+        } else if ((own && !ex.own) || (star && !ex.star)) setTweak(ex, {own: own || ex.own, star: star || ex.star});
         return;
       }
       const id = uid();
@@ -1621,6 +1649,12 @@ $("services").onclick = e => {
   if (i > -1) list.splice(i, 1); else list.push(n);
   state.settings.services = list; saveSettings(); renderServices();
 };
+function renderStarter() {
+  $("starterIn").checked = state.settings.starter;
+  const mine = movies().length;
+  $("starterNote").textContent = state.settings.starter ? "" : `Your library has ${mine} movie${mine === 1 ? "" : "s"}. Add more from the Library tab with “📋 Add a list”.`;
+}
+$("starterIn").onchange = e => { state.settings.starter = e.target.checked; saveSettings(); resetPick(); renderAll(); };
 $("tmdbSave").onclick = () => {
   const v = $("tmdbIn").value.replace(/\s+/g, "");
   state.settings.tmdb = v; look.err = ""; saveSettings();
@@ -1639,7 +1673,7 @@ $("tmdbRun").onclick = () => {
 // ---------- render ----------
 function renderAll() {
   renderPick();
-  if ($("v-family").className.indexOf("on") > -1) { renderServices(); tmdbStatus(); if (document.activeElement !== $("tmdbIn")) $("tmdbIn").value = state.settings.tmdb; }
+  if ($("v-family").className.indexOf("on") > -1) { renderStarter(); renderServices(); tmdbStatus(); if (document.activeElement !== $("tmdbIn")) $("tmdbIn").value = state.settings.tmdb; }
   if ($("v-watched").className.indexOf("on") > -1) renderWatched();
   if ($("v-library").className.indexOf("on") > -1) renderLibrary();
   if ($("v-family").className.indexOf("on") > -1) renderFamily();
