@@ -181,6 +181,27 @@ footer{text-align:center;margin-top:20px}
 @media (prefers-reduced-motion: reduce){
   .hero .tw,.hero .bob,.marquee.land{animation:none}
 }
+/* wheel + options */
+.wheelcard{text-align:center}
+.wheelbox{position:relative;width:260px;max-width:80%;margin:6px auto 12px}
+#wheel{display:block;width:100%;height:auto;-webkit-transition:-webkit-transform 4s cubic-bezier(.17,.67,.12,.99);transition:transform 4s cubic-bezier(.17,.67,.12,.99)}
+#wheel text{font-family:inherit;font-weight:800;fill:#1d2a4d}
+.pointer{position:absolute;left:50%;top:-6px;margin-left:-14px;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--ink);z-index:2}
+.chooser{display:inline-block;background:var(--gold);color:#2a1300;font-weight:800;border-radius:999px;padding:2px 14px}
+.options{margin:12px -6px 0;font-size:0;text-align:center}
+.opt{display:inline-block;vertical-align:top;width:-webkit-calc(33.33% - 12px);width:calc(33.33% - 12px);margin:0 6px 12px;font-size:16px;text-align:center;background:var(--screen);color:#fff4dc;border:5px dotted var(--gold);border-radius:20px;padding:12px 10px;-webkit-animation:land .5s ease both;animation:land .5s ease both}
+.opt:nth-child(2){-webkit-animation-delay:.12s;animation-delay:.12s}
+.opt:nth-child(3){-webkit-animation-delay:.24s;animation-delay:.24s}
+.opt .plan{display:inline-block;background:var(--gold);color:#2a1300;font-weight:800;border-radius:999px;padding:0 10px;font-size:.8rem;text-transform:uppercase}
+.opt img.p{display:block;width:100%;max-width:170px;margin:8px auto 0;border-radius:10px}
+.opt .np{display:block;font-size:3rem;margin:12px 0 4px}
+.opt h3{margin:8px 0 2px;font-size:1.2rem;line-height:1.15}
+.opt .meta{margin:0;color:#c9d0f0;font-size:.9rem}
+.opt .warnings{color:#c9d0f0}
+.opt .btn{margin-top:10px;color:var(--btnInk)}
+.opt .link{color:#c9d0f0;font-size:.85rem;display:block;margin:4px auto 0}
+@-webkit-keyframes land{0%{opacity:0;-webkit-transform:scale(.9)}100%{opacity:1;-webkit-transform:scale(1)}}
+@media (max-width:640px){ .opt{width:-webkit-calc(100% - 12px);width:calc(100% - 12px)} .opt img.p{max-width:140px} }
 /* posters, info, filters */
 .poster{display:block;width:150px;max-width:45%;margin:12px auto 0;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,.4)}
 .thumb{width:44px;height:66px;border-radius:6px;object-fit:cover;background:var(--off);-webkit-flex:0 0 44px;flex:0 0 44px;margin-left:4px}
@@ -199,6 +220,13 @@ footer{text-align:center;margin-top:20px}
 .filtersOn{display:inline-block;font-size:.85rem;font-weight:800;border-radius:999px;padding:0 10px;margin-left:6px;background:var(--btn);color:var(--btnInk)}
 textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 10px;border-radius:12px;border:2px solid var(--wire);background:var(--off);color:var(--ink)}
 .small{font-size:.85rem;color:var(--soft)}
+.results{list-style:none;margin:10px 0 0;padding:0}
+.results li{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;padding:8px 0;border-bottom:1px solid var(--off)}
+.results .main{-webkit-box-flex:1;-webkit-flex:1;flex:1;min-width:0;margin:0 10px}
+.results .t{font-weight:800;display:block;line-height:1.2}
+.results .s{display:block;font-size:.85rem;color:var(--soft);max-height:2.6em;overflow:hidden}
+.results .btn{white-space:nowrap;padding:6px 12px}
+.results .added{font-weight:800;color:#4fd18b;white-space:nowrap}
 .selbar{position:-webkit-sticky;position:sticky;top:0;z-index:5;background:var(--sheet);border-radius:14px;padding:8px;margin:0 0 8px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
 .selbar .btn{margin:3px}
 .selecting .list li .star{display:none}
@@ -257,9 +285,19 @@ textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 
       <div class="chips" id="crew"></div>
       <p class="hint" id="crewHint" style="margin-top:8px"></p>
     </div>
+    <div class="card wheelcard" id="wheelCard">
+      <h2>Who picks tonight?</h2>
+      <div class="wheelbox">
+        <div class="pointer" aria-hidden="true"></div>
+        <svg id="wheel" viewBox="-110 -110 220 220" role="img" aria-label="Spinner wheel"></svg>
+      </div>
+      <button class="go" id="spinBtn" type="button">🎡 Spin!</button>
+      <p class="msg" id="wheelMsg" aria-live="polite"></p>
+      <p class="small" id="wheelNote" style="margin:4px 0 0"></p>
+    </div>
     <div id="seasonSlot"></div>
     <div class="card">
-      <h2>Pick a kind of movie</h2>
+      <h2 id="catHead">Pick a kind of movie</h2>
       <div class="cats" id="cats"></div>
       <label class="toggle"><input type="checkbox" id="seenToggle"> Include movies we’ve already seen</label>
     </div>
@@ -270,23 +308,10 @@ textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 
       <span class="fl">Where</span><div class="chips" id="fWhere"></div>
       <p class="small" id="fNote" style="margin:6px 0 0"></p>
     </details>
-    <div class="actions">
-      <button class="go" id="goBtn" type="button">Pick a movie!</button>
-      <p class="msg" id="pickMsg" aria-live="polite"></p>
-    </div>
-    <div class="marquee" id="marquee" hidden>
-      <span class="plan" id="planLabel">Plan A</span>
-      <img class="poster" id="pickPoster" alt="" hidden>
-      <h2 id="pickTitle"></h2>
-      <p class="meta" id="pickMeta"></p>
-      <p class="warnings" id="pickWarn"></p>
-      <p class="meta" id="pickWhere" style="margin-top:6px"></p>
-      <p class="seen" id="pickSeen"></p>
-      <div class="row" id="pickBtns">
-        <button class="btn primary big" id="watchBtn" type="button">🍿 Let’s watch it!</button>
-        <button class="btn big" id="planBBtn" type="button">Plan B →</button>
-      </div>
-      <button class="link" id="neverBtn" type="button">Never suggest this one</button>
+    <p class="msg" id="pickMsg" aria-live="polite"></p>
+    <div id="options" class="options"></div>
+    <div class="actions" id="planRow" hidden>
+      <button class="btn big" id="planBBtn" type="button">None of these? Plan B →</button>
     </div>
   </section>
 
@@ -323,6 +348,7 @@ textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 
       <div class="section-h">
         <h2>All movies</h2>
         <button class="btn primary" id="addBtn" type="button">+ Add a movie</button>
+        <button class="btn" id="findBtn" type="button">🔍 Find a movie</button>
         <button class="btn" id="importBtn" type="button">📋 Add a list</button>
         <button class="btn" id="selBtn" type="button">Select</button>
       </div>
@@ -354,8 +380,13 @@ textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 
       <div class="row"><button class="btn primary" id="famSave" type="button">Save</button> <button class="link" id="famNew" type="button">Make a new code</button></div>
     </div>
     <div class="card">
+      <h2>Find &amp; add movies</h2>
+      <p class="hint">Search for any movie and add it to your library.</p>
+      <div class="row" style="margin-top:8px"><button class="btn primary" id="findBtn2" type="button">🔍 Find a movie</button></div>
+    </div>
+    <div class="card">
       <h2>Starter movies</h2>
-      <p class="hint">The site comes with about 190 family favourites so it works straight away. Turn this off to build the library from your own movies instead. Starter movies you’ve added from a list, marked as owned, starred or watched stay.</p>
+      <p class="hint">The site has about 190 family favourites built in. Turn this on to mix them into your library and picks. Starter movies you’ve added, marked as owned, starred or watched always show.</p>
       <label class="toggle"><input type="checkbox" id="starterIn"> Include the starter list</label>
       <p class="small" id="starterNote" style="margin:6px 0 0"></p>
     </div>
@@ -606,8 +637,8 @@ const BUILTIN = RAW.split("\n").map(l => {
 });
 
 // ---------- state ----------
-const state = {people: [], custom: {}, tweaks: {}, watches: {}, info: {}, settings: {tmdb: "", services: [], starter: true}};
-const session = {f: loadFilters(), who: null, cat: null, seen: false, rejected: new Set(), plan: 0, current: null, libCat: "all", watchCat: "all"};
+const state = {people: [], custom: {}, tweaks: {}, watches: {}, info: {}, settings: {tmdb: "", services: [], starter: false}};
+const session = {f: loadFilters(), chooser: null, shown: [], who: null, cat: null, seen: false, rejected: new Set(), plan: 0, current: null, libCat: "all", watchCat: "all"};
 const canWrite = true;
 
 // ---------- helpers ----------
@@ -754,7 +785,7 @@ function cleanCustom(x, id) {
 }
 function cleanSettings(x) {
   x = x || {};
-  return {starter: x.starter !== false, tmdb: str(x.tmdb, 300).replace(/\s+/g, ""), services: (Array.isArray(x.services) ? x.services : []).filter(v => typeof v === "string").map(v => v.slice(0, 40)).slice(0, 30)};
+  return {starter: x.starter === true, tmdb: str(x.tmdb, 300).replace(/\s+/g, ""), services: (Array.isArray(x.services) ? x.services : []).filter(v => typeof v === "string").map(v => v.slice(0, 40)).slice(0, 30)};
 }
 function cleanProv(a) {
   return (Array.isArray(a) ? a : []).slice(0, 12).map(p => ({n: str(p && p.n, 40), l: /^\/[\w.-]+$/.test(p && p.l) ? p.l : ""})).filter(p => p.n);
@@ -780,7 +811,7 @@ function cleanWatch(x) {
   if (!x || !/^\d{4}-\d{2}-\d{2}$/.test(x.d) || !str(x.k, 120)) return null;
   const r = {};
   if (x.r && typeof x.r === "object") Object.keys(x.r).slice(0, 12).forEach(k => { const v = +x.r[k]; if (v >= 1 && v <= 5) r[k] = Math.round(v); });
-  return {k: str(x.k, 120), t: str(x.t, 80), d: x.d, cat: str(x.cat, 32), who: (Array.isArray(x.who) ? x.who : []).filter(s => typeof s === "string").slice(0, 12), r};
+  return {k: str(x.k, 120), t: str(x.t, 80), d: x.d, cat: str(x.cat, 32), ch: str(x.ch, 24), who: (Array.isArray(x.who) ? x.who : []).filter(s => typeof s === "string").slice(0, 12), r};
 }
 CLEAN.custom = (x, id) => cleanCustom(x, id); CLEAN.tweaks = x => cleanTweak(x); CLEAN.watches = x => cleanWatch(x); CLEAN.info = x => cleanInfo(x);
 function customToDoc(m) { return {t: m.t, y: m.y, r: m.r || "", a: m.a, cats: m.cats}; }
@@ -955,7 +986,7 @@ function runQueue() {
   // another device (or an earlier run) may have looked it up already
   const cur = movieByKey(m.k);
   if (!cur || (cur.info && !stale(cur, m._days))) { look.busy = false; if (cur && m._after) m._after(cur.info); setTimeout(runQueue, 0); return; }
-  m.info = cur.info;
+  if (cur.info) m.info = cur.info;
   lookup(m).then(info => {
     saveInfo(m, info);
     if (m._after) m._after(info);
@@ -1061,93 +1092,146 @@ function onCat(e) {
 $("cats").onclick = onCat; $("seasonSlot").onclick = onCat;
 $("seenToggle").onchange = e => { session.seen = e.target.checked; resetPick(); };
 
-function resetPick() { session.rejected.clear(); session.plan = 0; session.current = null; $("marquee").hidden = true; toast(""); }
+function resetPick() { session.rejected.clear(); session.plan = 0; session.shown = []; $("options").innerHTML = ""; $("planRow").hidden = true; toast(""); }
 
-function weighted(list) {
-  const ws = list.map(m => {
-    const avg = movieAvg(m.k), seen = watchesOf(m.k).length;
-    let w = seen ? (avg ? avg / 2.5 : 1) : 2;
-    if (m.star) w *= 3;
-    return w;
-  });
-  let r = Math.random() * ws.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < list.length; i++) { r -= ws[i]; if (r <= 0) return list[i]; }
-  return list[list.length - 1];
+// ---- who picks: the spinner wheel ----
+const WHEEL_COLORS = ["#ffd23f", "#ff6b6b", "#4fd18b", "#5ab4ff", "#c08bff", "#ff8a3d", "#7be0d6", "#f7a8d8"];
+let wheelAngle = 0, wheelSpinning = false;
+function lastChooser() {
+  const ws = Object.keys(state.watches).map(id => state.watches[id]).filter(w => w.ch).sort((a, b) => a.d < b.d ? 1 : -1);
+  return ws.length ? ws[0].ch : "";
 }
+function wheelPeople() {
+  const w = watchers();
+  const last = lastChooser();
+  // whoever picked last time sits this one out, so turns stay fair
+  return w.length > 1 ? w.filter(p => p.id !== last) : w;
+}
+function drawWheel() {
+  const ppl = wheelPeople();
+  $("wheelCard").hidden = state.people.length < 2 || watchers().length < 2;
+  if ($("wheelCard").hidden) { session.chooser = watchers().length === 1 ? watchers()[0].id : null; renderCatHead(); return; }
+  const n = ppl.length, seg = 360 / n;
+  let svg = "";
+  ppl.forEach((p, i) => {
+    const a0 = (i * seg - 90) * Math.PI / 180, a1 = ((i + 1) * seg - 90) * Math.PI / 180;
+    const x0 = 100 * Math.cos(a0), y0 = 100 * Math.sin(a0), x1 = 100 * Math.cos(a1), y1 = 100 * Math.sin(a1);
+    const path = n === 1 ? '<circle r="100"' : `<path d="M0 0 L${x0.toFixed(2)} ${y0.toFixed(2)} A100 100 0 ${seg > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z"`;
+    svg += `${path} fill="${WHEEL_COLORS[i % WHEEL_COLORS.length]}" stroke="#fff" stroke-width="2"/>`;
+    const mid = (i + 0.5) * seg;
+    const name = esc((p.n || "?").slice(0, 10));
+    svg += `<text transform="rotate(${mid - 90}) translate(58 0)" text-anchor="middle" dominant-baseline="middle" font-size="${n > 5 ? 13 : 17}">${name}</text>`;
+  });
+  svg += '<circle r="16" fill="#fff4dc" stroke="#1d2a4d" stroke-width="3"/>';
+  $("wheel").innerHTML = svg;
+  const last = state.people.find(p => p.id === lastChooser());
+  $("wheelNote").textContent = last && watchers().length > 1 && watchers().some(p => p.id === last.id) ? `${last.n} picked last time, so they sit this spin out.` : "";
+  renderCatHead();
+}
+function renderCatHead() {
+  const c = state.people.find(p => p.id === session.chooser);
+  $("catHead").innerHTML = c ? `<span class="chooser">👑 ${esc(c.n)}</span>, pick a kind of movie` : "Pick a kind of movie";
+}
+$("spinBtn").onclick = () => {
+  if (wheelSpinning) return;
+  const ppl = wheelPeople(); if (!ppl.length) return;
+  const i = Math.floor(Math.random() * ppl.length), seg = 360 / ppl.length;
+  // land somewhere inside the chosen slice, under the pointer at the top
+  const inside = seg * (0.15 + Math.random() * 0.7);
+  const target = 360 - (i * seg + inside);
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  wheelAngle += (reduce ? 0 : 360 * 5) + ((target - wheelAngle % 360) + 360) % 360;
+  const w = $("wheel");
+  w.style.webkitTransform = w.style.transform = "rotate(" + wheelAngle + "deg)";
+  wheelSpinning = true; $("wheelMsg").textContent = ""; session.chooser = null; resetPick(); renderCatHead();
+  setTimeout(() => {
+    wheelSpinning = false;
+    session.chooser = ppl[i].id;
+    $("wheelMsg").innerHTML = `🎉 <b>${esc(ppl[i].n)}</b> picks tonight!`;
+    renderCatHead();
+    try { $("catHead").scrollIntoView({behavior: reduce ? "auto" : "smooth", block: "start"}); } catch (e) {}
+  }, reduce ? 50 : 4100);
+};
 
-let spinTimer = null;
+// ---- options: up to three to choose from ----
+function weightOf(m) {
+  const avg = movieAvg(m.k), seen = watchesOf(m.k).length;
+  let w = seen ? (avg ? avg / 2.5 : 1) : 2;
+  if (m.star) w *= 3;
+  return w;
+}
+function pickSome(list, n) {
+  const left = list.slice(), out = [];
+  while (out.length < n && left.length) {
+    const ws = left.map(weightOf);
+    let r = Math.random() * ws.reduce((a, b) => a + b, 0), k = left.length - 1;
+    for (let i = 0; i < left.length; i++) { r -= ws[i]; if (r <= 0) { k = i; break; } }
+    out.push(left.splice(k, 1)[0]);
+  }
+  return out;
+}
+function optionHtml(m, i) {
+  const inf = m.info && !m.info.none ? m.info : null;
+  const ws = watchesOf(m.k), avg = movieAvg(m.k);
+  const seen = ws.length ? `Seen ${ws.length === 1 ? "once" : ws.length + "×"}${avg ? " " + faceFor(avg) : ""}` : (m.star ? "⭐ Must-watch" : "New for us!");
+  return `<div class="opt" data-k="${esc(m.k)}"><span class="plan">Option ${i + 1}</span>` +
+    (inf && inf.p ? `<img class="p" src="${IMG}w342${inf.p}" alt="Poster for ${esc(m.t)}">` : `<span class="np">${m.cats.length ? catInfo(m.cats[0]).e : "🎬"}</span>`) +
+    `<h3>${esc(m.t)}</h3><p class="meta">${[m.y || "", certOf(m), inf && runtimeText(inf.rt)].filter(Boolean).join(" · ")}</p>` +
+    (inf && inf.desc.length ? `<p class="warnings">⚠️ ${esc(inf.desc.join(", "))}</p>` : "") +
+    `<p class="meta" style="margin-top:4px">${m.own ? '<span class="own">📀 Ours</span> ' : ""}${whereHtml(inf)}</p>` +
+    `<p class="meta" style="color:var(--gold);font-weight:700;margin-top:4px">${seen}</p>` +
+    `<button type="button" class="btn primary" data-watch="${esc(m.k)}">🍿 Watch this!</button>` +
+    `<button type="button" class="link" data-never="${esc(m.k)}">Never suggest this one</button></div>`;
+}
 function pick() {
   if (!session.cat) { toast("Pick a kind of movie first 👆"); return; }
   if (!watchers().length && state.people.length) { toast("Tap who’s watching first."); return; }
   let p = pool(session.cat, session.seen).filter(m => !session.rejected.has(m.k));
   let rewatch = false;
-  if (!p.length && !session.seen) {
-    p = pool(session.cat, true).filter(m => !session.rejected.has(m.k));
-    rewatch = p.length > 0;
-  }
+  if (!p.length && !session.seen) { p = pool(session.cat, true).filter(m => !session.rejected.has(m.k)); rewatch = p.length > 0; }
   const c = catInfo(session.cat);
   if (!p.length) {
+    $("options").innerHTML = ""; $("planRow").hidden = true;
     const any = pool(session.cat, true).length;
-    $("marquee").hidden = true;
-    toast(any ? `That’s every ${c.n} movie we’ve got for this crew! Try another kind, or add one in the Library.` : `No ${c.n} movies fit this crew yet. Add one in the Library!`);
+    toast(any ? `That’s every ${c.n} movie we’ve got for this crew! Try another kind, or add more in the Library.` : `No ${c.n} movies fit this crew yet. Add some in the Library!`);
     session.rejected.clear(); session.plan = 0;
     return;
   }
-  const choice = weighted(p);
-  session.current = choice.k;
+  const picks = pickSome(p, 3);
+  session.shown = picks.map(m => m.k);
   const label = "Plan " + String.fromCharCode(65 + Math.min(session.plan, 25));
-  const mq = $("marquee");
-  mq.hidden = false; mq.className = "marquee spin";
-  $("planLabel").textContent = label;
-  $("pickMeta").textContent = ""; $("pickSeen").textContent = ""; $("pickWarn").textContent = ""; $("pickWhere").innerHTML = ""; $("pickPoster").hidden = true;
-  $("pickBtns").style.visibility = "hidden"; $("neverBtn").style.visibility = "hidden";
-  toast(rewatch ? `You’ve seen all the ${c.n} ones — here’s a rewatch!` : "");
-  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const all = pool(session.cat, true);
-  let n = 0;
-  clearInterval(spinTimer);
-  const finish = () => {
-    clearInterval(spinTimer);
-    $("pickTitle").textContent = choice.t;
-    const inf = choice.info && !choice.info.none ? choice.info : null;
-    const pp = $("pickPoster");
-    if (inf && inf.p) { pp.src = IMG + "w342" + inf.p; pp.alt = "Poster for " + choice.t; pp.hidden = false; } else pp.hidden = true;
-    $("pickMeta").textContent = [choice.y || "", certOf(choice), inf && runtimeText(inf.rt), "Age " + choice.a + "+"].filter(Boolean).join(" · ") + "  " + choice.cats.map(x => catInfo(x).e).join(" ");
-    $("pickWarn").textContent = inf && inf.desc.length ? "Heads-up: " + inf.desc.join(", ") : "";
-    $("pickWhere").innerHTML = (choice.own ? '<span class="own">📀 We own it</span> ' : "") + whereHtml(inf);
-    if (choice.info && stale(choice, 7)) queueLookups([Object.assign({}, choice, {_after: () => { if (session.current === choice.k) $("pickWhere").innerHTML = (choice.own ? '<span class="own">📀 We own it</span> ' : "") + whereHtml(state.info[choice.k]); }})], true, 7);
-    const ws = watchesOf(choice.k), avg = movieAvg(choice.k);
-    $("pickSeen").textContent = ws.length ? `Seen ${ws.length === 1 ? "once" : ws.length + " times"} · last ${prettyDate(ws[0].d)}${avg ? " · " + faceFor(avg) : ""}` : (choice.star ? "⭐ On your must-watch list" : "A new one for us!");
-    $("planBBtn").textContent = "Plan " + String.fromCharCode(66 + Math.min(session.plan, 24)) + " →";
-    $("pickBtns").style.visibility = ""; $("neverBtn").style.visibility = "";
-    mq.className = "marquee land";
-    mq.scrollIntoView({behavior: reduce ? "auto" : "smooth", block: "nearest"});
-  };
-  if (reduce || all.length < 2) { finish(); return; }
-  spinTimer = setInterval(() => {
-    $("pickTitle").textContent = all[Math.floor(Math.random() * all.length)].t;
-    if (++n > 14) finish();
-  }, 85);
+  const ch = state.people.find(x => x.id === session.chooser);
+  toast((ch ? ch.n + ", here are " : "Here are ") + (picks.length === 1 ? "your option" : "your " + picks.length + " options") + ` (${label})` + (rewatch ? ` — you’ve seen all the ${c.n} ones, so these are rewatches!` : ":"));
+  $("options").innerHTML = picks.map(optionHtml).join("");
+  const more = p.length > picks.length || pool(session.cat, session.seen).length > picks.length;
+  $("planRow").hidden = !more;
+  $("planBBtn").textContent = "None of these? Plan " + String.fromCharCode(66 + Math.min(session.plan, 24)) + " →";
+  // refresh streaming info that's getting old
+  picks.forEach(m => { if (m.info && stale(m, 7)) queueLookups([Object.assign({}, m)], false, 7); });
+  try { $("pickMsg").scrollIntoView({behavior: "smooth", block: "start"}); } catch (e) {}
 }
-$("goBtn").onclick = () => { session.rejected.clear(); session.plan = 0; pick(); };
-$("planBBtn").onclick = () => { if (session.current) session.rejected.add(session.current); session.plan++; pick(); };
-$("neverBtn").onclick = () => {
-  const m = movieByKey(session.current); if (!m) return;
-  setTweak(m, {hide: true});
-  session.rejected.add(m.k); session.plan++;
-  pick();
-  toast(`Okay, “${m.t}” won’t come up again. (Bring it back from the Library.)`);
-};
-$("watchBtn").onclick = () => {
+$("planBBtn").onclick = () => { (session.shown || []).forEach(k => session.rejected.add(k)); session.plan++; pick(); };
+$("options").onclick = e => {
+  const nv = e.target.closest("[data-never]");
+  if (nv) {
+    const m = movieByKey(nv.dataset.never); if (!m) return;
+    setTweak(m, {hide: true});
+    const card = nv.closest(".opt"); if (card) card.parentNode.removeChild(card);
+    toast(`Okay, “${m.t}” won’t come up again. (Bring it back from the Library.)`);
+    return;
+  }
+  const wb = e.target.closest("[data-watch]"); if (!wb) return;
   if (!canWrite) { toast("This account can only view."); return; }
-  const m = movieByKey(session.current); if (!m) return;
+  const m = movieByKey(wb.dataset.watch); if (!m) return;
   const id = uid();
-  put("watches", id, {k: m.k, t: m.t, d: today(), cat: session.cat === "any" ? "" : session.cat, who: watchers().map(p => p.id), r: {}});
-  $("marquee").hidden = true;
-  session.current = null;
+  const doc = {k: m.k, t: m.t, d: today(), cat: session.cat === "any" ? "" : session.cat, who: watchers().map(p => p.id), r: {}};
+  if (session.chooser) doc.ch = session.chooser;
+  put("watches", id, doc);
+  $("options").innerHTML = ""; $("planRow").hidden = true;
+  session.chooser = null; $("wheelMsg").textContent = "";
   toast(`Enjoy “${m.t}”! 🍿 Come back after to rate it.`);
   renderAll();
-  window.scrollTo({top: 0, behavior: "smooth"});
+  window.scrollTo(0, 0);
 };
 
 // rating UI
@@ -1199,7 +1283,7 @@ function renderBanners() {
 }
 $("banners").onclick = e => onFace(e);
 
-function renderPick() { renderCrew(); renderFilters(); renderCats(); renderBanners(); }
+function renderPick() { renderCrew(); if (!wheelSpinning) drawWheel(); renderFilters(); renderCats(); renderBanners(); }
 
 // ---------- WATCHED ----------
 function renderWatched() {
@@ -1235,7 +1319,8 @@ function renderWatched() {
   $("watchList").innerHTML = shown.length ? shown.map(([id, w]) => {
     const faces = (w.who.length ? w.who : Object.keys(w.r)).map(i => w.r[i] ? FACES[w.r[i] - 1] : "").join("");
     const who = w.who.map(i => (state.people.find(p => p.id === i) || {}).n).filter(Boolean).join(", ");
-    return `<li data-w="${esc(id)}"><span class="main"><span class="t">${esc(w.t)}</span><span class="s">${prettyDate(w.d)}${w.cat ? " · " + catInfo(w.cat).e : ""}${who ? " · " + esc(who) : ""}</span></span><span class="r">${faces || '<span class="badge">rate</span>'}</span></li>`;
+    const chooser = w.ch && (state.people.find(p => p.id === w.ch) || {}).n;
+    return `<li data-w="${esc(id)}"><span class="main"><span class="t">${esc(w.t)}</span><span class="s">${prettyDate(w.d)}${w.cat ? " · " + catInfo(w.cat).e : ""}${chooser ? " · 👑 " + esc(chooser) + " picked" : ""}${who ? " · " + esc(who) : ""}</span></span><span class="r">${faces || '<span class="badge">rate</span>'}</span></li>`;
   }).join("") : '<p class="empty">Nothing yet — pick a movie and hit “Let’s watch it!”</p>';
 }
 $("watchFilter").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; session.watchCat = b.dataset.c; renderWatched(); };
@@ -1732,6 +1817,72 @@ $("importBtn").onclick = () => {
     $("libCount").textContent = `Added ${added} movie${added === 1 ? "" : "s"}` + (already.length ? `. Already in the library: ${already.slice(0, 6).join(", ")}${already.length > 6 ? "…" : ""}` : "") + (hasKey && added ? ". Looking up posters and details now." : ".");
   };
 };
+
+// ---------- find a movie ----------
+function inLibrary(r) {
+  const y = +(r.release_date || "").slice(0, 4);
+  return movies().find(m => (m.info && m.info.tid === r.id) || (norm(m.t) === norm(r.title) && (!m.y || !y || m.y === y)));
+}
+function addFromSearch(r, opts) {
+  const y = +(r.release_date || "").slice(0, 4);
+  const starter = movies(true).find(m => m.builtin && norm(m.t) === norm(r.title) && (!m.y || !y || Math.abs(m.y - y) <= 1));
+  if (starter) {
+    setTweak(starter, {keep: true, own: opts.own || starter.own, star: opts.star || starter.star});
+    if (!starter.info || starter.info.none) queueLookups([Object.assign({}, starter, {info: {tid: r.id}})], true, 0);
+    return;
+  }
+  const id = uid();
+  put("custom", id, {t: String(r.title).slice(0, 80), y, r: "", a: 7, cats: ["fun"]});
+  if (opts.own || opts.star) put("tweaks", "u-" + id, Object.assign({}, opts.own ? {own: true} : {}, opts.star ? {star: true} : {}));
+  const m = movieByKey("u-" + id);
+  m.info = {tid: r.id};   // look up this exact movie, not a title search
+  m._after = afterImport(id, {guessCats: true, gc: [], autoAge: true});
+  queueLookups([m], true, 0);
+}
+function openFindSheet() {
+  if (!state.settings.tmdb) {
+    openSheet(`<h2>Find a movie</h2><p class="hint">Searching needs your TMDB key. Add it in the Family tab under “Posters, run times &amp; streaming”.</p><div class="row"><button type="button" class="btn primary right" id="fClose">OK</button></div>`);
+    $("fClose").onclick = closeSheet; return;
+  }
+  let results = [];
+  openSheet(`<h2>Find a movie</h2>
+    <form id="fForm"><input type="text" id="fQ" placeholder="Movie title…" autocomplete="off" style="width:-webkit-calc(100% - 100px);width:calc(100% - 100px)"> <button class="btn primary" type="submit">Search</button></form>
+    <label class="toggle"><input type="checkbox" id="fOwn"> 📀 We own it</label>
+    <label class="toggle" style="margin-top:6px"><input type="checkbox" id="fStar"> ⭐ Must-watch</label>
+    <p class="small" id="fMsg" style="margin:8px 0 0"></p>
+    <ul class="results" id="fRes"></ul>
+    <div class="row"><button type="button" class="btn primary right" id="fDone">Done</button></div>`);
+  const draw = () => {
+    $("fRes").innerHTML = results.map((r, i) => {
+      const have = inLibrary(r), y = (r.release_date || "").slice(0, 4);
+      return `<li>${r.poster_path ? `<img class="thumb" src="${IMG}w92${r.poster_path}" alt="">` : '<span class="thumb none">🎬</span>'}
+        <span class="main"><span class="t">${esc(r.title)}${y ? " (" + y + ")" : ""}</span><span class="s">${esc((r.overview || "").slice(0, 140))}</span></span>
+        ${have ? '<span class="added">✓ In library</span>' : `<button type="button" class="btn" data-i="${i}">+ Add</button>`}</li>`;
+    }).join("");
+  };
+  $("fForm").onsubmit = e => {
+    e.preventDefault();
+    const q = $("fQ").value.trim(); if (!q) return;
+    $("fQ").blur();
+    $("fMsg").textContent = "Searching…"; $("fRes").innerHTML = "";
+    tmdbGet("/search/movie", {query: q, include_adult: "false", language: "en-CA"}).then(r => {
+      results = (r.results || []).slice(0, 15);
+      $("fMsg").textContent = results.length ? "" : "No movies found. Try fewer words.";
+      draw();
+    }, err => { $("fMsg").textContent = err && err.code === "badkey" ? "TMDB didn’t accept the key — check it in the Family tab." : "Couldn’t reach TMDB. Check your connection."; });
+  };
+  $("fRes").onclick = e => {
+    const b = e.target.closest("button[data-i]"); if (!b) return;
+    const r = results[+b.dataset.i];
+    addFromSearch(r, {own: $("fOwn").checked, star: $("fStar").checked});
+    b.outerHTML = '<span class="added">✓ Added</span>';
+    $("fMsg").textContent = `Added “${r.title}”. Its kind and age are filled in from TMDB — tap it in the Library to change them.`;
+  };
+  $("fDone").onclick = closeSheet;
+  setTimeout(() => { try { $("fQ").focus(); } catch (e) {} }, 50);
+}
+$("findBtn").onclick = openFindSheet;
+$("findBtn2").onclick = openFindSheet;
 
 // ---------- streaming services & TMDB key ----------
 const COMMON_SERVICES = ["Netflix", "Disney Plus", "Amazon Prime Video", "Crave", "Apple TV Plus", "Paramount Plus", "CBC Gem"];
