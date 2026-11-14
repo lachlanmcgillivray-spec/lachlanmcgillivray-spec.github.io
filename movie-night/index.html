@@ -835,6 +835,12 @@ Black Panther|2018|PG-13|11|P`;
       var tw = state.tweaks[b.k] || {};
       if (!includeAll && !state.settings.starter && !(tw.keep || tw.own || tw.star || watched[b.k])) return;
       list.push(Object.assign({}, b, {
+        t: tw.t || b.t,
+        y: tw.y || b.y,
+        cats: tw.cats || b.cats,
+        origT: b.t,
+        origY: b.y,
+        origCats: b.cats,
         a: tw.a != null ? tw.a : b.a,
         star: !!tw.star,
         hide: !!tw.hide,
@@ -1094,6 +1100,13 @@ Black Panther|2018|PG-13|11|P`;
     var o = {};
     if (x.own) o.own = true;
     if (x.keep) o.keep = true;
+    if (typeof x.t === "string" && x.t.trim()) o.t = x.t.slice(0, 80);
+    if (typeof x.y === "number" && x.y >= 1900 && x.y <= 2100) o.y = Math.round(x.y);
+    if (Array.isArray(x.cats) && x.cats.length) o.cats = x.cats.filter(function (c) {
+      return typeof c === "string";
+    }).map(function (c) {
+      return c.slice(0, 32);
+    }).slice(0, 8);
     if (typeof x.a === "number" && x.a >= 0 && x.a <= 18) o.a = Math.round(x.a);
     if (x.star) o.star = true;
     if (x.hide) o.hide = true;
@@ -2326,6 +2339,11 @@ Black Panther|2018|PG-13|11|P`;
     if (cur.hide) doc.hide = true;
     if (cur.own) doc.own = true;
     if (cur.keep) doc.keep = true;
+    if (!m.custom) {
+      if (cur.t && cur.t !== m.origT) doc.t = cur.t;
+      if (cur.y && cur.y !== m.origY) doc.y = cur.y;
+      if (cur.cats && cur.cats.join() !== m.origCats.join()) doc.cats = cur.cats;
+    }
     var id = m.k;
     if (Object.keys(doc).length) put("tweaks", id, doc);else if (state.tweaks[id]) del("tweaks", id);
   }
@@ -2414,6 +2432,9 @@ Black Panther|2018|PG-13|11|P`;
   function openSheet(html) {
     sheet.innerHTML = html;
     veil.className = "veil show";
+    veil.onclick = function (e) {
+      if (e.target === veil) closeSheet();
+    };
   }
   function closeSheet() {
     veil.className = "veil";
@@ -2463,41 +2484,41 @@ Black Panther|2018|PG-13|11|P`;
     var infoHtml = function infoHtml() {
       var inf = state.info[k];
       if (!inf) return state.settings.tmdb ? '<p class="small">Looking up poster and streaming…</p>' : '<p class="small">Add a TMDB key in the Family tab to see the poster, run time and where to stream.</p>';
-      if (inf.none) return '<p class="small">Couldn’t find this one on TMDB. <button type="button" class="link" id="reLook" style="margin:0;padding:0">Try again</button></p>';
+      if (inf.none) return '<p class="small">Couldn’t find this one on TMDB. <button type="button" class="link" id="wrongBtn" style="margin:0;padding:0">Search for it</button></p>';
       var where = function where(label, list) {
         return list && list.length ? `<p class="small" style="margin:6px 0 2px"><b>${label}</b></p>` + list.map(function (p) {
           return `<span class="svcname${isMine(p.n) ? " mine" : ""}">${esc(p.n)}</span>`;
         }).join("") : "";
       };
       var any = inf.stream.length || inf.rent.length || inf.buy.length;
-      return (inf.p ? `<img class="poster" src="${IMG}w342${inf.p}" alt="Poster for ${esc(m.t)}">` : "") + `<p class="hint" style="margin-top:10px">${[certOf(m) && certOf(m) + (inf.cc === "CA" ? " (Canada)" : ""), runtimeText(inf.rt)].filter(Boolean).join(" · ")}</p>` + (inf.desc.length ? `<p class="warnings">⚠️ ${esc(inf.desc.join(", "))}</p>` : "") + (inf.ov ? `<p style="margin:8px 0 0">${esc(inf.ov)}</p>` : "") + (inf.imdb ? `<p class="ext" style="margin:8px 0 0"><a href="https://www.imdb.com/title/${inf.imdb}/parentalguide" target="_blank" rel="noopener">IMDb Parents Guide</a><a href="https://www.imdb.com/title/${inf.imdb}/" target="_blank" rel="noopener">IMDb page</a></p>` : "") + `<label class="l">Where to watch in Canada</label>` + (any ? where("Streaming", inf.stream) + where("Rent", inf.rent) + where("Buy", inf.buy) : '<p class="small">Not streaming anywhere right now.</p>') + (inf.link ? `<p class="ext small" style="margin:6px 0 0"><a href="${esc(inf.link)}" target="_blank" rel="noopener">More options</a> <span class="small">· updated ${prettyDate(inf.at)}</span></p>` : "");
+      return (inf.p ? `<img class="poster" src="${IMG}w342${inf.p}" alt="Poster for ${esc(m.t)}">` : "") + `<p class="hint" style="margin-top:10px">${[certOf(m) && certOf(m) + (inf.cc === "CA" ? " (Canada)" : ""), runtimeText(inf.rt)].filter(Boolean).join(" · ")}</p>` + (inf.desc.length ? `<p class="warnings">⚠️ ${esc(inf.desc.join(", "))}</p>` : "") + (inf.ov ? `<p style="margin:8px 0 0">${esc(inf.ov)}</p>` : "") + (inf.imdb ? `<p class="ext" style="margin:8px 0 0"><a href="https://www.imdb.com/title/${inf.imdb}/parentalguide" target="_blank" rel="noopener">IMDb Parents Guide</a><a href="https://www.imdb.com/title/${inf.imdb}/" target="_blank" rel="noopener">IMDb page</a></p>` : "") + `<label class="l">Where to watch in Canada</label>` + (any ? where("Streaming", inf.stream) + where("Rent", inf.rent) + where("Buy", inf.buy) : '<p class="small">Not streaming anywhere right now.</p>') + (inf.link ? `<p class="ext small" style="margin:6px 0 0"><a href="${esc(inf.link)}" target="_blank" rel="noopener">More options</a> <span class="small">· updated ${prettyDate(inf.at)}</span></p>` : "") + '<p class="small" style="margin:8px 0 0">Wrong poster or details? <button type="button" class="link" id="wrongBtn" style="margin:0;padding:0">Pick the right movie</button></p>';
     };
     var catChips = function catChips() {
       return allCats().map(function (c) {
         return `<button type="button" class="chip${cats.indexOf(c.id) > -1 ? " on" : ""}" data-c="${esc(c.id)}">${c.e} ${esc(c.n)}</button>`;
       }).join("");
     };
-    openSheet(`<h2>${esc(m.t)}</h2><p class="hint">${[m.y || "", m.cats.map(function (c) {
-      return catInfo(c).e;
-    }).join(" ")].filter(Boolean).join(" · ")}</p>
+    openSheet(`<label class="l" for="edT" style="margin-top:0">Title</label><input type="text" id="edT" maxlength="80" value="${esc(m.t)}" style="font-weight:800;font-size:1.2rem">
+    <label class="l" for="edY">Year</label><input type="number" id="edY" inputmode="numeric" min="1900" max="2100" value="${m.y || ""}" style="width:7em">
+    ${m.builtin && m.origT !== m.t ? `<p class="small">Originally “${esc(m.origT)}”</p>` : ""}
     <div id="infoBox">${infoHtml()}</div>
     <p class="hint" style="margin-top:10px">${ws.length ? `Watched ${ws.length === 1 ? "once" : ws.length + " times"}, last ${prettyDate(ws[0].d)} ${faceFor(avg)}` : "Not watched yet"}</p>
     <label class="l">Suitable from age${m.custom ? "" : ` <span class="hint" style="font-weight:500">(our suggestion: ${m.origA}+)</span>`}</label>
     <div class="stepper"><button type="button" id="ageDn">−</button><b id="ageV">${age}+</b><button type="button" id="ageUp">+</button></div>
     <p class="hint" id="ageNote">${ageNote()}</p>
-    ${m.custom ? `<label class="l">What kind of movie?</label><div class="chips" id="mvCats">${catChips()}</div>` : ""}
+    <label class="l">What kind of movie?</label><div class="chips" id="mvCats">${catChips()}</div>
     <label class="toggle"><input type="checkbox" id="ownIn"${m.own ? " checked" : ""}> 📀 We own it (DVD, Blu-ray or digital)</label>
     <label class="toggle"><input type="checkbox" id="starIn"${m.star ? " checked" : ""}> ⭐ On our must-watch list</label>
     <label class="toggle"><input type="checkbox" id="hideIn"${m.hide ? " checked" : ""}> Hide from the picker</label>
     <div class="row"><button type="button" class="btn" id="logBtn">🍿 We watched this</button>${m.custom ? '<button type="button" class="btn danger" id="delMovie">Delete</button>' : ""}<button type="button" class="btn primary right" id="doneBtn">Done</button></div>`);
     var wireInfo = function wireInfo() {
-      var r = $("reLook");
+      var r = $("wrongBtn");
       if (r) r.onclick = function () {
-        del("info", k);
-        $("infoBox").innerHTML = infoHtml();
-        queueLookups([Object.assign(movieByKey(k), {
-          _after: refreshInfo
-        })], true, 0);
+        save();
+        openFindSheet({
+          matchKey: k,
+          q: $("edT") ? $("edT").value.trim() : m.t
+        });
       };
     };
     var refreshInfo = function refreshInfo() {
@@ -2510,7 +2531,7 @@ Black Panther|2018|PG-13|11|P`;
     if (state.settings.tmdb && (!m.info || stale(m, 7))) queueLookups([Object.assign({}, m, {
       _after: refreshInfo
     })], true, 7);
-    if (m.custom) $("mvCats").onclick = function (e) {
+    $("mvCats").onclick = function (e) {
       var b = e.target.closest(".chip");
       if (!b) return;
       var c = b.dataset.c,
@@ -2529,30 +2550,62 @@ Black Panther|2018|PG-13|11|P`;
     $("ageUp").onclick = function () {
       return setAge(age + 1);
     };
+    var saved = false;
     var save = function save() {
+      if (saved) return;
+      saved = true;
       var star = $("starIn").checked,
         hide = $("hideIn").checked,
         own = $("ownIn").checked;
+      var t = ($("edT").value || "").trim().slice(0, 80) || m.t;
+      var yv = +$("edY").value,
+        y = yv >= 1900 && yv <= 2100 ? yv : m.custom ? 0 : m.y;
+      var newCats = cats.length ? cats : m.cats;
+      var renamed = t !== m.t || y !== (m.y || 0) && !(m.builtin && !yv);
       if (m.custom) {
-        if (age !== m.a || cats.join() !== m.cats.join()) put("custom", m.id, customToDoc(Object.assign({}, m, {
+        if (renamed || age !== m.a || newCats.join() !== m.cats.join()) put("custom", m.id, customToDoc(Object.assign({}, m, {
+          t,
+          y,
           a: age,
-          cats: cats.length ? cats : m.cats
+          cats: newCats
         })));
         if (star !== m.star || hide !== m.hide || own !== m.own) setTweak(m, {
           star,
           hide,
           own
         });
-      } else if (age !== m.a || star !== m.star || hide !== m.hide || own !== m.own) setTweak(m, {
-        a: age,
-        star,
-        hide,
-        own
-      });
+      } else if (renamed || age !== m.a || star !== m.star || hide !== m.hide || own !== m.own || newCats.join() !== m.cats.join()) {
+        setTweak(m, {
+          a: age,
+          star,
+          hide,
+          own,
+          t,
+          y,
+          cats: newCats
+        });
+      }
+      if (renamed) {
+        Object.keys(state.watches).forEach(function (id) {
+          if (state.watches[id].k === k && state.watches[id].t !== t) put("watches", id, Object.assign({}, state.watches[id], {
+            t
+          }));
+        });
+        if (state.info[k]) del("info", k);
+        if (state.settings.tmdb) queueLookups([Object.assign({}, movieByKey(k), {
+          info: null
+        })], true, 0);
+      }
     };
     $("doneBtn").onclick = function () {
       save();
       closeSheet();
+    };
+    veil.onclick = function (e) {
+      if (e.target === veil) {
+        save();
+        closeSheet();
+      }
     };
     $("logBtn").onclick = function () {
       save();
@@ -3035,17 +3088,18 @@ Black Panther|2018|PG-13|11|P`;
     });
     queueLookups([m], true, 0);
   }
-  function openFindSheet() {
+  function openFindSheet(opts) {
+    opts = opts && opts.matchKey ? opts : {};
     if (!state.settings.tmdb) {
       openSheet(`<h2>Find a movie</h2><p class="hint">Searching needs your TMDB key. Add it in the Family tab under “Posters, run times &amp; streaming”.</p><div class="row"><button type="button" class="btn primary right" id="fClose">OK</button></div>`);
       $("fClose").onclick = closeSheet;
       return;
     }
     var results = [];
-    openSheet(`<h2>Find a movie</h2>
+    openSheet(`<h2>${opts.matchKey ? "Pick the right movie" : "Find a movie"}</h2>
     <form id="fForm"><input type="text" id="fQ" placeholder="Movie title…" autocomplete="off" style="width:-webkit-calc(100% - 100px);width:calc(100% - 100px)"> <button class="btn primary" type="submit">Search</button></form>
-    <label class="toggle"><input type="checkbox" id="fOwn"> 📀 We own it</label>
-    <label class="toggle" style="margin-top:6px"><input type="checkbox" id="fStar"> ⭐ Must-watch</label>
+    <div${opts.matchKey ? " hidden" : ""}><label class="toggle"><input type="checkbox" id="fOwn"> 📀 We own it</label>
+    <label class="toggle" style="margin-top:6px"><input type="checkbox" id="fStar"> ⭐ Must-watch</label></div>
     <p class="small" id="fMsg" style="margin:8px 0 0"></p>
     <ul class="results" id="fRes"></ul>
     <div class="row"><button type="button" class="btn primary right" id="fDone">Done</button></div>`);
@@ -3055,7 +3109,7 @@ Black Panther|2018|PG-13|11|P`;
           y = (r.release_date || "").slice(0, 4);
         return `<li>${r.poster_path ? `<img class="thumb" src="${IMG}w92${r.poster_path}" alt="">` : '<span class="thumb none">🎬</span>'}
         <span class="main"><span class="t">${esc(r.title)}${y ? " (" + y + ")" : ""}</span><span class="s">${esc((r.overview || "").slice(0, 140))}</span></span>
-        ${have ? '<span class="added">✓ In library</span>' : `<button type="button" class="btn" data-i="${i}">+ Add</button>`}</li>`;
+        ${opts.matchKey ? `<button type="button" class="btn" data-i="${i}">Use this</button>` : have ? '<span class="added">✓ In library</span>' : `<button type="button" class="btn" data-i="${i}">+ Add</button>`}</li>`;
       }).join("");
     };
     $("fForm").onsubmit = function (e) {
@@ -3081,6 +3135,27 @@ Black Panther|2018|PG-13|11|P`;
       var b = e.target.closest("button[data-i]");
       if (!b) return;
       var r = results[+b.dataset.i];
+      if (opts.matchKey) {
+        var k = opts.matchKey,
+          m = movieByKey(k);
+        if (!m) return;
+        var y = +(r.release_date || "").slice(0, 4);
+        if (m.custom && !m.y && y) put("custom", m.id, customToDoc(Object.assign({}, m, {
+          y
+        })));
+        if (state.info[k]) del("info", k);
+        queueLookups([Object.assign({}, movieByKey(k), {
+          info: {
+            tid: r.id
+          },
+          _after: function _after() {
+            return openMovieSheet(k);
+          }
+        })], true, 0);
+        $("fRes").innerHTML = "";
+        $("fMsg").textContent = "Getting the details for “" + r.title + "”…";
+        return;
+      }
       addFromSearch(r, {
         own: $("fOwn").checked,
         star: $("fStar").checked
@@ -3089,7 +3164,14 @@ Black Panther|2018|PG-13|11|P`;
       $("fMsg").textContent = `Added “${r.title}”. Its kind and age are filled in from TMDB — tap it in the Library to change them.`;
     };
     $("fDone").onclick = closeSheet;
-    setTimeout(function () {
+    if (opts.q) {
+      $("fQ").value = opts.q;
+      setTimeout(function () {
+        return $("fForm").onsubmit({
+          preventDefault() {}
+        });
+      }, 0);
+    } else setTimeout(function () {
       try {
         $("fQ").focus();
       } catch (e) {}
