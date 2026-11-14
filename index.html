@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kids' Hub</title>
+<!-- These make "Add to Home Screen" on the iPad look like a real app -->
+<meta name="apple-mobile-web-app-title" content="Kids' Hub">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  /* Plain CSS only, no JavaScript, so it works on old iPads */
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #1d3557;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #ffffff;
+    text-align: center;
+    -webkit-text-size-adjust: 100%;
+  }
+  h1 { font-size: 44px; margin: 36px 16px 8px; }
+  p.sub { font-size: 20px; margin: 0 16px 28px; color: #cfe0f5; }
+  .tiles { max-width: 900px; margin: 0 auto; padding: 0 12px 40px; }
+  a.tile {
+    display: inline-block;
+    vertical-align: top;
+    width: 260px;
+    margin: 12px;
+    padding: 28px 16px 24px;
+    border-radius: 24px;
+    color: #ffffff;
+    text-decoration: none;
+    -webkit-box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+    box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+    -webkit-tap-highlight-color: rgba(255,255,255,0.3);
+  }
+  a.tile:active { position: relative; top: 4px; -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.25); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
+  .emoji { display: block; font-size: 80px; line-height: 1.1; }
+  .name  { display: block; font-size: 28px; font-weight: bold; margin-top: 10px; }
+  .what  { display: block; font-size: 17px; margin-top: 6px; opacity: 0.9; }
+  .red    { background: #c1121f; }
+  .purple { background: #6a4c93; }
+  .green  { background: #2a9d8f; }
+</style>
+</head>
+<body>
+
+<h1>Kids' Hub</h1>
+<p class="sub">Tap a picture to go!</p>
+
+<div class="tiles">
+
+  <a class="tile red" href="https://lachlanmcgillivray-spec.github.io/advent-calendar/">
+    <span class="emoji">🎄</span>
+    <span class="name">Advent Calendar</span>
+    <span class="what">A Christmas joke every day</span>
+  </a>
+
+  <a class="tile purple" href="https://lachlanmcgillivray-spec.github.io/Gamenightchallenge/">
+    <span class="emoji">🎲</span>
+    <span class="name">Game Night</span>
+    <span class="what">100 Nights of Game Night</span>
+  </a>
+
+  <a class="tile green" href="https://lachlanmcgillivray-spec.github.io/pickleague/">
+    <span class="emoji">🏈</span>
+    <span class="name">Pick League</span>
+    <span class="what">Pick the winners each week</span>
+  </a>
+
+  <!-- To add another site later: copy one <a class="tile">...</a> block above,
+       change the link, emoji and words, and pick a colour (red, purple or green). -->
+
+</div>
+
+</body>
+</html>
