@@ -1,0 +1,2901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Movie Night</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Movie Night">
+<meta name="theme-color" content="#1d2a4d">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#d9ecff; --sky2:#bfdcfb; --ink:#1d2a4d; --soft:#4a5a85;
+  --wire:#7d8db8; --off:#eef4ff; --offline:#a9b8da;
+  --btn:#ff8a3d; --btnInk:#2a1300; --card:rgba(255,255,255,.65); --sheet:#ffffff;
+  --gold:#ffd23f; --red:#e05555; --screen:#1d2a4d;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --sky:#141a3a; --sky2:#0a0e24; --ink:#fff4dc; --soft:#b9c0e6;
+    --wire:#3a4475; --off:#252c55; --offline:#3d4680;
+    --btn:#ffb347; --btnInk:#2a1300; --card:rgba(255,255,255,.07); --sheet:#1d2450;
+    --screen:#0b0f26;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--sky);
+  background-image:linear-gradient(180deg,var(--sky2),var(--sky));
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:"Baloo 2","Chalkboard SE","Comic Sans MS","Trebuchet MS",sans-serif;
+  font-size:16px;
+  -webkit-tap-highlight-color:transparent;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+button{font:inherit;color:inherit}
+.wrap{max-width:860px;margin:0 auto;padding-block:12px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{text-align:center;margin:0 0 10px}
+.hero{display:block;width:100%;max-width:380px;height:auto;margin:0 auto}
+.hero .tw{animation:tw 1.6s ease-in-out infinite}
+.hero .tw:nth-child(2n){animation-delay:.8s}
+@keyframes tw{0%,100%{opacity:1}50%{opacity:.35}}
+.hero .bob{animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+h1{font-size:2.2rem;line-height:1.05;margin:2px 0 4px;font-weight:800}
+.sync{text-align:center;font-size:.9rem;color:var(--soft);margin:2px 0 0}
+.sync .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--offline);margin-right:6px;vertical-align:middle}
+.sync.on .dot{background:#4fd18b}
+
+nav{text-align:center;margin:14px 0 16px}
+nav button{margin:3px;border:2px solid var(--wire);background:transparent;border-radius:999px;padding:6px 16px;font-weight:700;font-size:1.05rem;cursor:pointer}
+nav button.on{background:var(--btn);border-color:var(--btn);color:var(--btnInk)}
+.view{display:none}
+.view.on{display:block}
+
+.card{background:var(--card);border-radius:20px;padding:16px 18px;margin:0 0 16px}
+.card h2{margin:0 0 8px;font-size:1.35rem;line-height:1.15}
+.hint{color:var(--soft);margin:0}
+.chips{display:block}
+.chip{display:inline-block;margin:0 6px 6px 0;vertical-align:top;font-weight:700;font-size:1rem;padding:5px 14px;border-radius:999px;border:2px solid var(--wire);background:transparent;cursor:pointer}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--sky)}
+.chip .age{font-weight:500;opacity:.75;margin-left:4px}
+
+.season{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;width:100%;text-align:left;border:0;border-radius:20px;padding:14px 18px;margin:0 0 12px;cursor:pointer;background:linear-gradient(120deg,#c0392b,#e74c3c 45%,#1e8449);color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.season.hall{background:linear-gradient(120deg,#d35400,#ff8a3d 50%,#5b2c6f)}
+.season .big{font-size:2.6rem;line-height:1;margin-right:14px}
+.season b{display:block;font-size:1.4rem;line-height:1.1}
+.season span{opacity:.9}
+.season.on{outline:4px solid var(--gold);outline-offset:2px}
+.cats{margin:0 -5px;font-size:0}
+.cat{display:inline-block;vertical-align:top;width:-webkit-calc(25% - 10px);width:calc(25% - 10px);margin:0 5px 10px;font-size:16px;border:2px solid var(--wire);background:var(--card);border-radius:18px;padding:10px 8px 8px;cursor:pointer;text-align:center}
+.cat .e{font-size:2rem;line-height:1.1;display:block}
+.cat .n{font-weight:800;font-size:1.05rem;display:block;line-height:1.15}
+.cat .c{font-size:.85rem;color:var(--soft);display:block}
+.cat.on{border-color:var(--btn);background:var(--btn);color:var(--btnInk)}
+.cat.on .c{color:var(--btnInk)}
+.cat.empty{opacity:.45}
+.toggle{display:block;margin:14px 0 0;font-weight:700;cursor:pointer}
+.toggle input{width:22px;height:22px;vertical-align:middle;margin:0 8px 0 0;accent-color:var(--btn)}
+
+.actions{text-align:center;margin:18px 0 6px}
+.go{font-size:1.5rem;font-weight:800;padding:12px 32px;border:0;border-radius:999px;background:var(--btn);color:var(--btnInk);cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.go:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.go[disabled]{opacity:.5;cursor:default}
+.link{background:none;border:0;color:var(--soft);text-decoration:underline;cursor:pointer;font-size:1rem;margin:6px 8px 0;padding:6px}
+.msg{min-height:1.5em;text-align:center;font-size:1.1rem;margin:6px 0 0;color:var(--soft)}
+
+.marquee{position:relative;max-width:520px;margin:18px auto 0;border-radius:22px;padding:22px 20px 18px;text-align:center;background:var(--screen);color:#fff4dc;border:7px dotted var(--gold);box-shadow:0 0 22px rgba(255,210,63,.45)}
+.marquee .plan{display:inline-block;background:var(--gold);color:#2a1300;font-weight:800;border-radius:999px;padding:2px 14px;font-size:.95rem;letter-spacing:.04em;text-transform:uppercase}
+.marquee h2{font-size:2rem;line-height:1.1;margin:10px 0 4px;font-weight:800;min-height:1.1em}
+.marquee .meta{margin:0;color:#c9d0f0}
+.marquee .seen{margin:6px 0 0;color:var(--gold);font-weight:700;min-height:1.4em}
+.marquee .row{margin-top:14px;text-align:center}
+.marquee .row .btn{margin:4px}
+.marquee .btn{border-color:#c9d0f0;color:#fff4dc}
+.marquee .btn.primary{color:var(--btnInk)}
+.marquee .link{color:#c9d0f0}
+.marquee.spin h2{opacity:.7}
+.marquee.land{animation:land .5s ease}
+@keyframes land{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+.btn{font-weight:700;font-size:1.05rem;padding:8px 18px;border-radius:999px;border:2px solid var(--wire);background:transparent;cursor:pointer}
+.btn.primary{background:var(--btn);border-color:var(--btn);color:var(--btnInk)}
+.btn.big{font-size:1.25rem;padding:10px 22px}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn.armed{background:var(--red);color:#fff}
+
+.banner{background:var(--card);border-left:6px solid var(--gold);border-radius:14px;padding:10px 14px;margin:0 0 12px}
+.banner b{display:block}
+.rate{margin:10px 0 0}
+.rate .who{font-weight:800;margin:8px 0 2px}
+.faces{display:block}
+.face{display:inline-block;margin:0 4px 4px 0;font-size:1.7rem;line-height:1;border:2px solid transparent;background:transparent;border-radius:14px;padding:4px 6px;cursor:pointer;opacity:.45;filter:grayscale(.6)}
+.face.on{opacity:1;filter:none;border-color:var(--btn);background:var(--off)}
+.face:hover{opacity:1;filter:none}
+.facelabel{font-size:.85rem;color:var(--soft);min-height:1.2em}
+
+.stats{margin:0 -5px 16px;font-size:0}
+.stat{display:inline-block;vertical-align:top;width:-webkit-calc(25% - 10px);width:calc(25% - 10px);margin:0 5px 10px;font-size:16px;background:var(--card);border-radius:16px;padding:10px 12px;text-align:center}
+.stat b{display:block;font-size:1.8rem;line-height:1.1}
+.stat span{color:var(--soft);font-size:.95rem}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;padding:9px 4px;border-bottom:1px solid var(--off);cursor:pointer}
+.list li:last-child{border-bottom:0}
+.list .main{-webkit-box-flex:1;-webkit-flex:1;flex:1;min-width:0;margin:0 10px}
+.list .t{font-weight:800;line-height:1.2;display:block;overflow:hidden;text-overflow:ellipsis}
+.list .s{color:var(--soft);font-size:.92rem;display:block}
+.list .r{font-size:1.25rem;white-space:nowrap}
+.badge{display:inline-block;font-size:.8rem;font-weight:800;border-radius:8px;padding:0 7px;border:2px solid var(--wire);color:var(--soft);white-space:nowrap}
+.badge.lock{border-color:var(--btn);color:var(--btn)}
+.star{font-size:1.4rem;background:none;border:0;cursor:pointer;padding:2px 4px;opacity:.35}
+.star.on{opacity:1}
+.empty{color:var(--soft);margin:6px 0}
+.search{width:100%;font:inherit;font-size:1.1rem;padding:9px 12px;border-radius:12px;border:2px solid var(--wire);background:var(--off);color:var(--ink);margin:0 0 10px}
+.filters{margin:0 0 12px}
+.section-h{overflow:hidden}
+.section-h h2{float:left;margin-right:10px}
+.section-h .btn{float:right;margin:0 0 6px 6px}
+
+.people .p{padding:8px 0;border-bottom:1px solid var(--off)}
+.people input,.people select,.sheet input,.sheet select{font:inherit;font-size:1.05rem;padding:7px 10px;border-radius:12px;border:2px solid var(--wire);background:var(--off);color:var(--ink);min-height:44px}
+.people input,.people select,.people .btn,.people .agebit{margin:3px 6px 3px 0;vertical-align:middle}
+.people input{width:170px}
+.people .agebit{display:inline-block;color:var(--soft);min-width:4.5em}
+
+.veil{display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(5,8,25,.55);z-index:20;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch}
+.veil.show{display:block}
+.sheet{max-width:460px;margin:30px auto;background:var(--sheet);border-radius:22px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.sheet h2{margin:0 0 4px;font-size:1.5rem;line-height:1.15}
+.sheet label.l{display:block;font-weight:800;margin:14px 0 6px}
+.sheet input[type=text],.sheet input[type=date],.sheet input[type=number]{width:100%}
+.sheet .row{margin-top:18px;overflow:hidden}
+.sheet .row .btn{margin:4px 8px 4px 0}
+.sheet .row .right{float:right}
+.sheet .spacer{flex:1}
+.stepper{display:block}
+.stepper button{vertical-align:middle;width:44px;height:44px;border-radius:50%;border:2px solid var(--wire);background:transparent;font-size:1.4rem;font-weight:800;cursor:pointer}
+.stepper b{display:inline-block;vertical-align:middle;font-size:1.5rem;min-width:3.2em;text-align:center}
+.warn{color:var(--red);font-weight:700;min-height:1.3em;margin:8px 0 0}
+footer{text-align:center;margin-top:20px}
+.copybox{display:none;width:100%;height:150px;font:inherit;font-size:.95rem;padding:8px;border-radius:10px;border:2px solid var(--wire);background:var(--off);color:var(--ink);margin-top:8px}
+
+@media (max-width:520px){
+  h1{font-size:1.8rem}
+  .marquee h2{font-size:1.6rem}
+  .cat{width:-webkit-calc(33.33% - 10px);width:calc(33.33% - 10px)}
+  .stat{width:-webkit-calc(50% - 10px);width:calc(50% - 10px)}
+  .cat .e{font-size:1.7rem}
+  .cat .n{font-size:.95rem}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero .tw,.hero .bob,.marquee.land{animation:none}
+}
+/* posters, info, filters */
+.poster{display:block;width:150px;max-width:45%;margin:12px auto 0;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.thumb{width:44px;height:66px;border-radius:6px;object-fit:cover;background:var(--off);-webkit-flex:0 0 44px;flex:0 0 44px;margin-left:4px}
+.thumb.none{display:inline-block;text-align:center;line-height:66px;font-size:1.3rem}
+.svc{display:inline-block;vertical-align:middle;margin:2px 4px 2px 0}
+.svc img{width:28px;height:28px;border-radius:7px;vertical-align:middle}
+.svc.mine img{box-shadow:0 0 0 3px var(--gold)}
+.svcname{display:inline-block;font-size:.85rem;font-weight:700;border-radius:8px;padding:1px 7px;margin:2px 4px 2px 0;background:var(--off);color:var(--ink)}
+.svcname.mine{background:var(--gold);color:#2a1300}
+.own{display:inline-block;font-size:.85rem;font-weight:800;border-radius:8px;padding:1px 7px;background:#4fd18b;color:#08331b}
+.warnings{font-size:.92rem;color:var(--soft);margin:4px 0 0}
+.marquee .warnings{color:#c9d0f0}
+.ext a{color:var(--btn);font-weight:700;margin-right:14px}
+.filters-card .fl{font-weight:800;margin:10px 0 4px;display:block}
+.filters-card summary{cursor:pointer;font-weight:800;font-size:1.2rem}
+.filtersOn{display:inline-block;font-size:.85rem;font-weight:800;border-radius:999px;padding:0 10px;margin-left:6px;background:var(--btn);color:var(--btnInk)}
+textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 10px;border-radius:12px;border:2px solid var(--wire);background:var(--off);color:var(--ink)}
+.small{font-size:.85rem;color:var(--soft)}
+.credit{font-size:.8rem;color:var(--soft);text-align:center;margin:18px 0 0}
+#famIn,#tmdbIn{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1rem;padding:8px 10px;border-radius:12px;border:2px solid var(--wire);background:var(--off);color:var(--ink);margin:6px 0}
+</style>
+</head>
+<body>
+<!-- Home button: goes back to the Kids' Hub -->
+<a href="https://lachlanmcgillivray-spec.github.io/" aria-label="Back to Kids' Hub" style="position:fixed;top:10px;left:10px;z-index:9;display:block;padding:8px 14px;border-radius:22px;background:rgba(0,0,0,0.55);color:#fff;font:bold 18px/1.2 'Helvetica Neue',Helvetica,Arial,sans-serif;text-decoration:none;-webkit-box-shadow:0 2px 6px rgba(0,0,0,0.4);box-shadow:0 2px 6px rgba(0,0,0,0.4);">&#127968; Home</a>
+<div class="wrap">
+  <header>
+    <svg class="hero" viewBox="0 0 380 170" role="img" aria-label="A movie screen with marquee lights and a bucket of popcorn">
+      <rect x="40" y="14" width="300" height="110" rx="14" fill="#1d2a4d" stroke="#ffd23f" stroke-width="4"/>
+      <rect x="56" y="28" width="268" height="82" rx="6" fill="#5ab4ff" opacity=".22"/>
+      <path d="M150 52 L150 88 L182 70 Z" fill="#fff4dc" opacity=".9"/>
+      <g fill="#ffd23f">
+        <circle class="tw" cx="60" cy="14" r="5"/><circle class="tw" cx="100" cy="14" r="5"/><circle class="tw" cx="140" cy="14" r="5"/>
+        <circle class="tw" cx="180" cy="14" r="5"/><circle class="tw" cx="220" cy="14" r="5"/><circle class="tw" cx="260" cy="14" r="5"/>
+        <circle class="tw" cx="300" cy="14" r="5"/><circle class="tw" cx="40" cy="50" r="5"/><circle class="tw" cx="340" cy="50" r="5"/>
+        <circle class="tw" cx="40" cy="90" r="5"/><circle class="tw" cx="340" cy="90" r="5"/>
+      </g>
+      <g class="bob">
+        <circle cx="262" cy="104" r="11" fill="#fff4dc"/><circle cx="278" cy="98" r="12" fill="#fff8e6"/><circle cx="294" cy="104" r="11" fill="#fff4dc"/>
+        <circle cx="270" cy="92" r="9" fill="#fff8e6"/><circle cx="287" cy="88" r="9" fill="#fff4dc"/>
+        <path d="M252 108 L304 108 L296 160 L260 160 Z" fill="#ff6b6b"/>
+        <path d="M265 108 L268 160 M278 108 L278 160 M291 108 L288 160" stroke="#fff" stroke-width="5"/>
+      </g>
+      <g>
+        <rect x="70" y="128" width="40" height="34" rx="6" fill="#c08bff"/>
+        <rect x="78" y="118" width="24" height="14" rx="4" fill="#ffd23f"/>
+        <rect x="124" y="134" width="34" height="28" rx="6" fill="#4fd18b"/>
+        <path d="M200 128 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z" fill="#ffd23f"/>
+      </g>
+    </svg>
+    <h1>Family Movie Night</h1>
+    <p class="sync" id="sync"><span class="dot"></span><span id="syncText">Connecting…</span></p>
+  </header>
+
+  <nav id="nav">
+    <button type="button" data-v="pick" class="on">🎲 Pick</button>
+    <button type="button" data-v="watched">🍿 Watched</button>
+    <button type="button" data-v="library">🎬 Library</button>
+    <button type="button" data-v="family">👨‍👩‍👧 Family</button>
+  </nav>
+
+  <!-- PICK -->
+  <section class="view on" id="v-pick">
+    <div id="banners"></div>
+    <div class="card" id="crewCard">
+      <h2>Who’s watching tonight?</h2>
+      <div class="chips" id="crew"></div>
+      <p class="hint" id="crewHint" style="margin-top:8px"></p>
+    </div>
+    <div id="seasonSlot"></div>
+    <div class="card">
+      <h2>Pick a kind of movie</h2>
+      <div class="cats" id="cats"></div>
+      <label class="toggle"><input type="checkbox" id="seenToggle"> Include movies we’ve already seen</label>
+    </div>
+    <details class="card filters-card" id="filtersCard">
+      <summary>Filters <span id="filtersOn"></span></summary>
+      <span class="fl">How long?</span><div class="chips" id="fLen"></div>
+      <span class="fl">Rating</span><div class="chips" id="fCert"></div>
+      <span class="fl">Where</span><div class="chips" id="fWhere"></div>
+      <p class="small" id="fNote" style="margin:6px 0 0"></p>
+    </details>
+    <div class="actions">
+      <button class="go" id="goBtn" type="button">Pick a movie!</button>
+      <p class="msg" id="pickMsg" aria-live="polite"></p>
+    </div>
+    <div class="marquee" id="marquee" hidden>
+      <span class="plan" id="planLabel">Plan A</span>
+      <img class="poster" id="pickPoster" alt="" hidden>
+      <h2 id="pickTitle"></h2>
+      <p class="meta" id="pickMeta"></p>
+      <p class="warnings" id="pickWarn"></p>
+      <p class="meta" id="pickWhere" style="margin-top:6px"></p>
+      <p class="seen" id="pickSeen"></p>
+      <div class="row" id="pickBtns">
+        <button class="btn primary big" id="watchBtn" type="button">🍿 Let’s watch it!</button>
+        <button class="btn big" id="planBBtn" type="button">Plan B →</button>
+      </div>
+      <button class="link" id="neverBtn" type="button">Never suggest this one</button>
+    </div>
+  </section>
+
+  <!-- WATCHED -->
+  <section class="view" id="v-watched">
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <h2>Family favourites</h2>
+      <ul class="list" id="favs"></ul>
+    </div>
+    <div class="card">
+      <div class="section-h"><h2>Everything we’ve watched</h2></div>
+      <div class="chips filters" id="watchFilter"></div>
+      <ul class="list" id="watchList"></ul>
+    </div>
+    <footer>
+      <button class="link" id="csvBtn" type="button" hidden>Download spreadsheet (CSV)</button>
+      <button class="link" id="copyBtn" type="button">Copy list as text</button>
+      <textarea class="copybox" id="copyBox" readonly></textarea>
+      <p class="msg" id="exportMsg"></p>
+    </footer>
+  </section>
+
+  <!-- LIBRARY -->
+  <section class="view" id="v-library">
+    <div class="card">
+      <div class="section-h">
+        <h2>Saving for when they’re older</h2>
+      </div>
+      <p class="hint" style="margin-bottom:8px">Movies the whole crew isn’t old enough for yet, with when they unlock. Tap ⭐ for the ones you really want to share with them — you’ll get a heads-up when they unlock.</p>
+      <ul class="list" id="someday"></ul>
+    </div>
+    <div class="card">
+      <div class="section-h">
+        <h2>All movies</h2>
+        <button class="btn primary" id="addBtn" type="button">+ Add a movie</button>
+        <button class="btn" id="importBtn" type="button">📋 Add a list</button>
+      </div>
+      <p class="hint" style="margin:4px 0 10px">Tap any movie to change its age, mark it as watched, or hide it.</p>
+      <input class="search" id="search" type="search" placeholder="Search…" autocomplete="off">
+      <div class="chips filters" id="libFilter"></div>
+      <p class="small" id="libCount" style="margin:0 0 6px"></p>
+      <ul class="list" id="libList"></ul>
+    </div>
+  </section>
+
+  <!-- FAMILY -->
+  <section class="view" id="v-family">
+    <div class="card people">
+      <h2>Our movie crew</h2>
+      <p class="hint">Add everyone who watches. Kids’ birth month keeps picks age-appropriate and tells you when older movies unlock. Leave grown-ups as “Grown-up”.</p>
+      <div id="people"></div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="addPerson" type="button">+ Add someone</button></div>
+    </div>
+    <div class="card">
+      <h2>Family code</h2>
+      <p class="hint" id="famNote"></p>
+      <input id="famIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="fam-…">
+      <div class="row"><button class="btn primary" id="famSave" type="button">Save</button> <button class="link" id="famNew" type="button">Make a new code</button></div>
+    </div>
+    <div class="card">
+      <h2>Posters, run times &amp; streaming</h2>
+      <p class="hint">This uses TMDB, a free movie database (IMDb doesn’t let websites read its data). Paste your free TMDB API key once and every device in the family gets it.</p>
+      <input id="tmdbIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="TMDB API key">
+      <div class="row"><button class="btn primary" id="tmdbSave" type="button">Save</button> <button class="btn" id="tmdbRun" type="button">Look up all movies now</button></div>
+      <p class="hint" id="tmdbStatus" style="margin-top:8px"></p>
+    </div>
+    <div class="card">
+      <h2>Our streaming services</h2>
+      <p class="hint">Tap the ones you have. Then use the “Where” filter on the Pick tab to only see what you can watch tonight.</p>
+      <div class="chips" id="services" style="margin-top:8px"></div>
+    </div>
+    <p class="hint" style="text-align:center">Age guides are suggestions — change any movie’s age in the Library to suit your family.</p>
+  </section>
+  <p class="credit">Movie info and posters from TMDB. This site uses the TMDB API but is not endorsed or certified by TMDB. Streaming info in Canada by JustWatch.</p>
+</div>
+
+<div class="veil" id="veil"><div class="sheet" role="dialog" aria-modal="true" id="sheet"></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+function _toConsumableArray(a) { return _arrayWithoutHoles(a) || _iterableToArray(a) || _unsupportedIterableToArray(a) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(r) { var e = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (Array.isArray(r) && (null == e || e === ("undefined" != typeof Symbol && [][Symbol.iterator]) || e === []["@@iterator"])) return r; if (null != e) { for (var t, o = [], a = e.call(r); !(t = a.next()).done;) o.push(t.value); return o; } }
+function _arrayWithoutHoles(a) { if (Array.isArray(a)) return _arrayLikeToArray(a); }
+function _slicedToArray(e, i) { return _iterableToArrayLimit(e, i) || _unsupportedIterableToArray(e, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(t, e) { if (t) { if ("string" == typeof t) return _arrayLikeToArray(t, e); var o = {}.toString.call(t).slice(8, -1); return "Object" === o && t.constructor && (o = t.constructor.name), "Map" === o || "Set" === o ? Array.from(t) : "Arguments" === o || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o) ? _arrayLikeToArray(t, e) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, t) { var e = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (Array.isArray(r) && (null == e || e === ("undefined" != typeof Symbol && [][Symbol.iterator]) || e === []["@@iterator"])) return r; if (null != e) { var l, n, i, a, u = [], o = !0, f = !1; try { if (i = (e = e.call(r)).next, 0 === t) { if (Object(e) !== e) return; o = !1; } else for (; !(o = (l = i.call(e)).done) && (u.push(l.value), u.length !== t); o = !0); } catch (r) { f = !0, n = r; } finally { try { if (!o && null != e.return && (a = e.return(), Object(a) !== a)) return; } finally { if (f) throw n; } } return u; } }
+if (!Object.values) Object.values = function (o) {
+  return Object.keys(o).map(function (k) {
+    return o[k];
+  });
+};
+if (!Object.entries) Object.entries = function (o) {
+  return Object.keys(o).map(function (k) {
+    return [k, o[k]];
+  });
+};
+if (window.Element && !Element.prototype.closest) Element.prototype.closest = function (sel) {
+  var el = this;
+  while (el && el.nodeType === 1) {
+    if ((el.matches || el.webkitMatchesSelector).call(el, sel)) return el;
+    el = el.parentNode;
+  }
+  return null;
+};
+(function () {
+  "use strict";
+
+  var $ = function $(id) {
+    return document.getElementById(id);
+  };
+  var esc = function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[c];
+    });
+  };
+  var KEY = "family-movie-night-v1";
+  var CATS = [{
+    id: "xmas",
+    e: "🎄",
+    n: "Christmas"
+  }, {
+    id: "hall",
+    e: "🎃",
+    n: "Halloween"
+  }, {
+    id: "anim",
+    e: "🎨",
+    n: "Animated"
+  }, {
+    id: "fun",
+    e: "😂",
+    n: "Funny"
+  }, {
+    id: "adv",
+    e: "🗺️",
+    n: "Adventure"
+  }, {
+    id: "magic",
+    e: "🪄",
+    n: "Magic & Fantasy"
+  }, {
+    id: "ani",
+    e: "🐾",
+    n: "Animals"
+  }, {
+    id: "mus",
+    e: "🎤",
+    n: "Musicals"
+  }, {
+    id: "hero",
+    e: "🦸",
+    n: "Superheroes"
+  }, {
+    id: "space",
+    e: "🚀",
+    n: "Space & Sci-fi"
+  }, {
+    id: "sport",
+    e: "🏒",
+    n: "Sports"
+  }, {
+    id: "classic",
+    e: "📼",
+    n: "Classics"
+  }];
+  var ANY = {
+    id: "any",
+    e: "🎲",
+    n: "Surprise me"
+  };
+  var CODE = {
+    X: "xmas",
+    H: "hall",
+    A: "anim",
+    V: "adv",
+    F: "fun",
+    M: "mus",
+    S: "sport",
+    N: "ani",
+    P: "hero",
+    C: "classic",
+    Y: "space",
+    W: "magic"
+  };
+  var RAW = `The Polar Express|2004|G|5|X A
+Elf|2003|PG|7|X F
+Home Alone|1990|PG|8|X F
+Home Alone 2: Lost in New York|1992|PG|8|X F
+How the Grinch Stole Christmas! (cartoon)|1966|TV|3|X A C
+The Grinch|2018|PG|4|X A F
+How the Grinch Stole Christmas|2000|PG|7|X F
+Arthur Christmas|2011|PG|5|X A F
+Klaus|2019|PG|6|X A
+The Muppet Christmas Carol|1992|G|5|X M F
+A Charlie Brown Christmas|1965|TV|3|X A C
+Rudolph the Red-Nosed Reindeer|1964|TV|3|X A C
+Frosty the Snowman|1969|TV|3|X A C
+The Santa Clause|1994|PG|6|X F
+Miracle on 34th Street|1994|PG|6|X
+It's a Wonderful Life|1946|PG|9|X C
+The Nightmare Before Christmas|1993|PG|7|X H A M
+Jingle All the Way|1996|PG|7|X F
+A Christmas Story|1983|PG|8|X F C
+A Christmas Carol (animated)|2009|PG|8|X A
+The Christmas Chronicles|2018|TV-PG|7|X V
+Noelle|2019|G|6|X F
+Mickey's Once Upon a Christmas|1999|G|3|X A
+The Snowman|1982|TV|3|X A C
+Olaf's Frozen Adventure|2017|TV|4|X A M
+Shrek the Halls|2007|TV|5|X A F
+Prep & Landing|2009|TV|4|X A F
+White Christmas|1954|G|7|X M C
+Hocus Pocus|1993|PG|9|H F
+It's the Great Pumpkin, Charlie Brown|1966|TV|3|H A C
+Hotel Transylvania|2012|PG|6|H A F
+Hotel Transylvania 2|2015|PG|6|H A F
+Monster House|2006|PG|9|H A
+Coraline|2009|PG|9|H A W
+ParaNorman|2012|PG|9|H A
+Casper|1995|PG|7|H F
+Ghostbusters|1984|PG|10|H F C
+Beetlejuice|1988|PG|12|H F
+The Addams Family (animated)|2019|PG|6|H A F
+Frankenweenie|2012|PG|8|H A N
+Corpse Bride|2005|PG|8|H A M
+Room on the Broom|2012|TV|3|H A
+Spookley the Square Pumpkin|2004|TV|3|H A
+Halloweentown|1998|TV-G|7|H W
+Goosebumps|2015|PG|9|H V
+Monsters, Inc.|2001|G|4|H A F
+The Haunted Mansion|2003|PG|8|H F
+Scooby-Doo|2002|PG|8|H F
+Gremlins|1984|PG|12|H F C
+The Witches|1990|PG|10|H W
+Wallace & Gromit: The Curse of the Were-Rabbit|2005|G|5|H A F
+Coco|2017|PG|7|H A M
+Toy Story|1995|G|3|A F
+Toy Story 2|1999|G|4|A F
+Toy Story 3|2010|G|5|A F
+Toy Story 4|2019|G|4|A F
+Finding Nemo|2003|G|4|A N
+Finding Dory|2016|PG|4|A N
+The Incredibles|2004|PG|6|A P
+Incredibles 2|2018|PG|6|A P
+Up|2009|PG|5|A V
+WALL-E|2008|G|5|A Y
+Inside Out|2015|PG|5|A F
+Inside Out 2|2024|PG|6|A F
+Ratatouille|2007|G|5|A N F
+Cars|2006|G|3|A S
+Moana|2016|PG|5|A M V
+Frozen|2013|PG|4|A M W
+Frozen II|2019|PG|5|A M W
+Encanto|2021|PG|5|A M W
+Zootopia|2016|PG|6|A N F
+The Lion King|1994|G|5|A M N C
+Aladdin|1992|G|5|A M W C
+Beauty and the Beast|1991|G|5|A M W C
+The Little Mermaid|1989|G|4|A M C
+Tangled|2010|PG|5|A M W
+Mulan|1998|G|6|A V M
+How to Train Your Dragon|2010|PG|6|A V W
+How to Train Your Dragon 2|2014|PG|7|A V W
+Shrek|2001|PG|7|A F W
+Kung Fu Panda|2008|PG|5|A F N
+Despicable Me|2010|PG|4|A F
+Minions|2015|PG|4|A F
+The Lego Movie|2014|PG|6|A F V
+My Neighbor Totoro|1988|G|3|A W
+Spirited Away|2001|PG|9|A W
+Kiki's Delivery Service|1989|G|5|A W
+Ponyo|2008|G|4|A W
+Luca|2021|PG|5|A F
+Soul|2020|PG|8|A
+The Mitchells vs. the Machines|2021|PG|7|A F Y
+Big Hero 6|2014|PG|6|A P
+Wreck-It Ralph|2012|PG|5|A F
+Sing|2016|PG|4|A M F
+The Secret Life of Pets|2016|PG|4|A N F
+Trolls|2016|PG|4|A M
+The Wild Robot|2024|PG|6|A N Y
+Puss in Boots: The Last Wish|2022|PG|8|A V F
+Spider-Man: Into the Spider-Verse|2018|PG|9|A P
+The Bad Guys|2022|PG|6|A F
+Cloudy with a Chance of Meatballs|2009|PG|5|A F
+Ice Age|2002|PG|5|A N F
+Madagascar|2005|PG|5|A N F
+Monsters University|2013|G|5|A F
+The Iron Giant|1999|PG|7|A Y C
+The Land Before Time|1988|G|4|A N C
+The Good Dinosaur|2015|PG|6|A N
+Lightyear|2022|PG|6|A Y
+Space Jam|1996|PG|6|A S F
+Snow White and the Seven Dwarfs|1937|G|4|A C M
+Cinderella|1950|G|3|A C M
+Peter Pan|1953|G|4|A C V
+The Jungle Book|1967|G|3|A C N M
+One Hundred and One Dalmatians|1961|G|4|A C N
+Robin Hood|1973|G|4|A C N
+The Many Adventures of Winnie the Pooh|1977|G|3|A C N
+Dumbo|1941|G|3|A C N
+The Aristocats|1970|G|3|A C N
+Star Wars: A New Hope|1977|PG|8|Y V C
+The Empire Strikes Back|1980|PG|9|Y V C
+Return of the Jedi|1983|PG|9|Y V C
+E.T. the Extra-Terrestrial|1982|PG|8|Y C
+Back to the Future|1985|PG|10|Y F C
+Apollo 13|1995|PG|10|Y
+Raiders of the Lost Ark|1981|PG|11|V C
+Indiana Jones and the Last Crusade|1989|PG-13|11|V C
+Jurassic Park|1993|PG-13|11|V N Y
+The Goonies|1985|PG|10|V F C
+Harry Potter and the Philosopher's Stone|2001|PG|7|W V
+Harry Potter and the Chamber of Secrets|2002|PG|8|W V
+Harry Potter and the Prisoner of Azkaban|2004|PG|9|W V
+Harry Potter and the Goblet of Fire|2005|PG-13|11|W V
+The Princess Bride|1987|PG|8|W F C
+Willy Wonka & the Chocolate Factory|1971|G|6|W M C
+Charlie and the Chocolate Factory|2005|PG|7|W F
+Wonka|2023|PG|6|W M
+The Wizard of Oz|1939|G|5|W M C
+Mary Poppins|1964|G|4|M W C
+Mary Poppins Returns|2018|PG|5|M W
+The Sound of Music|1965|G|6|M C
+Chitty Chitty Bang Bang|1968|G|5|M W C
+Singin' in the Rain|1952|G|7|M C
+Annie|1982|PG|6|M C
+The Greatest Showman|2017|PG|8|M
+Enchanted|2007|PG|6|M W F
+The Muppets|2011|PG|5|M F
+Muppet Treasure Island|1996|G|5|M F V
+School of Rock|2003|PG-13|10|F M
+Matilda|1996|PG|7|W F
+Night at the Museum|2006|PG|7|F V
+Jumanji|1995|PG|9|V W
+Jumanji: Welcome to the Jungle|2017|PG-13|11|V F
+The NeverEnding Story|1984|PG|8|W C
+Honey, I Shrunk the Kids|1989|PG|7|F Y
+Hook|1991|PG|8|V W
+The Chronicles of Narnia: The Lion, the Witch and the Wardrobe|2005|PG|8|W V
+The Lord of the Rings: The Fellowship of the Ring|2001|PG-13|11|W V
+Pirates of the Caribbean: The Curse of the Black Pearl|2003|PG-13|11|V F
+Hugo|2011|PG|8|V
+Holes|2003|PG|9|V
+Spy Kids|2001|PG|7|V F
+The Parent Trap|1998|PG|8|F
+Freaky Friday|2003|PG|9|F
+Mrs. Doubtfire|1993|PG-13|10|F
+Big|1988|PG|11|F
+Paddington|2014|PG|4|F N
+Paddington 2|2017|PG|4|F N
+Babe|1995|G|5|N
+Free Willy|1993|PG|6|N
+Homeward Bound: The Incredible Journey|1993|G|5|N V
+Fly Away Home|1996|PG|7|N
+Charlotte's Web|2006|G|5|N
+Dolphin Tale|2011|PG|6|N
+March of the Penguins|2005|G|5|N
+Air Bud|1997|PG|5|S N
+The Sandlot|1993|PG|8|S F
+The Mighty Ducks|1992|PG|8|S F
+Cool Runnings|1993|PG|7|S F
+Rookie of the Year|1993|PG|7|S F
+The Karate Kid|1984|PG|10|S C
+Remember the Titans|2000|PG|11|S
+Superman|1978|PG|8|P C
+Sky High|2005|PG|8|P F
+Spider-Man|2002|PG-13|10|P
+Spider-Man: Homecoming|2017|PG-13|10|P F
+Iron Man|2008|PG-13|11|P
+The Avengers|2012|PG-13|11|P
+Black Panther|2018|PG-13|11|P`;
+  var slug = function slug(s) {
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  };
+  var BUILTIN = RAW.split("\n").map(function (l) {
+    var _l$split = l.split("|"),
+      _l$split2 = _slicedToArray(_l$split, 5),
+      t = _l$split2[0],
+      y = _l$split2[1],
+      r = _l$split2[2],
+      a = _l$split2[3],
+      c = _l$split2[4];
+    return {
+      k: slug(t + "-" + y),
+      t,
+      y: +y,
+      r,
+      a: +a,
+      cats: c.trim().split(/\s+/).map(function (x) {
+        return CODE[x];
+      }),
+      builtin: true
+    };
+  });
+  var state = {
+    people: [],
+    custom: {},
+    tweaks: {},
+    watches: {},
+    info: {},
+    settings: {
+      tmdb: "",
+      services: []
+    }
+  };
+  var session = {
+    f: loadFilters(),
+    who: null,
+    cat: null,
+    seen: false,
+    rejected: new Set(),
+    plan: 0,
+    current: null,
+    libCat: "all",
+    watchCat: "all"
+  };
+  var canWrite = true;
+  var pad = function pad(x) {
+    return (x < 10 ? "0" : "") + x;
+  };
+  var iso = function iso(d) {
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  };
+  var today = function today() {
+    return iso(new Date());
+  };
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var prettyDate = function prettyDate(s) {
+    var p = s.split("-");
+    return MONTHS[+p[1] - 1] + " " + +p[2] + (p[0] != new Date().getFullYear() ? ", " + p[0] : "");
+  };
+  var uid = function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  };
+  var FACES = ["😖", "😕", "🙂", "😄", "🤩"];
+  var FACE_WORDS = ["Nope", "Meh", "It was OK", "Loved it", "Best ever!"];
+  function ageOf(b, when) {
+    if (!b) return 99;
+    var _b$split$map = b.split("-").map(Number),
+      _b$split$map2 = _slicedToArray(_b$split$map, 2),
+      y = _b$split$map2[0],
+      m = _b$split$map2[1];
+    var d = when || new Date();
+    var a = d.getFullYear() - y;
+    if (d.getMonth() + 1 < m) a--;
+    return a;
+  }
+  function unlockDate(b, age) {
+    var _b$split$map3 = b.split("-").map(Number),
+      _b$split$map4 = _slicedToArray(_b$split$map3, 2),
+      y = _b$split$map4[0],
+      m = _b$split$map4[1];
+    return new Date(y + age, m - 1, 1);
+  }
+  var kids = function kids() {
+    return state.people.filter(function (p) {
+      return p.b;
+    });
+  };
+  function catInfo(id) {
+    if (id === "any") return ANY;
+    var c = CATS.find(function (c) {
+      return c.id === id;
+    });
+    if (c) return c;
+    return {
+      id,
+      e: "🎬",
+      n: id.replace(/^c:/, "")
+    };
+  }
+  function allCats() {
+    var extra = new Set();
+    Object.values(state.custom).forEach(function (m) {
+      return m.cats.forEach(function (c) {
+        if (c.indexOf("c:") === 0) extra.add(c);
+      });
+    });
+    return CATS.concat(_toConsumableArray(extra).sort().map(catInfo));
+  }
+  function movies() {
+    var list = BUILTIN.map(function (b) {
+      var tw = state.tweaks[b.k] || {};
+      return Object.assign({}, b, {
+        a: tw.a != null ? tw.a : b.a,
+        star: !!tw.star,
+        hide: !!tw.hide,
+        own: !!tw.own,
+        origA: b.a,
+        info: state.info[b.k] || null
+      });
+    });
+    Object.keys(state.custom).forEach(function (id) {
+      var m = state.custom[id],
+        tw = state.tweaks[m.k] || {};
+      list.push(Object.assign({}, m, {
+        star: !!tw.star,
+        hide: !!tw.hide,
+        own: !!tw.own,
+        origA: m.a,
+        info: state.info[m.k] || null
+      }));
+    });
+    return list;
+  }
+  function movieByKey(k) {
+    return movies().find(function (m) {
+      return m.k === k;
+    });
+  }
+  function watchesOf(k) {
+    return Object.values(state.watches).filter(function (w) {
+      return w.k === k;
+    }).sort(function (a, b) {
+      return a.d < b.d ? 1 : -1;
+    });
+  }
+  function avgOfWatch(w) {
+    var v = Object.values(w.r || {});
+    return v.length ? v.reduce(function (a, b) {
+      return a + b;
+    }, 0) / v.length : null;
+  }
+  function movieAvg(k) {
+    var v = [];
+    watchesOf(k).forEach(function (w) {
+      return Object.values(w.r || {}).forEach(function (x) {
+        return v.push(x);
+      });
+    });
+    return v.length ? v.reduce(function (a, b) {
+      return a + b;
+    }, 0) / v.length : null;
+  }
+  var faceFor = function faceFor(avg) {
+    return avg == null ? "" : FACES[Math.max(0, Math.min(4, Math.round(avg) - 1))];
+  };
+  function okFor(m, people) {
+    return people.every(function (p) {
+      return ageOf(p.b) >= m.a;
+    });
+  }
+  function everyoneUnlock(m) {
+    var last = null,
+      who = null;
+    kids().forEach(function (p) {
+      var d = unlockDate(p.b, m.a);
+      if (!last || d > last) {
+        last = d;
+        who = p;
+      }
+    });
+    return {
+      date: last,
+      who
+    };
+  }
+  function watchers() {
+    var ids = session.who || new Set(state.people.map(function (p) {
+      return p.id;
+    }));
+    return state.people.filter(function (p) {
+      return ids.has(p.id);
+    });
+  }
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyAay_usXWb7Aw_Q0pEzjOJHoC8ETypOiwM",
+    authDomain: "game-night-1b980.firebaseapp.com",
+    projectId: "game-night-1b980",
+    storageBucket: "game-night-1b980.firebasestorage.app",
+    messagingSenderId: "941556296349",
+    appId: "1:941556296349:web:717e8f6cafc7acaa948274"
+  };
+  var FAM_KEY = "hundred-nights-family";
+  var CLOUD = {
+    custom: "movieCustom",
+    tweaks: "movieTweaks",
+    watches: "movieWatches",
+    info: "movieInfo"
+  };
+  var COLS = ["custom", "tweaks", "watches", "info"];
+  var CLEAN = {};
+  var family = "",
+    fam = null,
+    unsub = [],
+    writeError = "";
+  function saveLocal() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    } catch (e) {}
+  }
+  function loadLocal() {
+    try {
+      var s = JSON.parse(localStorage.getItem(KEY) || "null");
+      if (s) {
+        state.people = cleanPeople(s.people);
+        COLS.forEach(function (col) {
+          var map = {};
+          Object.keys(s[col] || {}).forEach(function (id) {
+            var v = CLEAN[col](col === "custom" ? customToDoc(s[col][id]) : s[col][id], id);
+            if (v) map[id] = v;
+          });
+          state[col] = map;
+        });
+        state.settings = cleanSettings(s.settings);
+      }
+    } catch (e) {}
+  }
+  function cloudRef(col, id) {
+    return col === "meta" ? fam.collection("movieMeta").doc(id) : fam.collection(CLOUD[col]).doc(id);
+  }
+  var queues = {};
+  function queued(path, fn) {
+    var p = (queues[path] || Promise.resolve()).then(fn);
+    queues[path] = p.catch(function () {});
+    return p.catch(failed);
+  }
+  function put(col, id, data) {
+    var remote = data;
+    if (col === "meta") {
+      if (id === "people") state.people = data.people;else state.settings = cleanSettings(data);
+    } else if (col === "custom") {
+      state.custom[id] = cleanCustom(data, id);
+      remote = customToDoc(data);
+    } else state[col][id] = data;
+    saveLocal();
+    if (!fam) return Promise.resolve();
+    var ref = cloudRef(col, id);
+    return queued(col + "/" + id, function () {
+      return ref.set(remote);
+    });
+  }
+  function del(col, id) {
+    delete state[col][id];
+    saveLocal();
+    if (!fam) return Promise.resolve();
+    var ref = cloudRef(col, id);
+    return queued(col + "/" + id, function () {
+      return ref.delete();
+    });
+  }
+  function savePeople() {
+    return put("meta", "people", {
+      people: state.people
+    });
+  }
+  function saveSettings() {
+    return put("meta", "settings", {
+      tmdb: state.settings.tmdb,
+      services: state.settings.services
+    });
+  }
+  function failed(err) {
+    writeError = err && err.code || "unknown";
+    setSync(false, "Couldn’t save to the family tracker (" + writeError + "). Saved on this device for now.");
+  }
+  function toast(t) {
+    $("pickMsg").textContent = t;
+  }
+  function str(x, n) {
+    return typeof x === "string" ? x.slice(0, n) : "";
+  }
+  function cleanPeople(arr) {
+    return (Array.isArray(arr) ? arr : []).slice(0, 12).map(function (p) {
+      return {
+        id: str(p && p.id, 24) || uid(),
+        n: str(p && p.n, 30),
+        b: /^\d{4}-\d{2}$/.test(p && p.b) ? p.b : ""
+      };
+    });
+  }
+  function cleanCustom(x, id) {
+    if (!x || !str(x.t, 80)) return null;
+    return {
+      k: "u-" + id,
+      id,
+      t: str(x.t, 80),
+      y: Math.max(0, Math.min(2100, +x.y || 0)),
+      r: str(x.r, 8),
+      a: Math.max(0, Math.min(18, +x.a || 0)),
+      cats: (Array.isArray(x.cats) ? x.cats : []).filter(function (c) {
+        return typeof c === "string";
+      }).map(function (c) {
+        return c.slice(0, 32);
+      }).slice(0, 8),
+      custom: true
+    };
+  }
+  function cleanSettings(x) {
+    x = x || {};
+    return {
+      tmdb: str(x.tmdb, 300).replace(/\s+/g, ""),
+      services: (Array.isArray(x.services) ? x.services : []).filter(function (v) {
+        return typeof v === "string";
+      }).map(function (v) {
+        return v.slice(0, 40);
+      }).slice(0, 30)
+    };
+  }
+  function cleanProv(a) {
+    return (Array.isArray(a) ? a : []).slice(0, 12).map(function (p) {
+      return {
+        n: str(p && p.n, 40),
+        l: /^\/[\w.-]+$/.test(p && p.l) ? p.l : ""
+      };
+    }).filter(function (p) {
+      return p.n;
+    });
+  }
+  function cleanInfo(x) {
+    if (!x || !/^\d{4}-\d{2}-\d{2}$/.test(x.at)) return null;
+    if (x.none) return {
+      none: true,
+      at: x.at
+    };
+    return {
+      tid: +x.tid || 0,
+      imdb: /^tt\d+$/.test(x.imdb) ? x.imdb : "",
+      p: /^\/[\w.-]+$/.test(x.p) ? x.p : "",
+      rt: Math.max(0, Math.min(600, +x.rt || 0)),
+      cert: str(x.cert, 10),
+      cc: str(x.cc, 2),
+      desc: (Array.isArray(x.desc) ? x.desc : []).filter(function (v) {
+        return typeof v === "string";
+      }).map(function (v) {
+        return v.slice(0, 40);
+      }).slice(0, 8),
+      ov: str(x.ov, 420),
+      stream: cleanProv(x.stream),
+      rent: cleanProv(x.rent),
+      buy: cleanProv(x.buy),
+      link: /^https:\/\/www\.themoviedb\.org\//.test(x.link) ? x.link : "",
+      at: x.at
+    };
+  }
+  function cleanTweak(x) {
+    if (!x) return null;
+    var o = {};
+    if (x.own) o.own = true;
+    if (typeof x.a === "number" && x.a >= 0 && x.a <= 18) o.a = Math.round(x.a);
+    if (x.star) o.star = true;
+    if (x.hide) o.hide = true;
+    return o;
+  }
+  function cleanWatch(x) {
+    if (!x || !/^\d{4}-\d{2}-\d{2}$/.test(x.d) || !str(x.k, 120)) return null;
+    var r = {};
+    if (x.r && typeof x.r === "object") Object.keys(x.r).slice(0, 12).forEach(function (k) {
+      var v = +x.r[k];
+      if (v >= 1 && v <= 5) r[k] = Math.round(v);
+    });
+    return {
+      k: str(x.k, 120),
+      t: str(x.t, 80),
+      d: x.d,
+      cat: str(x.cat, 32),
+      who: (Array.isArray(x.who) ? x.who : []).filter(function (s) {
+        return typeof s === "string";
+      }).slice(0, 12),
+      r
+    };
+  }
+  CLEAN.custom = function (x, id) {
+    return cleanCustom(x, id);
+  };
+  CLEAN.tweaks = function (x) {
+    return cleanTweak(x);
+  };
+  CLEAN.watches = function (x) {
+    return cleanWatch(x);
+  };
+  CLEAN.info = function (x) {
+    return cleanInfo(x);
+  };
+  function customToDoc(m) {
+    return {
+      t: m.t,
+      y: m.y,
+      r: m.r || "",
+      a: m.a,
+      cats: m.cats
+    };
+  }
+  var VIEWS = ["pick", "watched", "library", "family"];
+  function show(v) {
+    if (VIEWS.indexOf(v) < 0) v = "pick";
+    VIEWS.forEach(function (x) {
+      $("v-" + x).className = "view" + (x === v ? " on" : "");
+    });
+    _toConsumableArray($("nav").children).forEach(function (b) {
+      return b.className = b.dataset.v === v ? "on" : "";
+    });
+    renderAll();
+  }
+  $("nav").onclick = function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    show(b.dataset.v);
+    window.scrollTo(0, 0);
+  };
+  var IMG = "https://image.tmdb.org/t/p/";
+  function certLevel(c) {
+    c = (c || "").toUpperCase();
+    if (/^(G|TV-Y|TV-Y7|TV-G|E|U)$/.test(c)) return 1;
+    if (/^(PG|TV-PG)$/.test(c)) return 2;
+    if (/^(PG-13|14A|TV-14|12A)$/.test(c)) return 3;
+    if (/^(R|18A|NC-17|TV-MA|A)$/.test(c)) return 4;
+    return 0;
+  }
+  function certOf(m) {
+    return m.info && m.info.cert || (m.r && m.r !== "TV" ? m.r : "");
+  }
+  function isMine(name) {
+    return state.settings.services.indexOf(name) > -1;
+  }
+  function onOurServices(m) {
+    return !!(m.info && m.info.stream && m.info.stream.some(function (p) {
+      return isMine(p.n);
+    }));
+  }
+  function runtimeText(rt) {
+    if (!rt) return "";
+    var h = Math.floor(rt / 60),
+      mm = rt % 60;
+    return (h ? h + " hr " : "") + (mm ? mm + " min" : "");
+  }
+  var LEN = [[0, "Any length"], [90, "Under 1½ hrs"], [105, "Under 1¾ hrs"], [120, "Under 2 hrs"]];
+  var CERT = [[0, "Any"], [1, "G only"], [2, "Up to PG"], [3, "Up to PG-13 / 14A"]];
+  var WHERE = [["any", "Anywhere"], ["now", "📺 We can watch it now"], ["svc", "On our services"], ["own", "📀 We own it"]];
+  function loadFilters() {
+    try {
+      var f = JSON.parse(localStorage.getItem("movie-night-filters") || "null");
+      if (f) return {
+        len: +f.len || 0,
+        cert: +f.cert || 0,
+        where: f.where || "any"
+      };
+    } catch (e) {}
+    return {
+      len: 0,
+      cert: 0,
+      where: "any"
+    };
+  }
+  function saveFilters() {
+    try {
+      localStorage.setItem("movie-night-filters", JSON.stringify(session.f));
+    } catch (e) {}
+  }
+  function passFilters(m) {
+    var f = session.f;
+    if (f.len && !(m.info && m.info.rt && m.info.rt <= f.len)) return false;
+    if (f.cert) {
+      var l = certLevel(certOf(m));
+      if (!l || l > f.cert) return false;
+    }
+    if (f.where === "own" && !m.own) return false;
+    if (f.where === "svc" && !onOurServices(m)) return false;
+    if (f.where === "now" && !m.own && !onOurServices(m)) return false;
+    return true;
+  }
+  function filtersActive() {
+    var f = session.f;
+    return (f.len ? 1 : 0) + (f.cert ? 1 : 0) + (f.where !== "any" ? 1 : 0);
+  }
+  function renderFilters() {
+    var f = session.f;
+    var chips = function chips(list, key) {
+      return list.map(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+          v = _ref2[0],
+          n = _ref2[1];
+        return `<button type="button" class="chip${f[key] === v ? " on" : ""}" data-k="${key}" data-v="${v}">${n}</button>`;
+      }).join("");
+    };
+    $("fLen").innerHTML = chips(LEN, "len");
+    $("fCert").innerHTML = chips(CERT, "cert");
+    $("fWhere").innerHTML = chips(WHERE, "where");
+    var n = filtersActive();
+    $("filtersOn").innerHTML = n ? `<span class="filtersOn">${n} on</span>` : "";
+    var missing = movies().filter(function (m) {
+      return !m.hide && !m.info;
+    }).length;
+    var note = "";
+    if ((f.where === "svc" || f.where === "now") && !state.settings.services.length) note = "Pick your streaming services in the Family tab first. ";
+    if ((f.len || f.cert || f.where === "svc" || f.where === "now") && missing) note += state.settings.tmdb ? `${missing} movies haven’t been looked up yet, so they’re left out for now.` : "Run times, ratings and streaming need a TMDB key — see the Family tab.";
+    $("fNote").textContent = note;
+  }
+  $("filtersCard").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip[data-k]");
+    if (!b) return;
+    var k = b.dataset.k;
+    session.f[k] = k === "where" ? b.dataset.v : +b.dataset.v;
+    saveFilters();
+    resetPick();
+    renderFilters();
+    renderCats();
+  });
+  if (filtersActive()) $("filtersCard").open = true;
+  function whereHtml(info, mineOnly) {
+    if (!info || info.none) return "";
+    var out = (info.stream || []).filter(function (p) {
+      return !mineOnly || isMine(p.n);
+    }).map(function (p) {
+      return p.l ? `<span class="svc${isMine(p.n) ? " mine" : ""}" title="${esc(p.n)}"><img src="${IMG}w92${p.l}" alt="${esc(p.n)}"></span>` : `<span class="svcname${isMine(p.n) ? " mine" : ""}">${esc(p.n)}</span>`;
+    });
+    return out.join("");
+  }
+  function tmdbGet(path, params) {
+    return new Promise(function (resolve, reject) {
+      var key = state.settings.tmdb;
+      if (!key) {
+        reject({
+          code: "nokey"
+        });
+        return;
+      }
+      var q = Object.keys(params || {}).filter(function (k) {
+        return params[k] !== "" && params[k] != null;
+      }).map(function (k) {
+        return k + "=" + encodeURIComponent(params[k]);
+      });
+      var bearer = key.length > 60;
+      if (!bearer) q.push("api_key=" + encodeURIComponent(key));
+      var x = new XMLHttpRequest();
+      x.open("GET", "https://api.themoviedb.org/3" + path + "?" + q.join("&"));
+      x.setRequestHeader("Accept", "application/json");
+      if (bearer) x.setRequestHeader("Authorization", "Bearer " + key);
+      x.timeout = 15000;
+      x.onload = function () {
+        if (x.status === 401) return reject({
+          code: "badkey"
+        });
+        if (x.status === 429) return reject({
+          code: "slow"
+        });
+        if (x.status < 200 || x.status >= 300) return reject({
+          code: "http" + x.status
+        });
+        try {
+          resolve(JSON.parse(x.responseText));
+        } catch (e) {
+          reject({
+            code: "bad"
+          });
+        }
+      };
+      x.onerror = function () {
+        return reject({
+          code: "net"
+        });
+      };
+      x.ontimeout = function () {
+        return reject({
+          code: "net"
+        });
+      };
+      x.send();
+    });
+  }
+  var norm = function norm(t) {
+    return String(t || "").toLowerCase().replace(/\s*\((cartoon|animated)\)\s*/g, " ").replace(/&/g, "and").replace(/[^a-z0-9]+/g, " ").replace(/^(the|a|an) /, "").trim();
+  };
+  function searchTitle(m) {
+    return m.t.replace(/\s*\((cartoon|animated)\)\s*$/i, "");
+  }
+  function bestResult(results, m) {
+    if (!results.length) return null;
+    var want = norm(m.t);
+    var score = function score(r) {
+      var y = +(r.release_date || "").slice(0, 4);
+      var sc = 0;
+      if (norm(r.title) === want || norm(r.original_title) === want) sc += 10;
+      if (m.y && y === m.y) sc += 8;else if (m.y && Math.abs(y - m.y) === 1) sc += 4;
+      if (/\((cartoon|animated)\)/i.test(m.t) && (r.genre_ids || []).indexOf(16) > -1) sc += 5;
+      return sc + Math.min(3, (r.popularity || 0) / 20);
+    };
+    return results.slice().sort(function (a, b) {
+      return score(b) - score(a);
+    })[0];
+  }
+  function infoFromDetails(d) {
+    var rd = d.release_dates && d.release_dates.results || [];
+    var certFor = function certFor(cc) {
+      var x = rd.find(function (r) {
+        return r.iso_3166_1 === cc;
+      });
+      if (!x) return null;
+      var list = (x.release_dates || []).filter(function (z) {
+        return z.certification;
+      });
+      if (!list.length) return null;
+      var withDesc = list.find(function (z) {
+        return z.descriptors && z.descriptors.length;
+      }) || list[0];
+      return {
+        c: withDesc.certification,
+        d: withDesc.descriptors || []
+      };
+    };
+    var ca = certFor("CA"),
+      us = certFor("US");
+    var wpAll = d["watch/providers"] && d["watch/providers"].results || {};
+    var wp = wpAll.CA || {};
+    var prov = function prov(a) {
+      return (a || []).sort(function (x, y) {
+        return (x.display_priority || 0) - (y.display_priority || 0);
+      }).map(function (p) {
+        return {
+          n: p.provider_name,
+          l: p.logo_path || ""
+        };
+      });
+    };
+    var seen = {};
+    var stream = prov(wp.flatrate).concat(prov(wp.free), prov(wp.ads)).filter(function (p) {
+      return seen[p.n] ? false : seen[p.n] = 1;
+    });
+    var desc = ca && ca.d.length ? ca.d : us ? us.d : [];
+    return cleanInfo({
+      tid: d.id,
+      imdb: d.imdb_id || "",
+      p: d.poster_path || "",
+      rt: d.runtime || 0,
+      cert: ca ? ca.c : us ? us.c : "",
+      cc: ca ? "CA" : us ? "US" : "",
+      desc,
+      ov: d.overview || "",
+      stream,
+      rent: prov(wp.rent),
+      buy: prov(wp.buy),
+      link: wp.link || "",
+      at: today(),
+      _genres: (d.genres || []).map(function (g) {
+        return g.name;
+      }),
+      _kw: (d.keywords && d.keywords.keywords || []).map(function (k) {
+        return k.name;
+      })
+    });
+  }
+  function lookup(m) {
+    var tid = m.info && m.info.tid;
+    var details = function details(id) {
+      return tmdbGet("/movie/" + id, {
+        append_to_response: "release_dates,watch/providers,keywords",
+        language: "en-CA"
+      }).then(function (d) {
+        var info = infoFromDetails(d);
+        info._extra = {
+          genres: (d.genres || []).map(function (g) {
+            return g.name;
+          }),
+          kw: (d.keywords && d.keywords.keywords || []).map(function (k) {
+            return k.name.toLowerCase();
+          }),
+          title: d.title,
+          year: +(d.release_date || "").slice(0, 4)
+        };
+        return info;
+      });
+    };
+    if (tid) return details(tid);
+    return tmdbGet("/search/movie", {
+      query: searchTitle(m),
+      primary_release_year: m.y || "",
+      include_adult: "false",
+      language: "en-CA"
+    }).then(function (r) {
+      return r.results && r.results.length || !m.y ? r : tmdbGet("/search/movie", {
+        query: searchTitle(m),
+        include_adult: "false"
+      });
+    }).then(function (r) {
+      var best = bestResult(r.results || [], m);
+      return best ? details(best.id) : {
+        none: true,
+        at: today()
+      };
+    });
+  }
+  function saveInfo(m, info) {
+    var doc = {};
+    Object.keys(info).forEach(function (k) {
+      if (k.charAt(0) !== "_") doc[k] = info[k];
+    });
+    put("info", m.k, doc);
+  }
+  var look = {
+    queue: [],
+    busy: false,
+    done: 0,
+    total: 0,
+    err: ""
+  };
+  function stale(m, days) {
+    if (!m.info) return true;
+    var age = (Date.now() - new Date(m.info.at + "T12:00:00").getTime()) / 864e5;
+    return age > (m.info.none ? 30 : days);
+  }
+  function queueLookups(list, front, days) {
+    if (!state.settings.tmdb) return;
+    list.forEach(function (m) {
+      m._days = days == null ? 14 : days;
+      var i = look.queue.findIndex(function (x) {
+        return x.k === m.k;
+      });
+      if (i > -1) {
+        var old = look.queue.splice(i, 1)[0];
+        if (!m._after) m._after = old._after;
+        m._days = Math.min(m._days, old._days);
+      }
+      if (front) look.queue.unshift(m);else look.queue.push(m);
+    });
+    runQueue();
+  }
+  function runQueue() {
+    if (look.busy || !look.queue.length) {
+      tmdbStatus();
+      return;
+    }
+    look.busy = true;
+    tmdbStatus();
+    var m = look.queue.shift();
+    var cur = movieByKey(m.k);
+    if (!cur || cur.info && !stale(cur, m._days)) {
+      look.busy = false;
+      if (cur && m._after) m._after(cur.info);
+      setTimeout(runQueue, 0);
+      return;
+    }
+    m.info = cur.info;
+    lookup(m).then(function (info) {
+      saveInfo(m, info);
+      if (m._after) m._after(info);
+      look.done++;
+      look.err = "";
+      look.busy = false;
+      soon();
+      setTimeout(runQueue, 120);
+    }, function (err) {
+      look.busy = false;
+      var code = err && err.code;
+      if (code === "slow" || code === "net") {
+        look.queue.unshift(m);
+        look.err = code === "net" ? "Can’t reach TMDB — will keep trying." : "";
+        setTimeout(runQueue, 5000);
+      } else if (code === "badkey" || code === "nokey") {
+        look.err = "TMDB didn’t accept that key. Check it in the Family tab.";
+        look.queue = [];
+      } else {
+        look.done++;
+        setTimeout(runQueue, 300);
+      }
+      tmdbStatus();
+    });
+  }
+  function tmdbStatus() {
+    var el = $("tmdbStatus");
+    if (!el) return;
+    var all = movies(),
+      have = all.filter(function (m) {
+        return m.info && !m.info.none;
+      }).length,
+      none = all.filter(function (m) {
+        return m.info && m.info.none;
+      }).length;
+    var t = !state.settings.tmdb ? "No key yet. Get one free: make an account at themoviedb.org → Settings → API → Create (Personal use)." : `${have} of ${all.length} movies have posters and info` + (none ? `, ${none} couldn’t be found` : "") + ".";
+    if (look.queue.length || look.busy) t += ` Looking up… ${look.queue.length + (look.busy ? 1 : 0)} to go.`;
+    if (look.err) t += " " + look.err;
+    el.textContent = t;
+  }
+  function autoLookups() {
+    if (!state.settings.tmdb) return;
+    var all = movies().filter(function (m) {
+      return !m.hide;
+    });
+    queueLookups(all.filter(function (m) {
+      return !m.info;
+    }).concat(all.filter(function (m) {
+      return m.info && stale(m, 14);
+    })));
+  }
+  var GENRE_CAT = {
+    "Animation": "anim",
+    "Comedy": "fun",
+    "Adventure": "adv",
+    "Action": "adv",
+    "Fantasy": "magic",
+    "Science Fiction": "space",
+    "Music": "mus"
+  };
+  function guessCats(extra) {
+    var cats = [];
+    var add = function add(c) {
+      if (cats.indexOf(c) < 0) cats.push(c);
+    };
+    (extra.genres || []).forEach(function (g) {
+      if (GENRE_CAT[g]) add(GENRE_CAT[g]);
+    });
+    var kw = (extra.kw || []).join("|");
+    if (/christmas|santa claus/.test(kw)) add("xmas");
+    if (/halloween|ghost|witch|haunted|monster/.test(kw)) add("hall");
+    if (/superhero|super power/.test(kw)) add("hero");
+    if (/sport|hockey|baseball|football|basketball|soccer|olympic/.test(kw)) add("sport");
+    if (/musical/.test(kw)) add("mus");
+    if (/\b(dog|cat|horse|animal|penguin|dinosaur|bear|talking animal)\b/.test(kw)) add("ani");
+    if (extra.year && extra.year < 1985) add("classic");
+    return cats.length ? cats : ["fun"];
+  }
+  function ageFromCert(c) {
+    return [7, 4, 7, 11, 16][certLevel(c)];
+  }
+  function season() {
+    var d = new Date(),
+      m = d.getMonth() + 1,
+      day = d.getDate();
+    if (m === 12 || m === 11 || m === 1 && day <= 6) return "xmas";
+    if (m === 10 || m === 9 && day >= 20) return "hall";
+    return null;
+  }
+  function pool(catId, includeSeen, noFilters) {
+    var w = watchers();
+    return movies().filter(function (m) {
+      return !m.hide && (catId === "any" || m.cats.indexOf(catId) > -1) && okFor(m, w) && (includeSeen || !watchesOf(m.k).length) && (noFilters || passFilters(m));
+    });
+  }
+  function renderCrew() {
+    if (!state.people.length) {
+      $("crew").innerHTML = "";
+      $("crewHint").innerHTML = 'Add your family in the <button type="button" class="link" style="margin:0;padding:0" id="goFam">Family</button> tab so picks match the kids’ ages.';
+      $("goFam").onclick = function () {
+        return show("family");
+      };
+      return;
+    }
+    if (!session.who) session.who = new Set(state.people.map(function (p) {
+      return p.id;
+    }));
+    _toConsumableArray(session.who).forEach(function (id) {
+      if (!state.people.some(function (p) {
+        return p.id === id;
+      })) session.who.delete(id);
+    });
+    $("crew").innerHTML = state.people.map(function (p) {
+      return `<button type="button" class="chip${session.who.has(p.id) ? " on" : ""}" data-id="${esc(p.id)}">${esc(p.n || "?")}${p.b ? `<span class="age">${ageOf(p.b)}</span>` : ""}</button>`;
+    }).join("");
+    var w = watchers().filter(function (p) {
+      return p.b;
+    });
+    var youngest = w.length ? Math.min.apply(Math, _toConsumableArray(w.map(function (p) {
+      return ageOf(p.b);
+    }))) : null;
+    $("crewHint").textContent = !watchers().length ? "Tap who’s watching." : youngest == null ? "Grown-ups only — everything’s on the menu!" : `Picking movies suitable for age ${youngest}+.`;
+  }
+  $("crew").onclick = function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    var id = b.dataset.id;
+    if (session.who.has(id)) session.who.delete(id);else session.who.add(id);
+    resetPick();
+    renderPick();
+  };
+  function catTile(c, big) {
+    var unseen = pool(c.id, false).length,
+      total = pool(c.id, true).length;
+    var on = session.cat === c.id;
+    var sub = total === 0 ? "none for this crew" : unseen ? unseen + " to watch" : "all seen!";
+    if (big) {
+      var words = c.id === "xmas" ? ["It’s Christmas movie season!", "Tap for a festive pick"] : ["It’s spooky season!", "Tap for a Halloween pick"];
+      return `<button type="button" class="season ${c.id === "hall" ? "hall" : ""}${on ? " on" : ""}" data-cat="${c.id}"><span class="big">${c.e}</span><span><b>${words[0]}</b><span>${words[1]} · ${sub}</span></span></button>`;
+    }
+    return `<button type="button" class="cat${on ? " on" : ""}${total ? "" : " empty"}" data-cat="${esc(c.id)}"><span class="e">${c.e}</span><span class="n">${esc(c.n)}</span><span class="c">${sub}</span></button>`;
+  }
+  function renderCats() {
+    var s = season();
+    $("seasonSlot").innerHTML = s ? catTile(catInfo(s), true) : "";
+    $("cats").innerHTML = allCats().filter(function (c) {
+      return c.id !== s;
+    }).concat([ANY]).map(function (c) {
+      return catTile(c);
+    }).join("");
+  }
+  function onCat(e) {
+    var b = e.target.closest("[data-cat]");
+    if (!b) return;
+    session.cat = b.dataset.cat;
+    resetPick();
+    renderCats();
+    pick();
+  }
+  $("cats").onclick = onCat;
+  $("seasonSlot").onclick = onCat;
+  $("seenToggle").onchange = function (e) {
+    session.seen = e.target.checked;
+    resetPick();
+  };
+  function resetPick() {
+    session.rejected.clear();
+    session.plan = 0;
+    session.current = null;
+    $("marquee").hidden = true;
+    toast("");
+  }
+  function weighted(list) {
+    var ws = list.map(function (m) {
+      var avg = movieAvg(m.k),
+        seen = watchesOf(m.k).length;
+      var w = seen ? avg ? avg / 2.5 : 1 : 2;
+      if (m.star) w *= 3;
+      return w;
+    });
+    var r = Math.random() * ws.reduce(function (a, b) {
+      return a + b;
+    }, 0);
+    for (var i = 0; i < list.length; i++) {
+      r -= ws[i];
+      if (r <= 0) return list[i];
+    }
+    return list[list.length - 1];
+  }
+  var spinTimer = null;
+  function pick() {
+    if (!session.cat) {
+      toast("Pick a kind of movie first 👆");
+      return;
+    }
+    if (!watchers().length && state.people.length) {
+      toast("Tap who’s watching first.");
+      return;
+    }
+    var p = pool(session.cat, session.seen).filter(function (m) {
+      return !session.rejected.has(m.k);
+    });
+    var rewatch = false;
+    if (!p.length && !session.seen) {
+      p = pool(session.cat, true).filter(function (m) {
+        return !session.rejected.has(m.k);
+      });
+      rewatch = p.length > 0;
+    }
+    var c = catInfo(session.cat);
+    if (!p.length) {
+      var any = pool(session.cat, true).length;
+      $("marquee").hidden = true;
+      toast(any ? `That’s every ${c.n} movie we’ve got for this crew! Try another kind, or add one in the Library.` : `No ${c.n} movies fit this crew yet. Add one in the Library!`);
+      session.rejected.clear();
+      session.plan = 0;
+      return;
+    }
+    var choice = weighted(p);
+    session.current = choice.k;
+    var label = "Plan " + String.fromCharCode(65 + Math.min(session.plan, 25));
+    var mq = $("marquee");
+    mq.hidden = false;
+    mq.className = "marquee spin";
+    $("planLabel").textContent = label;
+    $("pickMeta").textContent = "";
+    $("pickSeen").textContent = "";
+    $("pickWarn").textContent = "";
+    $("pickWhere").innerHTML = "";
+    $("pickPoster").hidden = true;
+    $("pickBtns").style.visibility = "hidden";
+    $("neverBtn").style.visibility = "hidden";
+    toast(rewatch ? `You’ve seen all the ${c.n} ones — here’s a rewatch!` : "");
+    var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var all = pool(session.cat, true);
+    var n = 0;
+    clearInterval(spinTimer);
+    var finish = function finish() {
+      clearInterval(spinTimer);
+      $("pickTitle").textContent = choice.t;
+      var inf = choice.info && !choice.info.none ? choice.info : null;
+      var pp = $("pickPoster");
+      if (inf && inf.p) {
+        pp.src = IMG + "w342" + inf.p;
+        pp.alt = "Poster for " + choice.t;
+        pp.hidden = false;
+      } else pp.hidden = true;
+      $("pickMeta").textContent = [choice.y || "", certOf(choice), inf && runtimeText(inf.rt), "Age " + choice.a + "+"].filter(Boolean).join(" · ") + "  " + choice.cats.map(function (x) {
+        return catInfo(x).e;
+      }).join(" ");
+      $("pickWarn").textContent = inf && inf.desc.length ? "Heads-up: " + inf.desc.join(", ") : "";
+      $("pickWhere").innerHTML = (choice.own ? '<span class="own">📀 We own it</span> ' : "") + whereHtml(inf);
+      if (choice.info && stale(choice, 7)) queueLookups([Object.assign({}, choice, {
+        _after: function _after() {
+          if (session.current === choice.k) $("pickWhere").innerHTML = (choice.own ? '<span class="own">📀 We own it</span> ' : "") + whereHtml(state.info[choice.k]);
+        }
+      })], true, 7);
+      var ws = watchesOf(choice.k),
+        avg = movieAvg(choice.k);
+      $("pickSeen").textContent = ws.length ? `Seen ${ws.length === 1 ? "once" : ws.length + " times"} · last ${prettyDate(ws[0].d)}${avg ? " · " + faceFor(avg) : ""}` : choice.star ? "⭐ On your must-watch list" : "A new one for us!";
+      $("planBBtn").textContent = "Plan " + String.fromCharCode(66 + Math.min(session.plan, 24)) + " →";
+      $("pickBtns").style.visibility = "";
+      $("neverBtn").style.visibility = "";
+      mq.className = "marquee land";
+      mq.scrollIntoView({
+        behavior: reduce ? "auto" : "smooth",
+        block: "nearest"
+      });
+    };
+    if (reduce || all.length < 2) {
+      finish();
+      return;
+    }
+    spinTimer = setInterval(function () {
+      $("pickTitle").textContent = all[Math.floor(Math.random() * all.length)].t;
+      if (++n > 14) finish();
+    }, 85);
+  }
+  $("goBtn").onclick = function () {
+    session.rejected.clear();
+    session.plan = 0;
+    pick();
+  };
+  $("planBBtn").onclick = function () {
+    if (session.current) session.rejected.add(session.current);
+    session.plan++;
+    pick();
+  };
+  $("neverBtn").onclick = function () {
+    var m = movieByKey(session.current);
+    if (!m) return;
+    setTweak(m, {
+      hide: true
+    });
+    session.rejected.add(m.k);
+    session.plan++;
+    pick();
+    toast(`Okay, “${m.t}” won’t come up again. (Bring it back from the Library.)`);
+  };
+  $("watchBtn").onclick = function () {
+    if (!canWrite) {
+      toast("This account can only view.");
+      return;
+    }
+    var m = movieByKey(session.current);
+    if (!m) return;
+    var id = uid();
+    put("watches", id, {
+      k: m.k,
+      t: m.t,
+      d: today(),
+      cat: session.cat === "any" ? "" : session.cat,
+      who: watchers().map(function (p) {
+        return p.id;
+      }),
+      r: {}
+    });
+    $("marquee").hidden = true;
+    session.current = null;
+    toast(`Enjoy “${m.t}”! 🍿 Come back after to rate it.`);
+    renderAll();
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+  function rateBlock(id, w) {
+    var people = (w.who.length ? w.who : state.people.map(function (p) {
+      return p.id;
+    })).map(function (i) {
+      return state.people.find(function (p) {
+        return p.id === i;
+      });
+    }).filter(Boolean);
+    if (!people.length) return '<p class="hint">Add your family in the Family tab to rate.</p>';
+    return '<div class="rate">' + people.map(function (p) {
+      var v = w.r[p.id] || 0;
+      return `<div class="who">${esc(p.n || "?")}</div><div class="faces" data-w="${esc(id)}" data-p="${esc(p.id)}">` + FACES.map(function (f, i) {
+        return `<button type="button" class="face${v === i + 1 ? " on" : ""}" data-v="${i + 1}" aria-label="${FACE_WORDS[i]}" title="${FACE_WORDS[i]}">${f}</button>`;
+      }).join("") + `</div><div class="facelabel">${v ? FACE_WORDS[v - 1] : ""}</div>`;
+    }).join("") + "</div>";
+  }
+  function onFace(e) {
+    var b = e.target.closest(".face");
+    if (!b) return false;
+    var box = b.parentNode,
+      id = box.dataset.w,
+      pid = box.dataset.p,
+      v = +b.dataset.v;
+    var w = state.watches[id];
+    if (!w) return true;
+    if (!canWrite) {
+      toast("This account can only view.");
+      return true;
+    }
+    var r = Object.assign({}, w.r);
+    if (r[pid] === v) delete r[pid];else r[pid] = v;
+    put("watches", id, Object.assign({}, w, {
+      r
+    }));
+    _toConsumableArray(box.children).forEach(function (x) {
+      return x.className = "face" + (r[pid] === +x.dataset.v ? " on" : "");
+    });
+    box.nextElementSibling.textContent = r[pid] ? FACE_WORDS[r[pid] - 1] : "";
+    return true;
+  }
+  function renderBanners() {
+    var html = "";
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 14);
+    var pending = Object.entries(state.watches).filter(function (_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2),
+        id = _ref4[0],
+        w = _ref4[1];
+      if (w.d < iso(cutoff)) return false;
+      var ids = w.who.length ? w.who : state.people.map(function (p) {
+        return p.id;
+      });
+      return ids.some(function (i) {
+        return state.people.some(function (p) {
+          return p.id === i;
+        }) && !w.r[i];
+      });
+    }).sort(function (a, b) {
+      return a[1].d < b[1].d ? 1 : -1;
+    }).slice(0, 2);
+    pending.forEach(function (_ref5) {
+      var _ref6 = _slicedToArray(_ref5, 2),
+        id = _ref6[0],
+        w = _ref6[1];
+      html += `<div class="card"><h2>How was “${esc(w.t)}”?</h2><p class="hint">${w.d === today() ? "Tonight" : prettyDate(w.d)} · tap a face for each person</p>${rateBlock(id, w)}</div>`;
+    });
+    if (kids().length) {
+      var now = new Date(),
+        since = new Date();
+      since.setDate(since.getDate() - 120);
+      movies().filter(function (m) {
+        return m.star && !m.hide && !watchesOf(m.k).length;
+      }).forEach(function (m) {
+        var u = everyoneUnlock(m);
+        if (u.date && u.date <= now && u.date >= since) html += `<div class="banner"><b>🔓 Unlocked: ${esc(m.t)}</b>${esc(u.who.n || "Everyone")} is old enough now — it’s one from your must-watch list.</div>`;
+      });
+    }
+    $("banners").innerHTML = html;
+  }
+  $("banners").onclick = function (e) {
+    return onFace(e);
+  };
+  function renderPick() {
+    renderCrew();
+    renderFilters();
+    renderCats();
+    renderBanners();
+  }
+  function renderWatched() {
+    var all = Object.entries(state.watches).sort(function (a, b) {
+      return a[1].d < b[1].d ? 1 : a[1].d > b[1].d ? -1 : 0;
+    });
+    var year = String(new Date().getFullYear());
+    var uniq = new Set(all.map(function (x) {
+      return x[1].k;
+    })).size;
+    var catCount = {};
+    all.forEach(function (_ref7) {
+      var _ref8 = _slicedToArray(_ref7, 2),
+        w = _ref8[1];
+      var m = movieByKey(w.k);
+      (w.cat ? [w.cat] : m ? m.cats.slice(0, 1) : []).forEach(function (c) {
+        return catCount[c] = (catCount[c] || 0) + 1;
+      });
+    });
+    var topCat = Object.keys(catCount).sort(function (a, b) {
+      return catCount[b] - catCount[a];
+    })[0];
+    $("stats").innerHTML = `<div class="stat"><b>${all.length}</b><span>movie nights</span></div>` + `<div class="stat"><b>${all.filter(function (x) {
+      return x[1].d.slice(0, 4) === year;
+    }).length}</b><span>this year</span></div>` + `<div class="stat"><b>${uniq}</b><span>different movies</span></div>` + `<div class="stat"><b>${topCat ? catInfo(topCat).e : "–"}</b><span>${topCat ? esc(catInfo(topCat).n) : "favourite kind"}</span></div>`;
+    var byMovie = {};
+    all.forEach(function (_ref9) {
+      var _ref0 = _slicedToArray(_ref9, 2),
+        w = _ref0[1];
+      if (!byMovie[w.k]) byMovie[w.k] = {
+        t: w.t,
+        k: w.k
+      };
+    });
+    var favs = Object.values(byMovie).map(function (x) {
+      return Object.assign(x, {
+        avg: movieAvg(x.k)
+      });
+    }).filter(function (x) {
+      return x.avg;
+    }).sort(function (a, b) {
+      return b.avg - a.avg;
+    }).slice(0, 5);
+    $("favs").innerHTML = favs.length ? favs.map(function (f) {
+      var ppl = state.people.map(function (p) {
+        var v = [];
+        watchesOf(f.k).forEach(function (w) {
+          if (w.r[p.id]) v.push(w.r[p.id]);
+        });
+        return v.length ? esc(p.n) + " " + faceFor(v.reduce(function (a, b) {
+          return a + b;
+        }, 0) / v.length) : "";
+      }).filter(Boolean).join(" · ");
+      return `<li data-k="${esc(f.k)}"><span class="main"><span class="t">${esc(f.t)}</span><span class="s">${ppl}</span></span><span class="r">${faceFor(f.avg)}</span></li>`;
+    }).join("") : '<p class="empty">Rate a few movies and your top picks will show up here.</p>';
+    var used = new Set(all.map(function (_ref1) {
+      var _ref10 = _slicedToArray(_ref1, 2),
+        w = _ref10[1];
+      return w.cat;
+    }).filter(Boolean));
+    $("watchFilter").innerHTML = used.size ? [`<button type="button" class="chip${session.watchCat === "all" ? " on" : ""}" data-c="all">All</button>`].concat(_toConsumableArray(used).map(function (c) {
+      return `<button type="button" class="chip${session.watchCat === c ? " on" : ""}" data-c="${esc(c)}">${catInfo(c).e} ${esc(catInfo(c).n)}</button>`;
+    })).join("") : "";
+    var shown = all.filter(function (_ref11) {
+      var _ref12 = _slicedToArray(_ref11, 2),
+        w = _ref12[1];
+      return session.watchCat === "all" || w.cat === session.watchCat;
+    });
+    $("watchList").innerHTML = shown.length ? shown.map(function (_ref13) {
+      var _ref14 = _slicedToArray(_ref13, 2),
+        id = _ref14[0],
+        w = _ref14[1];
+      var faces = (w.who.length ? w.who : Object.keys(w.r)).map(function (i) {
+        return w.r[i] ? FACES[w.r[i] - 1] : "";
+      }).join("");
+      var who = w.who.map(function (i) {
+        return (state.people.find(function (p) {
+          return p.id === i;
+        }) || {}).n;
+      }).filter(Boolean).join(", ");
+      return `<li data-w="${esc(id)}"><span class="main"><span class="t">${esc(w.t)}</span><span class="s">${prettyDate(w.d)}${w.cat ? " · " + catInfo(w.cat).e : ""}${who ? " · " + esc(who) : ""}</span></span><span class="r">${faces || '<span class="badge">rate</span>'}</span></li>`;
+    }).join("") : '<p class="empty">Nothing yet — pick a movie and hit “Let’s watch it!”</p>';
+  }
+  $("watchFilter").onclick = function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    session.watchCat = b.dataset.c;
+    renderWatched();
+  };
+  $("watchList").onclick = function (e) {
+    var li = e.target.closest("li[data-w]");
+    if (li) openWatchSheet(li.dataset.w);
+  };
+  $("favs").onclick = function (e) {
+    var li = e.target.closest("li[data-k]");
+    if (li) openMovieSheet(li.dataset.k);
+  };
+  var canDownload = "download" in document.createElement("a");
+  if (canDownload) $("csvBtn").hidden = false;
+  function exportRows() {
+    return Object.values(state.watches).sort(function (a, b) {
+      return a.d < b.d ? -1 : 1;
+    });
+  }
+  function csvCell(s) {
+    s = String(s == null ? "" : s);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  $("csvBtn").onclick = function () {
+    var rows = exportRows();
+    if (!rows.length) {
+      $("exportMsg").textContent = "Watch a movie first!";
+      return;
+    }
+    var head = ["Date", "Movie", "Kind", "Watched by"].concat(state.people.map(function (p) {
+      return p.n + " rating";
+    }));
+    var lines = [head.map(csvCell).join(",")].concat(rows.map(function (w) {
+      return [w.d, w.t, w.cat ? catInfo(w.cat).n : "", w.who.map(function (i) {
+        return (state.people.find(function (p) {
+          return p.id === i;
+        }) || {}).n;
+      }).filter(Boolean).join(" & ")].concat(state.people.map(function (p) {
+        return w.r[p.id] || "";
+      })).map(csvCell).join(",");
+    }));
+    try {
+      var url = URL.createObjectURL(new Blob([lines.join("\n") + "\n"], {
+        type: "text/csv"
+      }));
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "movie-nights-" + today() + ".csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () {
+        return URL.revokeObjectURL(url);
+      }, 5000);
+      $("exportMsg").textContent = "Spreadsheet saved to your downloads.";
+    } catch (e) {
+      $("exportMsg").textContent = "Downloads don’t work here — use Copy instead.";
+    }
+  };
+  $("copyBtn").onclick = function () {
+    var rows = exportRows();
+    if (!rows.length) {
+      $("exportMsg").textContent = "Watch a movie first!";
+      return;
+    }
+    var text = "Our movie nights\n\n" + rows.map(function (w) {
+      return prettyDate(w.d) + " – " + w.t + (Object.keys(w.r).length ? "  " + Object.keys(w.r).map(function (i) {
+        var p = state.people.find(function (p) {
+          return p.id === i;
+        });
+        return p ? p.n + " " + FACES[w.r[i] - 1] : "";
+      }).filter(Boolean).join(" ") : "");
+    }).join("\n");
+    var box = $("copyBox");
+    box.value = text;
+    var fallback = function fallback() {
+      box.style.display = "block";
+      box.focus();
+      box.setSelectionRange(0, text.length);
+      $("exportMsg").textContent = "Select the text and copy it.";
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          box.style.display = "none";
+          $("exportMsg").textContent = "Copied!";
+        }, fallback);
+        return;
+      }
+    } catch (e) {}
+    fallback();
+  };
+  function libRow(m, extra) {
+    var ws = watchesOf(m.k),
+      avg = movieAvg(m.k);
+    var locked = kids().length && !okFor(m, kids());
+    var inf = m.info && !m.info.none ? m.info : null;
+    var thumb = inf && inf.p ? `<img class="thumb" src="${IMG}w92${inf.p}" alt="" loading="lazy">` : `<span class="thumb none">${m.cats.length ? catInfo(m.cats[0]).e : "🎬"}</span>`;
+    var bits = [m.y || "", certOf(m), inf && runtimeText(inf.rt)].filter(Boolean).join(" · ");
+    return `<li data-k="${esc(m.k)}"><button type="button" class="star${m.star ? " on" : ""}" data-star="${esc(m.k)}" aria-label="Must-watch">⭐</button>${thumb}` + `<span class="main"><span class="t">${esc(m.t)}${m.hide ? " <span class='badge'>hidden</span>" : ""}</span>` + `<span class="s">${bits} ${m.cats.map(function (c) {
+      return catInfo(c).e;
+    }).join("")}${extra ? " · " + extra : ""}${ws.length ? " · seen " + (ws.length > 1 ? ws.length + "×" : "✓") + " " + faceFor(avg) : ""}</span>` + `<span class="s">${m.own ? '<span class="own">📀 Ours</span> ' : ""}${whereHtml(inf, true)}</span></span>` + `<span class="badge${locked ? " lock" : ""}">${locked ? "🔒 " : ""}${m.a}+</span></li>`;
+  }
+  function renderLibrary() {
+    var all = movies();
+    var k = kids();
+    if (!k.length) $("someday").innerHTML = '<p class="empty">Add the kids’ birth months in the Family tab to see this.</p>';else {
+      var now = new Date();
+      var _list = all.filter(function (m) {
+        return !m.hide && !okFor(m, k);
+      }).map(function (m) {
+        return Object.assign(m, {
+          u: everyoneUnlock(m)
+        });
+      }).sort(function (a, b) {
+        return b.star - a.star || a.u.date - b.u.date || a.t.localeCompare(b.t);
+      });
+      $("someday").innerHTML = _list.length ? _list.slice(0, 40).map(function (m) {
+        var ready = k.filter(function (p) {
+          return ageOf(p.b) >= m.a;
+        }).map(function (p) {
+          return p.n;
+        });
+        var d = m.u.date;
+        var when = `everyone from ${MONTHS[d.getMonth()]} ${d.getFullYear()}` + (ready.length ? ` · ${esc(ready.join(" & "))} now` : "");
+        return libRow(m, when);
+      }).join("") + (_list.length > 40 ? `<p class="empty">…and ${_list.length - 40} more in All movies.</p>` : "") : '<p class="empty">Everything in the library suits the whole crew already!</p>';
+    }
+    var cats = allCats();
+    $("libFilter").innerHTML = [["all", "All"], ["star", "⭐ Must-watch"], ["own", "📀 We own it"], ["svc", "📺 On our services"], ["unseen", "Not seen yet"], ["hidden", "Hidden"]].map(function (_ref15) {
+      var _ref16 = _slicedToArray(_ref15, 2),
+        id = _ref16[0],
+        n = _ref16[1];
+      return `<button type="button" class="chip${session.libCat === id ? " on" : ""}" data-c="${id}">${n}</button>`;
+    }).join("") + cats.map(function (c) {
+      return `<button type="button" class="chip${session.libCat === c.id ? " on" : ""}" data-c="${esc(c.id)}">${c.e} ${esc(c.n)}</button>`;
+    }).join("");
+    var q = $("search").value.trim().toLowerCase();
+    var f = session.libCat;
+    var list = all.filter(function (m) {
+      return (f === "hidden" ? m.hide : f === "all" || f === "star" || f === "own" || f === "unseen" || !m.hide) && (f === "all" || f === "hidden" || (f === "star" ? m.star : f === "own" ? m.own : f === "svc" ? onOurServices(m) : f === "unseen" ? !watchesOf(m.k).length : m.cats.indexOf(f) > -1)) && (!q || m.t.toLowerCase().indexOf(q) > -1);
+    }).sort(function (a, b) {
+      return a.t.replace(/^(the|a) /i, "").localeCompare(b.t.replace(/^(the|a) /i, ""));
+    });
+    $("libList").innerHTML = list.length ? list.map(function (m) {
+      return libRow(m);
+    }).join("") : '<p class="empty">No movies match.</p>';
+    $("libCount").textContent = list.length + (list.length === 1 ? " movie" : " movies");
+  }
+  $("search").oninput = function () {
+    return renderLibrary();
+  };
+  $("libFilter").onclick = function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    session.libCat = b.dataset.c;
+    renderLibrary();
+  };
+  function libClick(e) {
+    var s = e.target.closest("[data-star]");
+    if (s) {
+      var m = movieByKey(s.dataset.star);
+      if (m) setTweak(m, {
+        star: !m.star
+      });
+      renderAll();
+      return;
+    }
+    var li = e.target.closest("li[data-k]");
+    if (li) openMovieSheet(li.dataset.k);
+  }
+  $("libList").onclick = libClick;
+  $("someday").onclick = libClick;
+  function setTweak(m, change) {
+    if (!canWrite) {
+      toast("This account can only view.");
+      return;
+    }
+    var cur = Object.assign({}, state.tweaks[m.k] || {}, change);
+    var doc = {};
+    if (cur.a != null && cur.a !== m.origA && !m.custom) doc.a = cur.a;
+    if (cur.star) doc.star = true;
+    if (cur.hide) doc.hide = true;
+    if (cur.own) doc.own = true;
+    var id = m.k;
+    if (Object.keys(doc).length) put("tweaks", id, doc);else if (state.tweaks[id]) del("tweaks", id);
+  }
+  function yearOptions(sel) {
+    var y = new Date().getFullYear();
+    var o = `<option value=""${sel ? "" : " selected"}>Grown-up</option>`;
+    for (var i = y; i >= y - 18; i--) o += `<option value="${i}"${sel == i ? " selected" : ""}>Born ${i}</option>`;
+    return o;
+  }
+  function monthOptions(sel) {
+    return MONTHS.map(function (m, i) {
+      return `<option value="${pad(i + 1)}"${sel === pad(i + 1) ? " selected" : ""}>${m}</option>`;
+    }).join("");
+  }
+  function renderFamily(force) {
+    if (!force && $("v-family").contains(document.activeElement) && document.activeElement.tagName !== "BUTTON") return;
+    $("people").innerHTML = state.people.length ? state.people.map(function (p) {
+      var _ref17 = p.b ? p.b.split("-") : ["", "01"],
+        _ref18 = _slicedToArray(_ref17, 2),
+        by = _ref18[0],
+        bm = _ref18[1];
+      return `<div class="p" data-id="${esc(p.id)}"><input type="text" value="${esc(p.n)}" placeholder="Name" maxlength="30" data-f="n" aria-label="Name">` + `<select data-f="y" aria-label="Birth year">${yearOptions(by)}</select>` + `<select data-f="m" aria-label="Birth month"${p.b ? "" : " hidden"}>${monthOptions(bm)}</select>` + `<span class="agebit">${p.b ? "age " + ageOf(p.b) : ""}</span>` + `<button type="button" class="btn danger" data-f="del">Remove</button></div>`;
+    }).join("") : '<p class="empty">No one yet. Add each kid (and the grown-ups, so they can rate too!).</p>';
+  }
+  function personFromRow(row) {
+    var n = row.querySelector('[data-f="n"]').value.trim().slice(0, 30);
+    var y = row.querySelector('[data-f="y"]').value,
+      m = row.querySelector('[data-f="m"]').value;
+    return {
+      id: row.dataset.id,
+      n,
+      b: y ? y + "-" + m : ""
+    };
+  }
+  $("people").addEventListener("change", function (e) {
+    var row = e.target.closest(".p");
+    if (!row || !canWrite) return;
+    var np = personFromRow(row);
+    state.people = state.people.map(function (p) {
+      return p.id === np.id ? np : p;
+    });
+    savePeople();
+    if (e.target.tagName === "SELECT") e.target.blur();
+    renderFamily(e.target.tagName === "SELECT");
+    renderPick();
+  });
+  $("people").addEventListener("click", function (e) {
+    var b = e.target.closest('[data-f="del"]');
+    if (!b) return;
+    if (!b.classList.contains("armed")) {
+      b.classList.add("armed");
+      b.textContent = "Tap again";
+      setTimeout(function () {
+        b.classList.remove("armed");
+        b.textContent = "Remove";
+      }, 4000);
+      return;
+    }
+    var id = b.closest(".p").dataset.id;
+    state.people = state.people.filter(function (p) {
+      return p.id !== id;
+    });
+    savePeople();
+    document.activeElement && document.activeElement.blur();
+    renderAll();
+  });
+  $("addPerson").onclick = function () {
+    if (!canWrite) {
+      toast("This account can only view.");
+      return;
+    }
+    var p = {
+      id: uid(),
+      n: "",
+      b: ""
+    };
+    state.people = state.people.concat([p]);
+    if (session.who) session.who.add(p.id);
+    savePeople();
+    renderFamily(true);
+    var inp = $("people").querySelector(`[data-id="${p.id}"] input`);
+    if (inp) inp.focus();
+  };
+  var veil = $("veil"),
+    sheet = $("sheet");
+  function openSheet(html) {
+    sheet.innerHTML = html;
+    veil.className = "veil show";
+  }
+  function closeSheet() {
+    veil.className = "veil";
+    sheet.innerHTML = "";
+    renderAll();
+  }
+  veil.onclick = function (e) {
+    if (e.target === veil) closeSheet();
+  };
+  function twoTap(btn, armedText, fn) {
+    var orig = btn.textContent;
+    btn.onclick = function () {
+      if (btn.classList.contains("armed")) {
+        fn();
+        return;
+      }
+      btn.classList.add("armed");
+      btn.textContent = armedText;
+      setTimeout(function () {
+        btn.classList.remove("armed");
+        btn.textContent = orig;
+      }, 4000);
+    };
+  }
+  function openMovieSheet(k) {
+    var m = movieByKey(k);
+    if (!m) return;
+    var age = m.a;
+    var cats = m.cats.slice();
+    var ws = watchesOf(k),
+      avg = movieAvg(k);
+    var k2 = kids();
+    var ageNote = function ageNote() {
+      if (!k2.length) return "";
+      var ok = k2.filter(function (p) {
+          return ageOf(p.b) >= age;
+        }).map(function (p) {
+          return p.n;
+        }),
+        not = k2.filter(function (p) {
+          return ageOf(p.b) < age;
+        }).map(function (p) {
+          return p.n;
+        });
+      return not.length ? `Not yet for ${esc(not.join(" & "))}` + (ok.length ? ` · OK for ${esc(ok.join(" & "))}` : "") : "OK for everyone";
+    };
+    var infoHtml = function infoHtml() {
+      var inf = state.info[k];
+      if (!inf) return state.settings.tmdb ? '<p class="small">Looking up poster and streaming…</p>' : '<p class="small">Add a TMDB key in the Family tab to see the poster, run time and where to stream.</p>';
+      if (inf.none) return '<p class="small">Couldn’t find this one on TMDB. <button type="button" class="link" id="reLook" style="margin:0;padding:0">Try again</button></p>';
+      var where = function where(label, list) {
+        return list && list.length ? `<p class="small" style="margin:6px 0 2px"><b>${label}</b></p>` + list.map(function (p) {
+          return `<span class="svcname${isMine(p.n) ? " mine" : ""}">${esc(p.n)}</span>`;
+        }).join("") : "";
+      };
+      var any = inf.stream.length || inf.rent.length || inf.buy.length;
+      return (inf.p ? `<img class="poster" src="${IMG}w342${inf.p}" alt="Poster for ${esc(m.t)}">` : "") + `<p class="hint" style="margin-top:10px">${[certOf(m) && certOf(m) + (inf.cc === "CA" ? " (Canada)" : ""), runtimeText(inf.rt)].filter(Boolean).join(" · ")}</p>` + (inf.desc.length ? `<p class="warnings">⚠️ ${esc(inf.desc.join(", "))}</p>` : "") + (inf.ov ? `<p style="margin:8px 0 0">${esc(inf.ov)}</p>` : "") + (inf.imdb ? `<p class="ext" style="margin:8px 0 0"><a href="https://www.imdb.com/title/${inf.imdb}/parentalguide" target="_blank" rel="noopener">IMDb Parents Guide</a><a href="https://www.imdb.com/title/${inf.imdb}/" target="_blank" rel="noopener">IMDb page</a></p>` : "") + `<label class="l">Where to watch in Canada</label>` + (any ? where("Streaming", inf.stream) + where("Rent", inf.rent) + where("Buy", inf.buy) : '<p class="small">Not streaming anywhere right now.</p>') + (inf.link ? `<p class="ext small" style="margin:6px 0 0"><a href="${esc(inf.link)}" target="_blank" rel="noopener">More options</a> <span class="small">· updated ${prettyDate(inf.at)}</span></p>` : "");
+    };
+    var catChips = function catChips() {
+      return allCats().map(function (c) {
+        return `<button type="button" class="chip${cats.indexOf(c.id) > -1 ? " on" : ""}" data-c="${esc(c.id)}">${c.e} ${esc(c.n)}</button>`;
+      }).join("");
+    };
+    openSheet(`<h2>${esc(m.t)}</h2><p class="hint">${[m.y || "", m.cats.map(function (c) {
+      return catInfo(c).e;
+    }).join(" ")].filter(Boolean).join(" · ")}</p>
+    <div id="infoBox">${infoHtml()}</div>
+    <p class="hint" style="margin-top:10px">${ws.length ? `Watched ${ws.length === 1 ? "once" : ws.length + " times"}, last ${prettyDate(ws[0].d)} ${faceFor(avg)}` : "Not watched yet"}</p>
+    <label class="l">Suitable from age${m.custom ? "" : ` <span class="hint" style="font-weight:500">(our suggestion: ${m.origA}+)</span>`}</label>
+    <div class="stepper"><button type="button" id="ageDn">−</button><b id="ageV">${age}+</b><button type="button" id="ageUp">+</button></div>
+    <p class="hint" id="ageNote">${ageNote()}</p>
+    ${m.custom ? `<label class="l">What kind of movie?</label><div class="chips" id="mvCats">${catChips()}</div>` : ""}
+    <label class="toggle"><input type="checkbox" id="ownIn"${m.own ? " checked" : ""}> 📀 We own it (DVD, Blu-ray or digital)</label>
+    <label class="toggle"><input type="checkbox" id="starIn"${m.star ? " checked" : ""}> ⭐ On our must-watch list</label>
+    <label class="toggle"><input type="checkbox" id="hideIn"${m.hide ? " checked" : ""}> Hide from the picker</label>
+    <div class="row"><button type="button" class="btn" id="logBtn">🍿 We watched this</button>${m.custom ? '<button type="button" class="btn danger" id="delMovie">Delete</button>' : ""}<button type="button" class="btn primary right" id="doneBtn">Done</button></div>`);
+    var wireInfo = function wireInfo() {
+      var r = $("reLook");
+      if (r) r.onclick = function () {
+        del("info", k);
+        $("infoBox").innerHTML = infoHtml();
+        queueLookups([Object.assign(movieByKey(k), {
+          _after: refreshInfo
+        })], true, 0);
+      };
+    };
+    var refreshInfo = function refreshInfo() {
+      if ($("infoBox")) {
+        $("infoBox").innerHTML = infoHtml();
+        wireInfo();
+      }
+    };
+    wireInfo();
+    if (state.settings.tmdb && (!m.info || stale(m, 7))) queueLookups([Object.assign({}, m, {
+      _after: refreshInfo
+    })], true, 7);
+    if (m.custom) $("mvCats").onclick = function (e) {
+      var b = e.target.closest(".chip");
+      if (!b) return;
+      var c = b.dataset.c,
+        i = cats.indexOf(c);
+      if (i > -1) cats.splice(i, 1);else cats.push(c);
+      $("mvCats").innerHTML = catChips();
+    };
+    var setAge = function setAge(a) {
+      age = Math.max(0, Math.min(18, a));
+      $("ageV").textContent = age + "+";
+      $("ageNote").innerHTML = ageNote();
+    };
+    $("ageDn").onclick = function () {
+      return setAge(age - 1);
+    };
+    $("ageUp").onclick = function () {
+      return setAge(age + 1);
+    };
+    var save = function save() {
+      var star = $("starIn").checked,
+        hide = $("hideIn").checked,
+        own = $("ownIn").checked;
+      if (m.custom) {
+        if (age !== m.a || cats.join() !== m.cats.join()) put("custom", m.id, customToDoc(Object.assign({}, m, {
+          a: age,
+          cats: cats.length ? cats : m.cats
+        })));
+        if (star !== m.star || hide !== m.hide || own !== m.own) setTweak(m, {
+          star,
+          hide,
+          own
+        });
+      } else if (age !== m.a || star !== m.star || hide !== m.hide || own !== m.own) setTweak(m, {
+        a: age,
+        star,
+        hide,
+        own
+      });
+    };
+    $("doneBtn").onclick = function () {
+      save();
+      closeSheet();
+    };
+    $("logBtn").onclick = function () {
+      save();
+      var id = uid();
+      put("watches", id, {
+        k: m.k,
+        t: m.t,
+        d: today(),
+        cat: "",
+        who: state.people.map(function (p) {
+          return p.id;
+        }),
+        r: {}
+      });
+      openWatchSheet(id);
+    };
+    if (m.custom) twoTap($("delMovie"), "Tap again to delete", function () {
+      del("custom", m.id);
+      if (state.tweaks[m.k]) del("tweaks", m.k);
+      if (state.info[m.k]) del("info", m.k);
+      closeSheet();
+    });
+  }
+  function openWatchSheet(id) {
+    var w0 = state.watches[id];
+    if (!w0) return;
+    var w = JSON.parse(JSON.stringify(w0));
+    if (!w.who.length) w.who = state.people.map(function (p) {
+      return p.id;
+    });
+    var _draw = function draw() {
+      openSheet(`<h2>${esc(w.t)}</h2>
+      <label class="l" for="wDate">When did we watch it?</label><input type="date" id="wDate" value="${w.d}" max="${today()}">
+      <label class="l">Who watched?</label><div class="chips" id="wWho">${state.people.map(function (p) {
+        return `<button type="button" class="chip${w.who.indexOf(p.id) > -1 ? " on" : ""}" data-id="${esc(p.id)}">${esc(p.n || "?")}</button>`;
+      }).join("")}</div>
+      <label class="l">How did everyone rate it?</label><div id="wRate">${rateBlock("__sheet", w)}</div>
+      <p class="warn" id="wWarn"></p>
+      <div class="row"><button type="button" class="btn danger" id="wDel">Delete</button><span class="spacer"></span><button type="button" class="btn" id="wCancel">Cancel</button><button type="button" class="btn primary" id="wSave">Save</button></div>`);
+      $("wDate").onchange = function (e) {
+        w.d = e.target.value;
+      };
+      $("wWho").onclick = function (e) {
+        var b = e.target.closest(".chip");
+        if (!b) return;
+        var i = w.who.indexOf(b.dataset.id);
+        if (i > -1) {
+          w.who.splice(i, 1);
+          delete w.r[b.dataset.id];
+        } else w.who.push(b.dataset.id);
+        w.d = $("wDate").value || w.d;
+        _draw();
+      };
+      $("wRate").onclick = function (e) {
+        var b = e.target.closest(".face");
+        if (!b) return;
+        var pid = b.parentNode.dataset.p,
+          v = +b.dataset.v;
+        if (w.r[pid] === v) delete w.r[pid];else w.r[pid] = v;
+        _toConsumableArray(b.parentNode.children).forEach(function (x) {
+          return x.className = "face" + (w.r[pid] === +x.dataset.v ? " on" : "");
+        });
+        b.parentNode.nextElementSibling.textContent = w.r[pid] ? FACE_WORDS[w.r[pid] - 1] : "";
+      };
+      $("wCancel").onclick = closeSheet;
+      $("wSave").onclick = function () {
+        var d = $("wDate").value;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+          $("wWarn").textContent = "Pick a date.";
+          return;
+        }
+        if (d > today()) {
+          $("wWarn").textContent = "That night hasn’t happened yet!";
+          return;
+        }
+        w.d = d;
+        if (canWrite) put("watches", id, w);
+        closeSheet();
+      };
+      twoTap($("wDel"), "Tap again to delete", function () {
+        if (canWrite) del("watches", id);
+        closeSheet();
+      });
+    };
+    _draw();
+  }
+  $("addBtn").onclick = function () {
+    if (!canWrite) {
+      toast("This account can only view.");
+      return;
+    }
+    var chosen = new Set(session.libCat && CATS.some(function (c) {
+      return c.id === session.libCat;
+    }) ? [session.libCat] : []);
+    var age = kids().length ? Math.min.apply(Math, _toConsumableArray(kids().map(function (p) {
+      return ageOf(p.b);
+    }))) : 6;
+    var draw = function draw() {
+      var cats = allCats().concat(_toConsumableArray(chosen).filter(function (c) {
+        return !allCats().some(function (x) {
+          return x.id === c;
+        });
+      }).map(catInfo));
+      return cats.map(function (c) {
+        return `<button type="button" class="chip${chosen.has(c.id) ? " on" : ""}" data-c="${esc(c.id)}">${c.e} ${esc(c.n)}</button>`;
+      }).join("");
+    };
+    openSheet(`<h2>Add a movie</h2>
+    <label class="l" for="mT">Title</label><input type="text" id="mT" maxlength="80" placeholder="e.g. The Sound of Music">
+    <label class="l" for="mY">Year <span class="hint" style="font-weight:500">(optional)</span></label><input type="number" id="mY" inputmode="numeric" min="1900" max="2100">
+    <label class="l">Suitable from age</label>
+    <div class="stepper"><button type="button" id="ageDn">−</button><b id="ageV">${age}+</b><button type="button" id="ageUp">+</button></div>
+    <label class="l">What kind of movie? <span class="hint" style="font-weight:500">(pick any)</span></label>
+    <div class="chips" id="mCats">${draw()}</div>
+    <div class="row" style="margin-top:8px"><input type="text" id="mNewCat" maxlength="24" placeholder="New kind, e.g. Easter" style="flex:1"><button type="button" class="btn" id="mAddCat">Add</button></div>
+    <label class="toggle"><input type="checkbox" id="mStar"> ⭐ Add to our must-watch list</label>
+    <p class="warn" id="mWarn"></p>
+    <div class="row"><span class="spacer"></span><button type="button" class="btn" id="mCancel">Cancel</button><button type="button" class="btn primary" id="mSave">Add movie</button></div>`);
+    var setAge = function setAge(a) {
+      age = Math.max(0, Math.min(18, a));
+      $("ageV").textContent = age + "+";
+    };
+    $("ageDn").onclick = function () {
+      return setAge(age - 1);
+    };
+    $("ageUp").onclick = function () {
+      return setAge(age + 1);
+    };
+    $("mCats").onclick = function (e) {
+      var b = e.target.closest(".chip");
+      if (!b) return;
+      var c = b.dataset.c;
+      chosen.has(c) ? chosen.delete(c) : chosen.add(c);
+      $("mCats").innerHTML = draw();
+    };
+    $("mAddCat").onclick = function () {
+      var v = $("mNewCat").value.trim().slice(0, 24);
+      if (!v) return;
+      var existing = allCats().find(function (c) {
+        return c.n.toLowerCase() === v.toLowerCase();
+      });
+      chosen.add(existing ? existing.id : "c:" + v);
+      $("mNewCat").value = "";
+      $("mCats").innerHTML = draw();
+    };
+    $("mCancel").onclick = closeSheet;
+    $("mSave").onclick = function () {
+      var t = $("mT").value.trim();
+      if (!t) {
+        $("mWarn").textContent = "Give it a title.";
+        return;
+      }
+      if (!chosen.size) {
+        $("mWarn").textContent = "Pick at least one kind so the picker can find it.";
+        return;
+      }
+      if (movies().some(function (m) {
+        return m.t.toLowerCase() === t.toLowerCase();
+      })) {
+        $("mWarn").textContent = "That one’s already in the library.";
+        return;
+      }
+      var id = uid();
+      var doc = {
+        t,
+        y: +$("mY").value || 0,
+        r: "",
+        a: age,
+        cats: _toConsumableArray(chosen)
+      };
+      put("custom", id, doc);
+      if ($("mStar").checked) put("tweaks", "u-" + id, {
+        star: true
+      });
+      closeSheet();
+    };
+  };
+  function parseLine(l) {
+    l = l.replace(/^\s*[-*•\d.)]+\s+/, "").trim();
+    if (!l) return null;
+    var y = 0;
+    var m = /^(.*?)[\s,(\[-]+((?:19|20)\d\d)[)\]]?\s*$/.exec(l);
+    if (m && m[1].trim()) {
+      l = m[1].trim();
+      y = +m[2];
+    }
+    return {
+      t: l.slice(0, 80),
+      y
+    };
+  }
+  $("importBtn").onclick = function () {
+    var chosen = [];
+    var autoAge = true,
+      age = kids().length ? Math.min.apply(Math, _toConsumableArray(kids().map(function (p) {
+        return ageOf(p.b);
+      }))) : 6;
+    var draw = function draw() {
+      return allCats().map(function (c) {
+        return `<button type="button" class="chip${chosen.indexOf(c.id) > -1 ? " on" : ""}" data-c="${esc(c.id)}">${c.e} ${esc(c.n)}</button>`;
+      }).join("");
+    };
+    var hasKey = !!state.settings.tmdb;
+    openSheet(`<h2>Add a list of movies</h2>
+    <p class="hint">Type or paste one movie per line. Adding the year helps find the right one, e.g. <i>Elf (2003)</i>.</p>
+    <textarea class="import" id="impText" placeholder="Elf (2003)&#10;The Sound of Music&#10;Paddington 2, 2017"></textarea>
+    <label class="l">What kind of movies? <span class="hint" style="font-weight:500">${hasKey ? "(leave blank to guess from TMDB)" : "(pick at least one)"}</span></label>
+    <div class="chips" id="impCats">${draw()}</div>
+    <label class="l">Suitable from age</label>
+    ${hasKey ? '<label class="toggle" style="margin-top:0"><input type="checkbox" id="impAuto" checked> Guess from each movie’s rating</label>' : ""}
+    <div class="stepper" id="impStep"${hasKey ? " hidden" : ""}><button type="button" id="ageDn">−</button><b id="ageV">${age}+</b><button type="button" id="ageUp">+</button></div>
+    <label class="toggle"><input type="checkbox" id="impOwn"> 📀 These are movies we own</label>
+    <label class="toggle"><input type="checkbox" id="impStar"> ⭐ Add them to our must-watch list</label>
+    <p class="warn" id="impWarn"></p>
+    <div class="row"><button type="button" class="btn" id="impCancel">Cancel</button><button type="button" class="btn primary right" id="impGo">Add movies</button></div>`);
+    if (!hasKey) autoAge = false;
+    $("impCats").onclick = function (e) {
+      var b = e.target.closest(".chip");
+      if (!b) return;
+      var i = chosen.indexOf(b.dataset.c);
+      if (i > -1) chosen.splice(i, 1);else chosen.push(b.dataset.c);
+      $("impCats").innerHTML = draw();
+    };
+    if (hasKey) $("impAuto").onchange = function (e) {
+      autoAge = e.target.checked;
+      $("impStep").hidden = autoAge;
+    };
+    var setAge = function setAge(a) {
+      age = Math.max(0, Math.min(18, a));
+      $("ageV").textContent = age + "+";
+    };
+    $("ageDn").onclick = function () {
+      return setAge(age - 1);
+    };
+    $("ageUp").onclick = function () {
+      return setAge(age + 1);
+    };
+    $("impCancel").onclick = closeSheet;
+    $("impGo").onclick = function () {
+      var lines = $("impText").value.split(/\n/).map(parseLine).filter(Boolean).slice(0, 200);
+      if (!lines.length) {
+        $("impWarn").textContent = "Add at least one movie.";
+        return;
+      }
+      if (!hasKey && !chosen.length) {
+        $("impWarn").textContent = "Pick at least one kind so the picker can find them.";
+        return;
+      }
+      var own = $("impOwn").checked,
+        star = $("impStar").checked;
+      var all = movies();
+      var added = 0,
+        already = [];
+      var toLook = [];
+      lines.forEach(function (L) {
+        var want = norm(L.t);
+        var ex = all.find(function (m) {
+          return norm(m.t) === want && (!L.y || !m.y || m.y === L.y);
+        });
+        if (ex) {
+          already.push(ex.t);
+          if (own && !ex.own || star && !ex.star) setTweak(ex, {
+            own: own || ex.own,
+            star: star || ex.star
+          });
+          return;
+        }
+        var id = uid();
+        var doc = {
+          t: L.t,
+          y: L.y,
+          r: "",
+          a: autoAge ? 7 : age,
+          cats: chosen.length ? chosen.slice() : ["fun"]
+        };
+        put("custom", id, doc);
+        all.push(state.custom[id]);
+        if (own || star) put("tweaks", "u-" + id, Object.assign({}, own ? {
+          own: true
+        } : {}, star ? {
+          star: true
+        } : {}));
+        added++;
+        if (hasKey) {
+          var m = movieByKey("u-" + id);
+          m._after = function (info) {
+            if (!info || info.none) return;
+            var cur = state.custom[id];
+            if (!cur) return;
+            var upd = Object.assign({}, cur);
+            if (!chosen.length && info._extra) upd.cats = guessCats(info._extra);
+            if (autoAge && info.cert) upd.a = ageFromCert(info.cert);
+            if (!upd.y && info._extra && info._extra.year) upd.y = info._extra.year;
+            put("custom", id, customToDoc(upd));
+          };
+          toLook.push(m);
+        }
+      });
+      closeSheet();
+      queueLookups(toLook, true);
+      toast("");
+      session.libCat = "all";
+      $("search").value = "";
+      renderLibrary();
+      $("libCount").textContent = `Added ${added} movie${added === 1 ? "" : "s"}` + (already.length ? `. Already in the library: ${already.slice(0, 6).join(", ")}${already.length > 6 ? "…" : ""}` : "") + (hasKey && added ? ". Looking up posters and details now." : ".");
+    };
+  };
+  var COMMON_SERVICES = ["Netflix", "Disney Plus", "Amazon Prime Video", "Crave", "Apple TV Plus", "Paramount Plus", "CBC Gem"];
+  function renderServices() {
+    var count = {};
+    Object.keys(state.info).forEach(function (k) {
+      return (state.info[k].stream || []).forEach(function (p) {
+        count[p.n] = (count[p.n] || 0) + 1;
+      });
+    });
+    COMMON_SERVICES.forEach(function (n) {
+      if (!count[n]) count[n] = 0;
+    });
+    state.settings.services.forEach(function (n) {
+      if (count[n] == null) count[n] = 0;
+    });
+    var names = Object.keys(count).sort(function (a, b) {
+      return isMine(b) - isMine(a) || count[b] - count[a] || a.localeCompare(b);
+    }).slice(0, 30);
+    $("services").innerHTML = names.map(function (n) {
+      return `<button type="button" class="chip${isMine(n) ? " on" : ""}" data-n="${esc(n)}">${esc(n)}${count[n] ? `<span class="age">${count[n]}</span>` : ""}</button>`;
+    }).join("");
+  }
+  $("services").onclick = function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    var n = b.dataset.n,
+      list = state.settings.services.slice(),
+      i = list.indexOf(n);
+    if (i > -1) list.splice(i, 1);else list.push(n);
+    state.settings.services = list;
+    saveSettings();
+    renderServices();
+  };
+  $("tmdbSave").onclick = function () {
+    var v = $("tmdbIn").value.replace(/\s+/g, "");
+    state.settings.tmdb = v;
+    look.err = "";
+    saveSettings();
+    if (!v) {
+      tmdbStatus();
+      return;
+    }
+    $("tmdbStatus").textContent = "Checking the key…";
+    tmdbGet("/configuration", {}).then(function () {
+      autoLookups();
+      tmdbStatus();
+    }, function (err) {
+      $("tmdbStatus").textContent = err && err.code === "badkey" ? "TMDB didn’t accept that key — check you copied the whole “API Key”." : "Couldn’t reach TMDB to check the key. It’s saved; try “Look up all movies” later.";
+    });
+  };
+  $("tmdbRun").onclick = function () {
+    if (!state.settings.tmdb) {
+      tmdbStatus();
+      return;
+    }
+    look.err = "";
+    queueLookups(movies().filter(function (m) {
+      return !m.hide && (!m.info || stale(m, 1));
+    }), false, 1);
+    tmdbStatus();
+  };
+  function renderAll() {
+    renderPick();
+    if ($("v-family").className.indexOf("on") > -1) {
+      renderServices();
+      tmdbStatus();
+      if (document.activeElement !== $("tmdbIn")) $("tmdbIn").value = state.settings.tmdb;
+    }
+    if ($("v-watched").className.indexOf("on") > -1) renderWatched();
+    if ($("v-library").className.indexOf("on") > -1) renderLibrary();
+    if ($("v-family").className.indexOf("on") > -1) renderFamily();
+  }
+  function setSync(on, t) {
+    $("sync").className = on ? "sync on" : "sync";
+    $("syncText").textContent = t;
+    var f = $("famShort");
+    if (f) f.textContent = family ? family.slice(0, 6) + "…" + family.slice(-4) : "none";
+  }
+  var renderPending = false;
+  function soon() {
+    if (renderPending) return;
+    renderPending = true;
+    requestAnimationFrame(function () {
+      renderPending = false;
+      if (veil.className.indexOf("show") < 0) renderAll();
+    });
+  }
+  function validFamily(c) {
+    return /^[A-Za-z0-9_-]{20,60}$/.test(c || "");
+  }
+  function readFamily() {
+    var m = /[#&]family=([A-Za-z0-9_-]+)/.exec(location.hash || "");
+    if (m && validFamily(m[1])) {
+      var code = m[1].toLowerCase();
+      try {
+        localStorage.setItem(FAM_KEY, code);
+      } catch (e) {}
+      return code;
+    }
+    try {
+      var c = localStorage.getItem(FAM_KEY);
+      if (validFamily(c)) return c.toLowerCase();
+    } catch (e) {}
+    return "";
+  }
+  function keepFamilyInAddress() {
+    try {
+      history.replaceState(null, "", location.pathname + location.search + (family ? "#family=" + family : ""));
+    } catch (e) {}
+  }
+  var mergedKey = function mergedKey(col) {
+    return "movie-night-merged-" + col + "-" + family;
+  };
+  function connectFamily() {
+    unsub.forEach(function (u) {
+      try {
+        u();
+      } catch (e) {}
+    });
+    unsub = [];
+    fam = null;
+    if (!family) {
+      setSync(false, "Saved on this device only · add a family code in the Family tab to share");
+      return;
+    }
+    if (!window.firebase) {
+      setSync(false, "Can’t reach the family tracker right now. Saved on this device.");
+      return;
+    }
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        try {
+          firebase.firestore().settings({
+            experimentalForceLongPolling: true,
+            merge: true
+          });
+        } catch (e) {}
+      }
+      fam = firebase.firestore().collection("families").doc(family);
+    } catch (e) {
+      fam = null;
+      setSync(false, "Sync isn’t working. Saved on this device only.");
+      return;
+    }
+    writeError = "";
+    setSync(false, "Connecting to the family tracker…");
+    var myFam = fam;
+    COLS.forEach(function (col) {
+      var clean = CLEAN[col];
+      var first = true;
+      unsub.push(myFam.collection(CLOUD[col]).onSnapshot({
+        includeMetadataChanges: true
+      }, function (snap) {
+        if (first && snap.metadata.fromCache) return;
+        var map = {};
+        snap.forEach(function (doc) {
+          var v = clean(doc.data(), doc.id);
+          if (v) map[doc.id] = v;
+        });
+        if (first) {
+          first = false;
+          var merged = false;
+          try {
+            merged = localStorage.getItem(mergedKey(col)) === "1";
+          } catch (e) {}
+          if (!merged) {
+            Object.keys(state[col]).forEach(function (id) {
+              if (map[id]) return;
+              map[id] = state[col][id];
+              var data = col === "custom" ? customToDoc(state[col][id]) : state[col][id];
+              myFam.collection(CLOUD[col]).doc(id).set(data).then(null, failed);
+            });
+            try {
+              localStorage.setItem(mergedKey(col), "1");
+            } catch (e) {}
+          }
+        }
+        state[col] = map;
+        saveLocal();
+        soon();
+        if (writeError) {} else if (snap.metadata.hasPendingWrites) setSync(false, "Sending to the family tracker…");else if (!snap.metadata.fromCache) setSync(true, "Synced with the family");
+      }, function () {
+        return setSync(false, "Couldn’t reach the family tracker. Check the family code in the Family tab.");
+      }));
+    });
+    var firstPeople = true;
+    unsub.push(myFam.collection("movieMeta").doc("people").onSnapshot(function (doc) {
+      var x = doc.exists ? doc.data() : null;
+      var cloud = cleanPeople(x && x.people);
+      if (firstPeople) {
+        firstPeople = false;
+        if (!cloud.length && state.people.length) {
+          savePeople();
+          return;
+        }
+      }
+      state.people = cloud;
+      saveLocal();
+      soon();
+    }, function () {}));
+    var firstSettings = true;
+    unsub.push(myFam.collection("movieMeta").doc("settings").onSnapshot(function (doc) {
+      var cloud = cleanSettings(doc.exists ? doc.data() : null);
+      if (firstSettings) {
+        firstSettings = false;
+        if (!cloud.tmdb && state.settings.tmdb) {
+          saveSettings();
+          autoLookups();
+          return;
+        }
+      }
+      var hadKey = state.settings.tmdb;
+      state.settings = cloud;
+      saveLocal();
+      soon();
+      if (cloud.tmdb && cloud.tmdb !== hadKey) setTimeout(autoLookups, 3000);
+    }, function () {}));
+  }
+  function renderFamCode() {
+    $("famIn").value = family;
+    $("famNote").textContent = family ? "Devices with this family code share movies, ratings and the crew. It’s the same code as Game Night." : "Add your Game Night family code so every device shares the same movies and ratings.";
+  }
+  $("famSave").onclick = function () {
+    var f = $("famIn").value.replace(/\s+/g, "").toLowerCase();
+    if (f && !validFamily(f)) {
+      $("famNote").textContent = "That code doesn’t look right. It should be at least 20 letters and numbers (Game Night’s starts with fam-).";
+      return;
+    }
+    if (f === family) {
+      renderFamCode();
+      return;
+    }
+    family = f;
+    try {
+      if (f) localStorage.setItem(FAM_KEY, f);else localStorage.removeItem(FAM_KEY);
+    } catch (e) {}
+    keepFamilyInAddress();
+    connectFamily();
+    renderFamCode();
+  };
+  $("famNew").onclick = function () {
+    var chars = "abcdefghijkmnpqrstuvwxyz23456789";
+    var c = "fam-";
+    var r = new Uint8Array(20);
+    (window.crypto || window.msCrypto).getRandomValues(r);
+    for (var i = 0; i < 20; i++) c += chars[r[i] % chars.length];
+    $("famIn").value = c;
+    $("famNote").textContent = "New code made — tap Save, then type the same code on the other devices.";
+  };
+  loadLocal();
+  family = readFamily();
+  setTimeout(autoLookups, 4000);
+  keepFamilyInAddress();
+  show("pick");
+  renderFamCode();
+  connectFamily();
+})();
+</script>
+</body>
+</html>
