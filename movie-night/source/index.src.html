@@ -199,6 +199,13 @@ footer{text-align:center;margin-top:20px}
 .filtersOn{display:inline-block;font-size:.85rem;font-weight:800;border-radius:999px;padding:0 10px;margin-left:6px;background:var(--btn);color:var(--btnInk)}
 textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 10px;border-radius:12px;border:2px solid var(--wire);background:var(--off);color:var(--ink)}
 .small{font-size:.85rem;color:var(--soft)}
+.selbar{position:-webkit-sticky;position:sticky;top:0;z-index:5;background:var(--sheet);border-radius:14px;padding:8px;margin:0 0 8px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.selbar .btn{margin:3px}
+.selecting .list li .star{display:none}
+.list li.sel{background:rgba(255,138,61,.22);border-radius:12px}
+.list li .tick{display:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--wire);text-align:center;line-height:22px;font-weight:800;-webkit-flex:0 0 26px;flex:0 0 26px}
+.selecting .list li .tick{display:inline-block}
+.list li.sel .tick{background:var(--btn);border-color:var(--btn);color:var(--btnInk)}
 .credit{font-size:.8rem;color:var(--soft);text-align:center;margin:18px 0 0}
 #famIn,#tmdbIn{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1rem;padding:8px 10px;border-radius:12px;border:2px solid var(--wire);background:var(--off);color:var(--ink);margin:6px 0}
 </style>
@@ -317,11 +324,17 @@ textarea.import{width:100%;height:170px;font:inherit;font-size:1rem;padding:8px 
         <h2>All movies</h2>
         <button class="btn primary" id="addBtn" type="button">+ Add a movie</button>
         <button class="btn" id="importBtn" type="button">📋 Add a list</button>
+        <button class="btn" id="selBtn" type="button">Select</button>
       </div>
       <p class="hint" style="margin:4px 0 10px">Tap any movie to change its age, mark it as watched, or hide it.</p>
       <input class="search" id="search" type="search" placeholder="Search…" autocomplete="off">
       <div class="chips filters" id="libFilter"></div>
       <p class="small" id="libCount" style="margin:0 0 6px"></p>
+      <div class="selbar" id="selBar" hidden>
+        <button class="btn" id="selAll" type="button">Select all shown</button>
+        <button class="btn danger" id="selDel" type="button">Remove 0</button>
+        <button class="btn" id="selDone" type="button">Done</button>
+      </div>
       <ul class="list" id="libList"></ul>
     </div>
   </section>
@@ -776,7 +789,7 @@ function customToDoc(m) { return {t: m.t, y: m.y, r: m.r || "", a: m.a, cats: m.
 const VIEWS = ["pick", "watched", "library", "family"];
 function show(v) {
   if (VIEWS.indexOf(v) < 0) v = "pick";
-  VIEWS.forEach(x => { $("v-" + x).className = "view" + (x === v ? " on" : ""); });
+  VIEWS.forEach(x => { $("v-" + x).className = "view" + (x === v ? " on" : "") + (x === "library" && selecting ? " selecting" : ""); });
   [...$("nav").children].forEach(b => b.className = b.dataset.v === v ? "on" : "");
   renderAll();
 }
@@ -988,7 +1001,7 @@ function guessCats(extra) {
   if (/musical/.test(kw)) add("mus");
   if (/\b(dog|cat|horse|animal|penguin|dinosaur|bear|talking animal)\b/.test(kw)) add("ani");
   if (extra.year && extra.year < 1985) add("classic");
-  return cats.length ? cats : ["fun"];
+  return cats;
 }
 function ageFromCert(c) { return [7, 4, 7, 11, 16][certLevel(c)]; }
 
@@ -1272,7 +1285,7 @@ function libRow(m, extra) {
   const inf = m.info && !m.info.none ? m.info : null;
   const thumb = inf && inf.p ? `<img class="thumb" src="${IMG}w92${inf.p}" alt="" loading="lazy">` : `<span class="thumb none">${m.cats.length ? catInfo(m.cats[0]).e : "🎬"}</span>`;
   const bits = [m.y || "", certOf(m), inf && runtimeText(inf.rt)].filter(Boolean).join(" · ");
-  return `<li data-k="${esc(m.k)}"><button type="button" class="star${m.star ? " on" : ""}" data-star="${esc(m.k)}" aria-label="Must-watch">⭐</button>${thumb}` +
+  return `<li data-k="${esc(m.k)}"${selected[m.k] ? ' class="sel"' : ""}><span class="tick">✓</span><button type="button" class="star${m.star ? " on" : ""}" data-star="${esc(m.k)}" aria-label="Must-watch">⭐</button>${thumb}` +
     `<span class="main"><span class="t">${esc(m.t)}${m.hide ? " <span class='badge'>hidden</span>" : ""}</span>` +
     `<span class="s">${bits} ${m.cats.map(c => catInfo(c).e).join("")}${extra ? " · " + extra : ""}${ws.length ? " · seen " + (ws.length > 1 ? ws.length + "×" : "✓") + " " + faceFor(avg) : ""}</span>` +
     `<span class="s">${m.own ? '<span class="own">📀 Ours</span> ' : ""}${whereHtml(inf, true)}</span></span>` +
@@ -1311,7 +1324,43 @@ function renderLibrary() {
 }
 $("search").oninput = () => renderLibrary();
 $("libFilter").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; session.libCat = b.dataset.c; renderLibrary(); };
+const selected = {}; let selecting = false;
+function selCount() { return Object.keys(selected).length; }
+function renderSelBar() {
+  $("v-library").className = "view on" + (selecting ? " selecting" : "");
+  $("selBar").hidden = !selecting;
+  $("selBtn").hidden = selecting;
+  const n = selCount(); $("selDel").textContent = "Remove " + n;
+  $("selDel").classList.remove("armed");
+}
+$("selBtn").onclick = () => { selecting = true; renderSelBar(); renderLibrary(); };
+$("selDone").onclick = () => { selecting = false; Object.keys(selected).forEach(k => delete selected[k]); renderSelBar(); renderLibrary(); };
+$("selAll").onclick = () => {
+  const keys = [...$("libList").querySelectorAll("li[data-k]")].map(li => li.dataset.k);
+  const allOn = keys.every(k => selected[k]);
+  keys.forEach(k => { if (allOn) delete selected[k]; else selected[k] = 1; });
+  renderSelBar(); renderLibrary();
+};
+$("selDel").onclick = () => {
+  const b = $("selDel"), n = selCount();
+  if (!n) return;
+  if (!b.classList.contains("armed")) { b.classList.add("armed"); b.textContent = "Tap again to remove " + n; return; }
+  Object.keys(selected).forEach(k => {
+    const m = movieByKey(k); delete selected[k]; if (!m) return;
+    if (m.custom) { del("custom", m.id); if (state.tweaks[k]) del("tweaks", k); if (state.info[k]) del("info", k); }
+    else if (state.settings.starter) setTweak(m, {hide: true, keep: false, own: false, star: false});
+    else setTweak(m, {keep: false, own: false, star: false});
+  });
+  $("libCount").textContent = `Removed ${n} movie${n === 1 ? "" : "s"}.`;
+  selecting = false; renderSelBar(); renderAll();
+};
 function libClick(e) {
+  if (selecting) {
+    const li = e.target.closest("li[data-k]"); if (!li) return;
+    if (selected[li.dataset.k]) delete selected[li.dataset.k]; else selected[li.dataset.k] = 1;
+    li.className = selected[li.dataset.k] ? "sel" : ""; renderSelBar();
+    return;
+  }
   const s = e.target.closest("[data-star]");
   if (s) { const m = movieByKey(s.dataset.star); if (m) setTweak(m, {star: !m.star}); renderAll(); return; }
   const li = e.target.closest("li[data-k]"); if (li) openMovieSheet(li.dataset.k);
@@ -1544,21 +1593,80 @@ $("addBtn").onclick = () => {
 }
 
 // ---------- add a list ----------
+// Apple TV app genres → our kinds
+const APPLE_GENRES = [["Kids & Family", []], ["Action & Adventure", ["adv"]], ["Comedy", ["fun"]], ["Animation", ["anim"]], ["Anime", ["anim"]],
+  ["Sci-Fi & Fantasy", ["space", "magic"]], ["Holiday", ["xmas"]], ["Music", ["mus"]], ["Musicals", ["mus"]], ["Sports", ["sport"]],
+  ["Horror", ["hall"]], ["Classics", ["classic"]]];
+function genreCats(text) {
+  const out = [];
+  APPLE_GENRES.forEach(g => { if ((" " + text + " ").indexOf(" " + g[0] + " ") > -1) g[1].forEach(c => { if (out.indexOf(c) < 0) out.push(c); }); });
+  return out;
+}
+// a row copied from the Mac TV app: "Title 1:37:49 Director Genre 1"
+const DUR = /^(.*?)\s+(\d{1,2}:\d{2}(?::\d{2})?)(?:\s+(.*))?$/;
 function parseLine(l) {
-  let y = 0;
+  let y = 0, rest = "";
   if (l.indexOf("\t") > -1) {
-    // a row copied from a spreadsheet or the Mac TV app's list view: title first, year somewhere after
+    // a row from a spreadsheet: title first, other columns after
     const cells = l.split("\t").map(c => c.trim()).filter(Boolean);
     if (!cells.length || /^(name|title)$/i.test(cells[0])) return null;
     const yc = cells.slice(1).find(c => /^(19|20)\d\d$/.test(c) || /^\d{1,2}\/\d{1,2}\/(19|20)\d\d$/.test(c));
     if (yc) y = +yc.slice(-4);
-    l = cells[0];
+    l = cells[0]; rest = cells.slice(1).join(" ");
+  } else {
+    if (/^\s*name\s+time\b/i.test(l)) return null;
+    const d = DUR.exec(l.trim());
+    if (d && d[1].trim()) { l = d[1]; rest = d[3] || ""; }
   }
   l = l.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "").trim();
   if (!l) return null;
   const m = /^(.*?)[\s,(\[-]+((?:19|20)\d\d)[)\]]?\s*$/.exec(l);
   if (m && m[1].trim()) { l = m[1].trim(); y = +m[2]; }
-  return {t: l.slice(0, 80), y: y || 0};
+  return {t: l.slice(0, 80), y: y || 0, gc: genreCats(rest)};
+}
+function mergeCats(a, b) { const out = a.slice(); b.forEach(c => { if (out.indexOf(c) < 0) out.push(c); }); return out; }
+// after TMDB answers for a movie we added: fill in kinds, age and year
+function afterImport(id, opts) {
+  return info => {
+    if (!info || info.none) return;
+    const cur = state.custom[id]; if (!cur) return;
+    const upd = Object.assign({}, cur);
+    if (opts.guessCats && info._extra) { const c = mergeCats(opts.gc || [], guessCats(info._extra)); if (c.length) upd.cats = c; }
+    if (opts.autoAge && info.cert) upd.a = ageFromCert(info.cert);
+    if (!upd.y && info._extra && info._extra.year) upd.y = info._extra.year;
+    put("custom", id, customToDoc(upd));
+  };
+}
+
+// one-time tidy of movies imported before the TV app format was understood
+let repaired = false;
+function repairImports() {
+  const dirty = Object.keys(state.custom).filter(id => DUR.test(state.custom[id].t));
+  if (!dirty.length) return 0;
+  const all = movies(true), seen = {};
+  all.forEach(m => { if (!DUR.test(m.t)) seen[norm(m.t)] = m; });
+  dirty.forEach(id => {
+    const m = state.custom[id], key = "u-" + id, tw = state.tweaks[key] || {};
+    const L = parseLine(m.t); if (!L) return;
+    const dup = seen[norm(L.t)];
+    if (dup && (!L.y || !dup.y || dup.y === L.y)) {
+      // already have it (a starter movie, or listed twice): keep that one
+      setTweak(dup, {keep: true, own: tw.own || dup.own, star: tw.star || dup.star});
+      Object.keys(state.watches).forEach(w => { if (state.watches[w].k === key) put("watches", w, Object.assign({}, state.watches[w], {k: dup.k, t: dup.t})); });
+      del("custom", id); if (state.tweaks[key]) del("tweaks", key); if (state.info[key]) del("info", key);
+      return;
+    }
+    const cats = L.gc.length ? L.gc : m.cats;
+    put("custom", id, {t: L.t, y: L.y, r: "", a: m.a, cats});
+    if (state.info[key]) del("info", key);
+    seen[norm(L.t)] = movieByKey(key);
+    if (state.settings.tmdb) {
+      const mm = movieByKey(key);
+      mm._after = afterImport(id, {guessCats: true, gc: L.gc, autoAge: true});
+      queueLookups([mm], true, 0);
+    }
+  });
+  return dirty.length;
 }
 $("importBtn").onclick = () => {
   const chosen = [];
@@ -1606,22 +1714,14 @@ $("importBtn").onclick = () => {
         return;
       }
       const id = uid();
-      const doc = {t: L.t, y: L.y, r: "", a: autoAge ? 7 : age, cats: chosen.length ? chosen.slice() : ["fun"]};
+      const doc = {t: L.t, y: L.y, r: "", a: autoAge ? 7 : age, cats: chosen.length ? chosen.slice() : (L.gc.length ? L.gc : ["fun"])};
       put("custom", id, doc);
       all.push(state.custom[id]);
       if (own || star) put("tweaks", "u-" + id, Object.assign({}, own ? {own: true} : {}, star ? {star: true} : {}));
       added++;
       if (hasKey) {
         const m = movieByKey("u-" + id);
-        m._after = info => {
-          if (!info || info.none) return;
-          const cur = state.custom[id]; if (!cur) return;
-          const upd = Object.assign({}, cur);
-          if (!chosen.length && info._extra) upd.cats = guessCats(info._extra);
-          if (autoAge && info.cert) upd.a = ageFromCert(info.cert);
-          if (!upd.y && info._extra && info._extra.year) upd.y = info._extra.year;
-          put("custom", id, customToDoc(upd));
-        };
+        m._after = afterImport(id, {guessCats: !chosen.length, gc: L.gc, autoAge});
         toLook.push(m);
       }
     });
@@ -1685,7 +1785,13 @@ function setSync(on, t) {
   const f = $("famShort"); if (f) f.textContent = family ? family.slice(0, 6) + "…" + family.slice(-4) : "none";
 }
 let renderPending = false;
-function soon() { if (renderPending) return; renderPending = true; requestAnimationFrame(() => { renderPending = false; if (veil.className.indexOf("show") < 0) renderAll(); }); }
+let loadedCols = 0;
+function soon() { if (renderPending) return; renderPending = true; requestAnimationFrame(() => { renderPending = false; tidy(); if (veil.className.indexOf("show") < 0) renderAll(); }); }
+function tidy() {
+  if (fam && loadedCols < COLS.length) return;   // wait until the family tracker has answered
+  const n = repairImports();
+  if (n) $("libCount").textContent = `Tidied up ${n} movie${n === 1 ? "" : "s"} from the TV app. Looking up posters and details…`;
+}
 function validFamily(c) { return /^[A-Za-z0-9_-]{20,60}$/.test(c || ""); }
 function readFamily() {
   const m = /[#&]family=([A-Za-z0-9_-]+)/.exec(location.hash || "");
@@ -1710,7 +1816,7 @@ function connectFamily() {
     }
     fam = firebase.firestore().collection("families").doc(family);
   } catch (e) { fam = null; setSync(false, "Sync isn’t working. Saved on this device only."); return; }
-  writeError = "";
+  writeError = ""; loadedCols = 0; COLS.forEach(c => { delete state["_loaded_" + c]; });
   setSync(false, "Connecting to the family tracker…");
   const myFam = fam;
   COLS.forEach(col => {
@@ -1734,6 +1840,7 @@ function connectFamily() {
           try { localStorage.setItem(mergedKey(col), "1"); } catch (e) {}
         }
       }
+      if (!state["_loaded_" + col]) { state["_loaded_" + col] = 1; loadedCols++; }
       state[col] = map; saveLocal(); soon();
       if (writeError) {}
       else if (snap.metadata.hasPendingWrites) setSync(false, "Sending to the family tracker…");
@@ -1787,6 +1894,7 @@ $("famNew").onclick = () => {
 loadLocal();
 family = readFamily();
 setTimeout(autoLookups, 4000);
+setTimeout(soon, 500);
 keepFamilyInAddress();
 show("pick");
 renderFamCode();
