@@ -86,6 +86,20 @@ select{width:100%;font-size:16px;padding:10px 12px;border:2px solid var(--line);
 .tog .t{flex:1;line-height:1.3}.tog .t small{display:block;color:var(--muted);font-size:13px}
 .tog .xp{font-size:14px;font-weight:bold;color:var(--muted);white-space:nowrap}
 .tog.on .xp{color:var(--teal)}
+.lg{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.lg:first-of-type{border-top:0}
+.lg .nm{line-height:1.3}.lg .nm small{display:block;font-size:13px;color:var(--muted)}
+.seg{display:flex;gap:4px}
+.seg button{min-width:44px;height:44px;border-radius:12px;border:2px solid var(--line);background:#fff;cursor:pointer;font-weight:bold;font-size:16px;color:var(--ink);padding:0 6px}
+.seg button.on[data-v=on]{background:var(--teal);border-color:var(--teal);color:#fff}
+.seg button.on[data-v=off]{background:#f4a261;border-color:#f4a261;color:var(--ink)}
+.seg button.on[data-v=junk]{background:var(--red);border-color:var(--red);color:#fff}
+.lg .pen{font-size:13px;font-weight:bold;color:var(--red)}
+.lg .ni{grid-column:1/-1}.lg .ni input{padding:8px 10px}
+.key{font-size:13px;color:var(--muted);margin:0 0 4px}
+.sub2{font-size:13px;font-weight:bold;color:var(--muted);margin:14px 0 2px}
+.neg{color:var(--red)!important}
+.tog.auto{cursor:default}.tog:disabled{color:var(--ink);opacity:1}
 .boss{margin-top:18px;background:var(--ink);color:#fff;border-radius:20px;padding:16px}
 .boss h3{margin:0 0 4px}.boss p{margin:0 0 10px;color:#cfe0f5}
 .walks{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
@@ -224,7 +238,7 @@ const PEOPLE = [{id:'lachlan', name:'Lachlan'}, {id:'ashley', name:'Ashley'}];
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
 const DAYNAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const MISSIONS = [
-  {id:'meals', name:'Mediterranean meals', hint:'Two balanced Mediterranean-style meals', xp:25},
+  {id:'meals', name:'Mediterranean meals', hint:'Ticks itself when 2 meals are logged ✓', xp:25},
   {id:'plants', name:'Plant power', hint:'Five portions of fruit and veg', xp:15},
   {id:'drinks', name:'Smart drinks', hint:'No sugary energy drinks or pop', xp:10},
   {id:'walk', name:'Walk or recovery', hint:'A walk or recovery activity', xp:25},
@@ -233,6 +247,9 @@ const MISSIONS = [
   {id:'checkin', name:'Daily check-in', hint:'Open this page and tick your day', xp:5}
 ];
 const BOSS_XP = 150, MAX_XP = 850;
+// Meal log penalties (change these to make it stricter or gentler)
+const PENALTY = {off: [5, 5, 5, 5], junk: [20, 20, 20, 10]}; // breakfast, lunch, dinner, snack
+const LOGS = [{v:'on', t:'✓', a:'Ate the plan'}, {v:'off', t:'≈', a:'Off plan'}, {v:'junk', t:'✗', a:'Junk or fast food'}];
 
 // [breakfast, lunch, dinner, snack] as recipe ids or plain text
 const MENU = [
@@ -367,8 +384,13 @@ function cellHTML(i, k) {
 }
 
 /* ---------- XP ---------- */
-const dayXP = (pid, d) => MISSIONS.reduce((t, m) => t + (get(`xp.${pid}.${d}.${m.id}`) ? m.xp : 0), 0);
-const foodXP = pid => DAYS.reduce((t, d) => t + ['meals','plants','drinks'].reduce((s, id) => s + (get(`xp.${pid}.${d}.${id}`) ? MISSIONS.find(m => m.id === id).xp : 0), 0), 0);
+const logOf = (pid, d, k) => get(`log.${pid}.${d}.${k}`) || '';
+const onPlan = (pid, d) => [0, 1, 2].filter(k => logOf(pid, d, k) === 'on').length;
+const done = (pid, d, id) => id === 'meals' ? onPlan(pid, d) >= 2 : !!get(`xp.${pid}.${d}.${id}`);
+const penalty = (pid, d) => [0, 1, 2, 3].reduce((t, k) => { const l = logOf(pid, d, k); return t - (PENALTY[l] ? PENALTY[l][k] : 0); }, 0);
+const dayXP = (pid, d) => MISSIONS.reduce((t, m) => t + (done(pid, d, m.id) ? m.xp : 0), 0) + penalty(pid, d);
+const foodXP = pid => DAYS.reduce((t, d) => t + ['meals','plants','drinks'].reduce((s, id) => s + (done(pid, d, id) ? MISSIONS.find(m => m.id === id).xp : 0), 0) + penalty(pid, d), 0);
+const lost = pid => -DAYS.reduce((t, d) => t + penalty(pid, d), 0);
 const walksDone = pid => +get(`walks.${pid}`) || 0;
 const totalXP = pid => DAYS.reduce((t, d) => t + dayXP(pid, d), 0) + (walksDone(pid) >= 5 ? BOSS_XP : 0);
 const level = xp => xp >= 750 ? 'Level 5' : xp >= 550 ? 'Level 4' : xp >= 350 ? 'Level 3' : xp >= 150 ? 'Level 2' : 'Level 1';
@@ -383,7 +405,7 @@ let sel = todayIdx >= 0 ? todayIdx : 0;
 
 function renderPlayers() {
   $('players').innerHTML = PEOPLE.map(p => { const x = totalXP(p.id); return `<div class="pl"><span class="lv">${level(x)}</span><b>${p.name}</b>
-    <div class="bar"><i style="width:${Math.min(100, x / MAX_XP * 100)}%"></i></div><small>${x} / ${MAX_XP} XP this week</small></div>`; }).join('');
+    <div class="bar"><i style="width:${Math.max(0, Math.min(100, x / MAX_XP * 100))}%"></i></div><small>${x} / ${MAX_XP} XP this week${lost(p.id) ? ` · <span style="color:#ffb4a2">−${lost(p.id)} from off-plan food</span>` : ''}</small></div>`; }).join('');
 }
 function renderToday() {
   $('days').innerHTML = DAYS.map((d, i) => `<button data-day="${i}" class="${i === sel ? 'on' : ''} ${i === todayIdx ? 'today' : ''}">${fmt(dateOf(i), {weekday:'short'})}<small>${fmt(dateOf(i), {month:'short', day:'numeric'})}</small></button>`).join('');
@@ -394,8 +416,17 @@ function renderToday() {
     const fl = PEOPLE.map(p => { const h = hits(p.id, eff(p.id, sel, k), get(customP(p.id, DAYS[sel], k)) || ''); return h.length ? `<span class="flag">⚠ ${p.name}: ${esc(h.join(', '))}</span> ` : ''; }).join('');
     return `<button class="meal c${k}" data-slot="${k}"><small>${lab}</small>${body}${fl}<u>Recipe / swap</u></button>`; }).join('');
   const d = DAYS[sel];
-  $('missions').innerHTML = PEOPLE.map(p => `<div class="card"><h3>${p.name} <em>${dayXP(p.id, d)} / 100 XP</em></h3><ul class="ms">${MISSIONS.map(m => { const on = get(`xp.${p.id}.${d}.${m.id}`);
-    return `<li><button class="tog ${on ? 'on' : ''}" data-path="xp.${p.id}.${d}.${m.id}" aria-pressed="${!!on}"><span class="box"></span><span class="t">${m.name}<small>${m.hint}</small></span><span class="xp">+${m.xp}</span></button></li>`; }).join('')}</ul></div>`).join('');
+  const a = document.activeElement;
+  if (a && a.dataset && a.dataset.field && a.dataset.field.startsWith('lognote')) return; // don't redraw under someone typing
+  $('missions').innerHTML = PEOPLE.map(p => { const x = dayXP(p.id, d);
+    const meals = SLOTS.map((lab, k) => { const l = logOf(p.id, d, k), pen = PENALTY[l] ? PENALTY[l][k] : 0;
+      return `<div class="lg"><div class="nm"><small>${lab}</small>${esc(label(p.id, sel, k))}${pen ? ` <span class="pen">−${pen}</span>` : ''}</div>
+        <div class="seg" role="group" aria-label="${lab}">${LOGS.map(o => `<button data-log="log.${p.id}.${d}.${k}" data-v="${o.v}" class="${l === o.v ? 'on' : ''}" aria-pressed="${l === o.v}" aria-label="${o.a}" title="${o.a}">${o.t}</button>`).join('')}</div>
+        ${l === 'off' || l === 'junk' ? `<div class="ni">${field(`lognote.${p.id}.${d}.${k}`, 'What did you have instead?')}</div>` : ''}</div>`; }).join('');
+    return `<div class="card"><h3>${p.name} <em class="${x < 0 ? 'neg' : ''}">${x} / 100 XP</em></h3>
+      <p class="sub2">What I ate</p><p class="key">✓ ate the plan (or my swap) · ≈ off plan −5 · ✗ junk or fast food −20 (snack −10)</p>${meals}
+      <p class="sub2">Missions</p><ul class="ms">${MISSIONS.map(m => { const on = done(p.id, d, m.id), auto = m.id === 'meals';
+      return `<li><button class="tog ${on ? 'on' : ''} ${auto ? 'auto' : ''}" ${auto ? 'disabled' : `data-path="xp.${p.id}.${d}.${m.id}"`} aria-pressed="${on}"><span class="box"></span><span class="t">${m.name}<small>${m.hint}</small></span><span class="xp">+${m.xp}</span></button></li>`; }).join('')}</ul></div>`; }).join('');
   $('walks').innerHTML = PEOPLE.map(p => { const n = walksDone(p.id);
     return `<div class="walks"><b>${p.name}</b>${[1,2,3,4,5].map(k => `<button class="walk ${k <= n ? 'on' : ''}" data-walk="${p.id}" data-n="${k}" aria-label="Walk ${k}">${k}</button>`).join('')}${n >= 5 ? ' <span>+150 XP!</span>' : ''}</div>`; }).join('');
 }
@@ -447,6 +478,7 @@ function renderReview() {
   $('reviewPeople').innerHTML = PEOPLE.map(p => { const r = `review.${p.id}.`;
     return `<div class="card"><h3>${p.name}</h3>
       <div class="row"><div><small>Food XP</small><div class="stat">${foodXP(p.id)} / 350</div></div><div><small>Total XP</small><div class="stat">${totalXP(p.id)} / ${MAX_XP}</div></div></div>
+      <p style="margin:0">Lost to off-plan food: <b>${lost(p.id)} XP</b></p>
       <p style="margin:0">Boss battle: <b>${walksDone(p.id) >= 5 ? 'complete ✓' : walksDone(p.id) + ' of 5 walks'}</b></p>
       ${field(r + 'walkMin', 'Walking minutes (goal 75)', 'number')}
       <label class="f"><span>Energy this week (1–5)</span>${scale(r + 'energy')}</label>
@@ -484,8 +516,9 @@ window.addEventListener('hashchange', route);
 let pendingClear = false;
 document.addEventListener('click', e => {
   if (e.target.id === 'sheet' || e.target.id === 'sheetClose') { closeSheet(); return; }
-  const t = e.target.closest('[data-path],[data-day],[data-walk],[data-set],[data-recipe],[data-slot],[data-both],[data-reset],#gClear,#gYes');
+  const t = e.target.closest('[data-log],[data-path],[data-day],[data-walk],[data-set],[data-recipe],[data-slot],[data-both],[data-reset],#gClear,#gYes');
   if (!t) return;
+  if (t.dataset.log) { put(t.dataset.log, logOf.apply(null, t.dataset.log.split('.').slice(1)) === t.dataset.v ? '' : t.dataset.v); return; }
   if (t.dataset.slot) { openSheet(+t.dataset.slot); return; }
   if (t.dataset.both) { const k = +t.dataset.both, d = DAYS[sel], a = PEOPLE[0].id, b = PEOPLE[1].id;
     put(customP(b, d, k), get(customP(a, d, k)) || ''); put(choiceP(b, d, k), get(choiceP(a, d, k)) || ''); return; }
@@ -513,7 +546,7 @@ document.addEventListener('input', e => {
   const v = e.target.value; clearTimeout(timers[p]);
   timers[p] = setTimeout(() => { setLocal(p, v); cache(); write(p, v); renderAll(); }, 600);
 });
-document.addEventListener('focusout', e => { if (e.target.dataset && e.target.dataset.field) setTimeout(renderReview, 700); });
+document.addEventListener('focusout', e => { if (e.target.dataset && e.target.dataset.field) setTimeout(() => { if (!(document.activeElement && document.activeElement.dataset && document.activeElement.dataset.field)) renderAll(); }, 700); });
 
 route(); renderRecipes(); renderAll(); startSync();
 }
