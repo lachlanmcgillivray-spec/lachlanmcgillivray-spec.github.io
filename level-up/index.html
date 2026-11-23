@@ -100,6 +100,26 @@ select{width:100%;font-size:16px;padding:10px 12px;border:2px solid var(--line);
 .sub2{font-size:13px;font-weight:bold;color:var(--muted);margin:14px 0 2px}
 .neg{color:var(--red)!important}
 .tog.auto{cursor:default}.tog:disabled{color:var(--ink);opacity:1}
+.gems{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:4px 0 6px}
+.gem{border:0;background:#fff;border-radius:16px;padding:10px 4px 8px;cursor:pointer;color:var(--muted);text-align:center;font:inherit;line-height:1.15;min-height:96px;box-shadow:inset 0 0 0 2px var(--line)}
+.gem i{display:flex;width:44px;height:44px;margin:0 auto 6px;border-radius:50%;align-items:center;justify-content:center;background:var(--soft);color:#9aa8bb}
+.gem svg{width:24px;height:24px}
+.gem b{display:block;font-size:13px}.gem small{display:block;font-size:12px;margin-top:2px}
+.gem.on{color:var(--ink);box-shadow:inset 0 0 0 2px var(--gc)}
+.gem.on i{background:var(--gc);color:#fff;animation:pop .35s ease-out}
+.gem.auto{cursor:default}
+.gem.crown.on{background:var(--lemon);box-shadow:none}.gem.crown.on i{background:var(--ink);color:var(--lemon)}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.perfect{background:var(--lemon);color:var(--ink);border-radius:12px;padding:8px 12px;font-weight:bold;margin:4px 0 8px}
+.days button .st{display:block;font-size:12px;color:#c58a00;height:14px;line-height:14px}
+.days button.on .st{color:var(--lemon)}
+.trail{margin-top:6px;background:linear-gradient(#26426a,#1d3557);border-radius:22px;padding:14px 14px 10px;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.trail h2{font-size:22px;margin:0;color:#fff}.trail p{margin:2px 0 0;color:#cfe0f5;font-size:14px}
+.tfig{position:relative;height:230px;margin-top:6px}.tfig svg{position:absolute;inset:0;width:100%;height:100%}
+.where{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
+.where div{background:rgba(0,0,0,.2);border-radius:14px;padding:10px 12px;font-size:14px;color:#cfe0f5;line-height:1.35}
+.where b{color:#fff;font-size:16px}
+@media(prefers-reduced-motion:reduce){.gem.on i{animation:none}}
 .boss{margin-top:18px;background:var(--ink);color:#fff;border-radius:20px;padding:16px}
 .boss h3{margin:0 0 4px}.boss p{margin:0 0 10px;color:#cfe0f5}
 .walks{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
@@ -141,6 +161,7 @@ input:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:3px soli
 footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid var(--line);padding-top:14px}
 @media(max-width:700px){.meals{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){
+  .where{grid-template-columns:minmax(0,1fr)}.tfig{height:200px}
   .duo{grid-template-columns:minmax(0,1fr)}
   .pl{padding:12px}.pl b{font-size:18px}.pl .lv{float:none;display:block;padding:0}
   summary{flex-direction:column;gap:2px}summary small{white-space:normal}
@@ -165,6 +186,11 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
   <h1>LEVEL <span>UP</span></h1>
   <p class="sub">Week 1 · The First Step · Mon Nov 30 – Sun Dec 6</p>
   <div class="players" id="players"></div>
+  <div class="trail">
+    <h2 id="trailName"></h2><p id="trailSub"></p>
+    <div class="tfig"><svg id="trailSvg" role="img" aria-label="Trail progress"></svg></div>
+    <div class="where" id="where"></div>
+  </div>
   <nav id="nav">
     <a href="#today">Today</a><a href="#menu">Menu</a><a href="#recipes">Recipes</a>
     <a href="#groceries">Groceries</a><a href="#prep">Prep</a><a href="#review">Review</a>
@@ -246,7 +272,34 @@ const MISSIONS = [
   {id:'sleep', name:'Sleep opportunity', hint:'Get to bed in time for a full night', xp:10},
   {id:'checkin', name:'Daily check-in', hint:'Open this page and tick your day', xp:5}
 ];
-const BOSS_XP = 150, MAX_XP = 850;
+const BOSS_XP = 150, PERFECT_XP = 25, MAX_XP = 850 + 7 * PERFECT_XP;
+// A perfect day = every icon collected and no off-plan or junk meals logged. Worth +25 bonus XP.
+const ICONS = {
+  meals:{c:'#2a9d8f', s:'<path d="M3 12h18a9 9 0 0 1-18 0Z"/><path d="M12 3c-2 2-2 4 0 6M8 5c-1 1.5-1 3 0 4M16 5c1 1.5 1 3 0 4"/>'},
+  plants:{c:'#52b788', s:'<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15Z"/><path d="M5 19 13 11"/>'},
+  drinks:{c:'#6a4c93', s:'<path d="M6 3h12l-1.6 17a1 1 0 0 1-1 1H8.6a1 1 0 0 1-1-1Z"/><path d="M6.5 9h11"/>'},
+  walk:{c:'#e76f51', s:'<path d="M4 17h9l3-3 4 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><path d="M6 17V8a2 2 0 0 1 2-2h3l1 5 4 3"/>'},
+  water:{c:'#4ea8de', s:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/>'},
+  sleep:{c:'#3d5a80', s:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/>'},
+  checkin:{c:'#e9a23b', s:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/>'},
+  crown:{c:'#14213d', s:'<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5Z"/>'}
+};
+const svgI = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k].s}</svg>`;
+// This week's great walk. Distances from NZ DOC; the elevation profile is approximate.
+const TRAIL = {
+  name: 'The Milford Track', where: 'Fiordland, New Zealand · 53.5 km', km: 53.5, finishXP: 700,
+  stops: [
+    {km: 0, el: 200, n: 'Glade Wharf', s: 'Start'},
+    {km: 5, el: 200, n: 'Clinton Hut', s: 'Clinton'},
+    {km: 13, el: 330, n: 'Hirere Falls'},
+    {km: 22.5, el: 600, n: 'Mintaro Hut', s: 'Mintaro'},
+    {km: 26, el: 1154, n: 'Mackinnon Pass', s: 'Pass'},
+    {km: 31, el: 500, n: 'Sutherland Falls'},
+    {km: 35.5, el: 150, n: 'Dumpling Hut', s: 'Dumpling'},
+    {km: 45, el: 60, n: 'Giant Gate Falls'},
+    {km: 53.5, el: 0, n: 'Sandfly Point', s: 'Finish'}
+  ]
+};
 // Meal log penalties (change these to make it stricter or gentler)
 const PENALTY = {off: [5, 5, 5, 5], junk: [20, 20, 20, 10]}; // breakfast, lunch, dinner, snack
 const LOGS = [{v:'on', t:'✓', a:'Ate the plan'}, {v:'off', t:'≈', a:'Off plan'}, {v:'junk', t:'✗', a:'Junk or fast food'}];
@@ -388,12 +441,17 @@ const logOf = (pid, d, k) => get(`log.${pid}.${d}.${k}`) || '';
 const onPlan = (pid, d) => [0, 1, 2].filter(k => logOf(pid, d, k) === 'on').length;
 const done = (pid, d, id) => id === 'meals' ? onPlan(pid, d) >= 2 : !!get(`xp.${pid}.${d}.${id}`);
 const penalty = (pid, d) => [0, 1, 2, 3].reduce((t, k) => { const l = logOf(pid, d, k); return t - (PENALTY[l] ? PENALTY[l][k] : 0); }, 0);
-const dayXP = (pid, d) => MISSIONS.reduce((t, m) => t + (done(pid, d, m.id) ? m.xp : 0), 0) + penalty(pid, d);
+const clean = (pid, d) => [0, 1, 2, 3].every(k => !PENALTY[logOf(pid, d, k)]);
+const perfect = (pid, d) => MISSIONS.every(m => done(pid, d, m.id)) && clean(pid, d);
+const dayXP = (pid, d) => MISSIONS.reduce((t, m) => t + (done(pid, d, m.id) ? m.xp : 0), 0) + (perfect(pid, d) ? PERFECT_XP : 0) + penalty(pid, d);
+// trail progress: finishXP of points = the whole trail
+const kmFor = xp => Math.max(0, Math.min(TRAIL.km, xp / TRAIL.finishXP * TRAIL.km));
+function finishedOn(pid) { let t = walksDone(pid) >= 5 ? BOSS_XP : 0; for (let i = 0; i < 7; i++) { t += dayXP(pid, DAYS[i]); if (t >= TRAIL.finishXP) return i; } return -1; }
 const foodXP = pid => DAYS.reduce((t, d) => t + ['meals','plants','drinks'].reduce((s, id) => s + (done(pid, d, id) ? MISSIONS.find(m => m.id === id).xp : 0), 0) + penalty(pid, d), 0);
 const lost = pid => -DAYS.reduce((t, d) => t + penalty(pid, d), 0);
 const walksDone = pid => +get(`walks.${pid}`) || 0;
 const totalXP = pid => DAYS.reduce((t, d) => t + dayXP(pid, d), 0) + (walksDone(pid) >= 5 ? BOSS_XP : 0);
-const level = xp => xp >= 750 ? 'Level 5' : xp >= 550 ? 'Level 4' : xp >= 350 ? 'Level 3' : xp >= 150 ? 'Level 2' : 'Level 1';
+const level = xp => xp >= 850 ? 'Level 5' : xp >= 650 ? 'Level 4' : xp >= 400 ? 'Level 3' : xp >= 175 ? 'Level 2' : 'Level 1';
 
 /* ---------- view ---------- */
 const $ = id => document.getElementById(id);
@@ -403,12 +461,45 @@ const fmt = (d, o) => d.toLocaleDateString('en-CA', o);
 const todayIdx = (() => { const n = new Date(); const i = Math.floor((new Date(n.getFullYear(), n.getMonth(), n.getDate()) - START) / 864e5); return i >= 0 && i < 7 ? i : -1; })();
 let sel = todayIdx >= 0 ? todayIdx : 0;
 
+function renderTrail() {
+  $('trailName').textContent = TRAIL.name;
+  $('trailSub').textContent = `${TRAIL.where} · ${TRAIL.finishXP} XP reaches the end. More points, faster arrival.`;
+  $('where').innerHTML = PEOPLE.map(p => { const x = totalXP(p.id), km = kmFor(x), f = finishedOn(p.id);
+    const passed = TRAIL.stops.filter(s => s.km <= km + 1e-9).pop(), next = TRAIL.stops.find(s => s.km > km + 1e-9);
+    return `<div><b>${p.name}</b> · ${km.toFixed(1)} km<br>${f >= 0 ? `Reached ${TRAIL.stops[TRAIL.stops.length - 1].n} on ${DAYNAMES[f]}! 🎉` : `At ${esc(passed.n)}. Next: ${esc(next.n)} in ${(next.km - km).toFixed(1)} km (${Math.ceil((next.km - km) / TRAIL.km * TRAIL.finishXP)} XP)`}</div>`; }).join('');
+  drawTrail();
+}
+function drawTrail() {
+  const svg = $('trailSvg'), W = svg.clientWidth, H = svg.clientHeight; if (!W) return;
+  const narrow = W < 520, pl = 14, pr = 14, top = 34, base = H - (narrow ? 50 : 40);
+  const X = km => pl + km / TRAIL.km * (W - pl - pr), Y = el => base - el / 1250 * (base - top);
+  const pts = TRAIL.stops.map(s => [X(s.km), Y(s.el)]);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const elAt = km => { const st = TRAIL.stops; for (let i = 1; i < st.length; i++) if (km <= st[i].km) { const a = st[i - 1], b = st[i], t = (km - a.km) / (b.km - a.km); return a.el + t * (b.el - a.el); } return 0; };
+  let out = `<defs><linearGradient id="mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f7cac"/><stop offset="1" stop-color="#1d3557"/></linearGradient></defs>`;
+  out += `<path d="${line} L${X(TRAIL.km)} ${base} L${X(0)} ${base} Z" fill="url(#mtn)" opacity=".9"/>`;
+  out += `<path d="M${X(24.2)} ${Y(820)} L${X(26)} ${Y(1154)} L${X(27.8)} ${Y(870)} Z" fill="#fff" opacity=".85"/>`; // snow on the pass
+  out += `<path d="${line}" fill="none" stroke="#cfe0f5" stroke-width="2" stroke-dasharray="5 5"/>`;
+  out += `<line x1="${pl}" x2="${W - pr}" y1="${base}" y2="${base}" stroke="rgba(255,255,255,.25)"/>`;
+  TRAIL.stops.forEach((s, i) => { const x = X(s.km), y = Y(s.el), key = !!s.s;
+    out += `<circle cx="${x}" cy="${y}" r="${key ? 4.5 : 3}" fill="${key ? '#f4d35e' : '#cfe0f5'}"/>`;
+    if (key || !narrow) { const lab = narrow ? s.s : s.n, row = narrow ? TRAIL.stops.filter(t => t.s).indexOf(s) % 2 : i % 2, anc = i === 0 ? 'start' : i === TRAIL.stops.length - 1 ? 'end' : 'middle';
+      out += `<line x1="${x}" x2="${x}" y1="${base}" y2="${base + 5 + row * 14}" stroke="rgba(255,255,255,.3)"/><text x="${x}" y="${base + 16 + row * 14}" fill="${key ? '#fff' : '#cfe0f5'}" font-size="${narrow ? 11 : 12}" text-anchor="${anc}" font-weight="${key ? 'bold' : 'normal'}">${esc(lab)}</text>`; } });
+  out += `<text x="${X(26)}" y="${Y(1154) - 8}" fill="#fff" font-size="11" text-anchor="middle">1,154 m</text>`;
+  const pos = PEOPLE.map(p => { const km = kmFor(totalXP(p.id)); return {p, x: X(km), y: Y(elAt(km))}; });
+  const close = Math.abs(pos[0].x - pos[1].x) < 26;
+  pos.forEach((o, i) => { const lift = close ? (i ? 34 : 14) : 14, cy = o.y - lift;
+    out += `<line x1="${o.x}" x2="${o.x}" y1="${o.y}" y2="${cy + 11}" stroke="${i ? '#e76f51' : '#f4d35e'}" stroke-width="2"/><circle cx="${o.x}" cy="${cy}" r="11" fill="${i ? '#e76f51' : '#f4d35e'}" stroke="#1d3557" stroke-width="2"/><text x="${o.x}" y="${cy + 4}" font-size="12" font-weight="bold" text-anchor="middle" fill="#14213d">${o.p.name[0]}</text>`; });
+  svg.innerHTML = out;
+}
+const trailRO = new ResizeObserver(drawTrail); trailRO.observe($('trailSvg'));
 function renderPlayers() {
+  renderTrail();
   $('players').innerHTML = PEOPLE.map(p => { const x = totalXP(p.id); return `<div class="pl"><span class="lv">${level(x)}</span><b>${p.name}</b>
     <div class="bar"><i style="width:${Math.max(0, Math.min(100, x / MAX_XP * 100))}%"></i></div><small>${x} / ${MAX_XP} XP this week${lost(p.id) ? ` · <span style="color:#ffb4a2">−${lost(p.id)} from off-plan food</span>` : ''}</small></div>`; }).join('');
 }
 function renderToday() {
-  $('days').innerHTML = DAYS.map((d, i) => `<button data-day="${i}" class="${i === sel ? 'on' : ''} ${i === todayIdx ? 'today' : ''}">${fmt(dateOf(i), {weekday:'short'})}<small>${fmt(dateOf(i), {month:'short', day:'numeric'})}</small></button>`).join('');
+  $('days').innerHTML = DAYS.map((d, i) => `<button data-day="${i}" class="${i === sel ? 'on' : ''} ${i === todayIdx ? 'today' : ''}">${fmt(dateOf(i), {weekday:'short'})}<small>${fmt(dateOf(i), {month:'short', day:'numeric'})}</small><span class="st">${PEOPLE.map(p => perfect(p.id, d) ? '★' : '').join('')}</span></button>`).join('');
   $('dayTitle').textContent = `${DAYNAMES[sel]}, ${fmt(dateOf(sel), {month:'long', day:'numeric'})}` + (todayIdx < 0 && sel === 0 && new Date() < START ? ' · starts soon' : '');
   $('meals').innerHTML = SLOTS.map((lab, k) => {
     const vs = PEOPLE.map(p => eff(p.id, sel, k)), same = vs[0] === vs[1] && vs[0] !== 'custom';
@@ -423,10 +514,15 @@ function renderToday() {
       return `<div class="lg"><div class="nm"><small>${lab}</small>${esc(label(p.id, sel, k))}${pen ? ` <span class="pen">−${pen}</span>` : ''}</div>
         <div class="seg" role="group" aria-label="${lab}">${LOGS.map(o => `<button data-log="log.${p.id}.${d}.${k}" data-v="${o.v}" class="${l === o.v ? 'on' : ''}" aria-pressed="${l === o.v}" aria-label="${o.a}" title="${o.a}">${o.t}</button>`).join('')}</div>
         ${l === 'off' || l === 'junk' ? `<div class="ni">${field(`lognote.${p.id}.${d}.${k}`, 'What did you have instead?')}</div>` : ''}</div>`; }).join('');
-    return `<div class="card"><h3>${p.name} <em class="${x < 0 ? 'neg' : ''}">${x} / 100 XP</em></h3>
+    const got = MISSIONS.filter(m => done(p.id, d, m.id)).length, pf = perfect(p.id, d);
+    const gems = MISSIONS.map(m => { const on = done(p.id, d, m.id), auto = m.id === 'meals';
+      return `<button class="gem ${on ? 'on' : ''} ${auto ? 'auto' : ''}" style="--gc:${ICONS[m.id].c}" ${auto ? 'aria-disabled="true"' : `data-path="xp.${p.id}.${d}.${m.id}"`} aria-pressed="${on}" title="${esc(m.name + ': ' + m.hint)}"><i>${svgI(m.id)}</i><b>${m.name.replace('Mediterranean meals', 'Med meals').replace('Sleep opportunity', 'Sleep').replace('Walk or recovery', 'Walk').replace('Daily check-in', 'Check-in').replace('Smart drinks', 'Smart drink')}</b><small>+${m.xp}</small></button>`; }).join('')
+      + `<div class="gem crown ${pf ? 'on' : ''}" style="--gc:#14213d"><i>${svgI('crown')}</i><b>Perfect</b><small>+${PERFECT_XP}</small></div>`;
+    return `<div class="card"><h3>${p.name} <em class="${x < 0 ? 'neg' : ''}">${x} / ${100 + PERFECT_XP} XP</em></h3>
+      <p class="sub2">Collect them all · ${got} of ${MISSIONS.length}</p><div class="gems">${gems}</div>
+      ${pf ? `<div class="perfect">Perfect day! +${PERFECT_XP} bonus XP</div>` : got === MISSIONS.length && !clean(p.id, d) ? `<p class="key">All icons collected, but an off-plan meal blocks the perfect-day bonus.</p>` : `<p class="key">Med meals collects itself after two ✓ meals below. Tap the others as you do them.</p>`}
       <p class="sub2">What I ate</p><p class="key">✓ ate the plan (or my swap) · ≈ off plan −5 · ✗ junk or fast food −20 (snack −10)</p>${meals}
-      <p class="sub2">Missions</p><ul class="ms">${MISSIONS.map(m => { const on = done(p.id, d, m.id), auto = m.id === 'meals';
-      return `<li><button class="tog ${on ? 'on' : ''} ${auto ? 'auto' : ''}" ${auto ? 'disabled' : `data-path="xp.${p.id}.${d}.${m.id}"`} aria-pressed="${on}"><span class="box"></span><span class="t">${m.name}<small>${m.hint}</small></span><span class="xp">+${m.xp}</span></button></li>`; }).join('')}</ul></div>`; }).join('');
+    </div>`; }).join('');
   $('walks').innerHTML = PEOPLE.map(p => { const n = walksDone(p.id);
     return `<div class="walks"><b>${p.name}</b>${[1,2,3,4,5].map(k => `<button class="walk ${k <= n ? 'on' : ''}" data-walk="${p.id}" data-n="${k}" aria-label="Walk ${k}">${k}</button>`).join('')}${n >= 5 ? ' <span>+150 XP!</span>' : ''}</div>`; }).join('');
 }
@@ -478,6 +574,7 @@ function renderReview() {
   $('reviewPeople').innerHTML = PEOPLE.map(p => { const r = `review.${p.id}.`;
     return `<div class="card"><h3>${p.name}</h3>
       <div class="row"><div><small>Food XP</small><div class="stat">${foodXP(p.id)} / 350</div></div><div><small>Total XP</small><div class="stat">${totalXP(p.id)} / ${MAX_XP}</div></div></div>
+      <p style="margin:0">Perfect days: <b>${DAYS.filter(d => perfect(p.id, d)).length} of 7</b> · Trail: <b>${kmFor(totalXP(p.id)).toFixed(1)} of ${TRAIL.km} km</b></p>
       <p style="margin:0">Lost to off-plan food: <b>${lost(p.id)} XP</b></p>
       <p style="margin:0">Boss battle: <b>${walksDone(p.id) >= 5 ? 'complete ✓' : walksDone(p.id) + ' of 5 walks'}</b></p>
       ${field(r + 'walkMin', 'Walking minutes (goal 75)', 'number')}
