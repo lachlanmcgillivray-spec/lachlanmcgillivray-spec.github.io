@@ -66,6 +66,25 @@ h1{text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .mine{font-size:12px;background:var(--lemon);border-radius:8px;padding:1px 6px;font-weight:bold}
 .cnt{font-size:14px;color:var(--muted);font-weight:normal}
 #libList h3{margin-top:18px}
+.cards-h{margin:12px 0 6px!important;color:#fff!important;font-weight:bold;font-size:15px!important}
+.cards{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.card-pc{flex:none;width:104px;border:0;border-radius:14px;padding:0 0 8px;background:#fff;color:var(--ink);text-align:left;font:inherit;cursor:pointer;overflow:hidden;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.card-pc .ph{display:flex;align-items:center;justify-content:center;height:72px;background:var(--navy2) center/cover no-repeat;color:rgba(255,255,255,.6)}
+.card-pc b{display:block;font-size:12px;line-height:1.2;padding:6px 8px 0;min-height:34px}
+.card-pc .by{display:block;font-size:11px;color:var(--muted);padding:0 8px}
+.card-pc.locked{background:rgba(255,255,255,.1);color:#cfe0f5;cursor:default;box-shadow:none}
+.card-pc.locked .ph{background:rgba(0,0,0,.25)}.card-pc.locked .by{color:#9fb3cc}
+#pc{position:fixed;inset:0;z-index:30;background:rgba(5,10,25,.7);display:none;align-items:center;justify-content:center;padding:16px}
+#pc.on{display:flex}
+#pcBox{background:#fff;color:var(--ink);border-radius:24px;overflow:hidden;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;animation:pop .45s ease-out;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pc-photo{height:min(46vh,320px);background:var(--navy)}.pc-photo img,.pc-photo svg{width:100%;height:100%;object-fit:cover;display:block}
+.pc-body{padding:16px 20px 18px}
+.pc-k{margin:0;color:var(--orange);font-weight:bold;font-size:15px}
+.pc-body h2{margin:2px 0 4px}
+.pc-meta{margin:0 0 8px;color:var(--muted);font-size:14px}
+.pc-t{margin:0 0 8px;font-size:15px}
+.pc-c{margin:0;font-size:12px;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){#pcBox{animation:none}}
 .players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .pl{background:rgba(8,14,30,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:20px;padding:14px 16px;box-shadow:0 6px 0 rgba(0,0,0,.25)}
 .pl b{font-size:20px}
@@ -227,6 +246,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
     <h2 id="trailName"></h2><p id="trailSub"></p>
     <div class="tfig"><svg id="trailSvg" role="img" aria-label="Trail progress"></svg></div>
     <div class="where" id="where"></div>
+    <div id="cards"></div>
   </div>
   <nav id="nav">
     <a href="#today">Today</a><a href="#menu">Menu</a><a href="#recipes">Recipes</a>
@@ -289,6 +309,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
   <div class="note"><b>Portion guide for adults:</b> roughly half a plate of vegetables or fruit, a quarter protein, a quarter whole grains or starchy veg, with olive oil. Adjust for hunger and activity. Kids eat to their own needs; no adult targets for them.</div>
 </section>
 
+<div id="pc" role="dialog" aria-modal="true" aria-label="Milestone"><div id="pcBox"></div></div>
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Swap a meal"><div class="panel" id="panel"></div></div>
 <section id="s-plan">
   <h2>Plan your weeks</h2>
@@ -336,39 +357,39 @@ const svgI = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 // Great walks. Each week picks one. Distances from park and route guides; elevation profiles are approximate.
 const FINISH_XP = 700;
 const TRAILS = {
-  milford: {name: 'The Milford Track', where: 'Fiordland, New Zealand', km: 53.5, snow: true,
+  milford: {wiki: 'Milford Track', name: 'The Milford Track', where: 'Fiordland, New Zealand', km: 53.5, snow: true,
     theme: {deep: '#1d3557', mid: '#26426a', mtn: '#4f7cac'},
     stops: [
-      {km: 0, el: 200, n: 'Glade Wharf', s: 'Start'}, {km: 5, el: 200, n: 'Clinton Hut', s: 'Clinton'}, {km: 13, el: 330, n: 'Hirere Falls'},
-      {km: 22.5, el: 600, n: 'Mintaro Hut', s: 'Mintaro'}, {km: 26, el: 1154, n: 'Mackinnon Pass', s: 'Pass'}, {km: 31, el: 500, n: 'Sutherland Falls'},
-      {km: 35.5, el: 150, n: 'Dumpling Hut', s: 'Dumpling'}, {km: 45, el: 60, n: 'Giant Gate Falls'}, {km: 53.5, el: 0, n: 'Sandfly Point', s: 'Finish'}]},
-  inca: {name: 'The Inca Trail', where: 'Andes, Peru', km: 42, snow: false,
+      {km: 0, el: 200, n: 'Glade Wharf', w: "Lake Te Anau", s: 'Start'}, {km: 5, el: 200, n: 'Clinton Hut', s: 'Clinton'}, {km: 13, el: 330, n: 'Hirere Falls'},
+      {km: 22.5, el: 600, n: 'Mintaro Hut', s: 'Mintaro'}, {km: 26, el: 1154, n: 'Mackinnon Pass', w: "Mackinnon Pass", s: 'Pass'}, {km: 31, el: 500, n: 'Sutherland Falls', w: "Sutherland Falls"},
+      {km: 35.5, el: 150, n: 'Dumpling Hut', s: 'Dumpling'}, {km: 45, el: 60, n: 'Giant Gate Falls'}, {km: 53.5, el: 0, n: 'Sandfly Point', w: "Milford Sound", s: 'Finish'}]},
+  inca: {wiki: 'Inca Trail to Machu Picchu', name: 'The Inca Trail', where: 'Andes, Peru', km: 42, snow: false,
     theme: {deep: '#3d2645', mid: '#56365f', mtn: '#b0736e'},
     stops: [
-      {km: 0, el: 2700, n: 'KM 82', s: 'Start'}, {km: 6, el: 2750, n: 'Patallacta'}, {km: 12, el: 3000, n: 'Wayllabamba', s: 'Wayllabamba'},
-      {km: 19, el: 4215, n: "Dead Woman's Pass", s: 'Pass'}, {km: 21, el: 3600, n: 'Pacaymayo'}, {km: 25, el: 3950, n: 'Runkurakay Pass'},
-      {km: 32, el: 3650, n: 'Phuyupatamarca'}, {km: 38, el: 2650, n: 'Wiñay Wayna', s: 'Wiñay Wayna'}, {km: 41, el: 2720, n: 'Sun Gate'},
-      {km: 42, el: 2430, n: 'Machu Picchu', s: 'Finish'}]},
-  camino: {name: 'Camino de Santiago', where: 'Sarria to Santiago de Compostela, Spain', km: 116, snow: false,
+      {km: 0, el: 2700, n: 'KM 82', w: "Inca Trail to Machu Picchu", s: 'Start'}, {km: 6, el: 2750, n: 'Patallacta', w: "Patallaqta"}, {km: 12, el: 3000, n: 'Wayllabamba', s: 'Wayllabamba'},
+      {km: 19, el: 4215, n: "Dead Woman's Pass", s: 'Pass'}, {km: 21, el: 3600, n: 'Pacaymayo'}, {km: 25, el: 3950, n: 'Runkurakay Pass', w: "Runkurakay"},
+      {km: 32, el: 3650, n: 'Phuyupatamarca', w: "Phuyupatamarka"}, {km: 38, el: 2650, n: 'Wiñay Wayna', w: "Wiñay Wayna", s: 'Wiñay Wayna'}, {km: 41, el: 2720, n: 'Sun Gate', w: "Inti Punku"},
+      {km: 42, el: 2430, n: 'Machu Picchu', w: "Machu Picchu", s: 'Finish'}]},
+  camino: {wiki: 'Camino de Santiago', name: 'Camino de Santiago', where: 'Sarria to Santiago de Compostela, Spain', km: 116, snow: false,
     theme: {deep: '#1f3b2f', mid: '#2c5241', mtn: '#6d9f6a'},
     stops: [
-      {km: 0, el: 450, n: 'Sarria', s: 'Sarria'}, {km: 22, el: 350, n: 'Portomarín', s: 'Portomarín'}, {km: 47, el: 565, n: 'Palas de Rei', s: 'Palas'},
-      {km: 61, el: 455, n: 'Melide'}, {km: 76, el: 390, n: 'Arzúa', s: 'Arzúa'}, {km: 96, el: 270, n: 'O Pedrouzo', s: 'Pedrouzo'},
-      {km: 111, el: 370, n: 'Monte do Gozo'}, {km: 116, el: 260, n: 'Santiago', s: 'Santiago'}]},
-  wct: {name: 'The West Coast Trail', where: 'Vancouver Island, Canada', km: 75, snow: false,
+      {km: 0, el: 450, n: 'Sarria', w: "Sarria", s: 'Sarria'}, {km: 22, el: 350, n: 'Portomarín', w: "Portomarín", s: 'Portomarín'}, {km: 47, el: 565, n: 'Palas de Rei', w: "Palas de Rei", s: 'Palas'},
+      {km: 61, el: 455, n: 'Melide', w: "Melide"}, {km: 76, el: 390, n: 'Arzúa', w: "Arzúa", s: 'Arzúa'}, {km: 96, el: 270, n: 'O Pedrouzo', s: 'Pedrouzo'},
+      {km: 111, el: 370, n: 'Monte do Gozo', w: "Monte do Gozo"}, {km: 116, el: 260, n: 'Santiago', w: "Santiago de Compostela Cathedral", s: 'Santiago'}]},
+  wct: {wiki: 'West Coast Trail', name: 'The West Coast Trail', where: 'Vancouver Island, Canada', km: 75, snow: false,
     theme: {deep: '#17323d', mid: '#22485a', mtn: '#3f8188'},
     stops: [
-      {km: 0, el: 10, n: 'Pachena Bay', s: 'Pachena'}, {km: 9.5, el: 60, n: 'Pachena Lighthouse'}, {km: 12, el: 5, n: 'Michigan Creek', s: 'Michigan'},
-      {km: 25, el: 10, n: 'Tsusiat Falls', s: 'Tsusiat'}, {km: 32.2, el: 0, n: 'Nitinaht Narrows', s: 'Nitinaht'}, {km: 44, el: 30, n: 'Carmanah Lighthouse', s: 'Carmanah'},
+      {km: 0, el: 10, n: 'Pachena Bay', s: 'Pachena'}, {km: 9.5, el: 60, n: 'Pachena Lighthouse', w: "Pachena Point Lighthouse"}, {km: 12, el: 5, n: 'Michigan Creek', s: 'Michigan'},
+      {km: 25, el: 10, n: 'Tsusiat Falls', w: "Tsusiat Falls", s: 'Tsusiat'}, {km: 32.2, el: 0, n: 'Nitinaht Narrows', w: "Nitinat Lake", s: 'Nitinaht'}, {km: 44, el: 30, n: 'Carmanah Lighthouse', w: "Carmanah Point Lighthouse", s: 'Carmanah'},
       {km: 53, el: 5, n: 'Walbran Creek'}, {km: 57.7, el: 90, n: 'Cullite Cove'}, {km: 62.2, el: 5, n: 'Camper Bay', s: 'Camper'},
-      {km: 70, el: 10, n: 'Thrasher Cove'}, {km: 75, el: 0, n: 'Gordon River', s: 'Finish'}]},
-  whw: {name: 'The West Highland Way', where: 'Milngavie to Fort William, Scotland', km: 154, snow: false,
+      {km: 70, el: 10, n: 'Thrasher Cove'}, {km: 75, el: 0, n: 'Gordon River', w: "Port Renfrew", s: 'Finish'}]},
+  whw: {wiki: 'West Highland Way', name: 'The West Highland Way', where: 'Milngavie to Fort William, Scotland', km: 154, snow: false,
     theme: {deep: '#2b2540', mid: '#3c3459', mtn: '#8a7bb0'},
     stops: [
-      {km: 0, el: 50, n: 'Milngavie', s: 'Start'}, {km: 19, el: 70, n: 'Drymen'}, {km: 31, el: 361, n: 'Conic Hill'}, {km: 33, el: 10, n: 'Balmaha'},
-      {km: 44, el: 20, n: 'Rowardennan', s: 'Rowardennan'}, {km: 66.5, el: 20, n: 'Inverarnan'}, {km: 86, el: 250, n: 'Tyndrum', s: 'Tyndrum'},
-      {km: 97, el: 180, n: 'Bridge of Orchy'}, {km: 116, el: 250, n: 'Kingshouse', s: 'Kingshouse'}, {km: 120, el: 550, n: "Devil's Staircase"},
-      {km: 130, el: 10, n: 'Kinlochleven'}, {km: 154, el: 20, n: 'Fort William', s: 'Finish'}]}
+      {km: 0, el: 50, n: 'Milngavie', w: "Milngavie", s: 'Start'}, {km: 19, el: 70, n: 'Drymen', w: "Drymen"}, {km: 31, el: 361, n: 'Conic Hill', w: "Conic Hill"}, {km: 33, el: 10, n: 'Balmaha', w: "Balmaha"},
+      {km: 44, el: 20, n: 'Rowardennan', w: "Rowardennan", s: 'Rowardennan'}, {km: 66.5, el: 20, n: 'Inverarnan', w: "Inverarnan"}, {km: 86, el: 250, n: 'Tyndrum', w: "Tyndrum", s: 'Tyndrum'},
+      {km: 97, el: 180, n: 'Bridge of Orchy', w: "Bridge of Orchy"}, {km: 116, el: 250, n: 'Kingshouse', w: "Kingshouse Hotel", s: 'Kingshouse'}, {km: 120, el: 550, n: "Devil's Staircase"},
+      {km: 130, el: 10, n: 'Kinlochleven', w: "Kinlochleven"}, {km: 154, el: 20, n: 'Fort William', w: "Fort William, Highland", s: 'Finish'}]}
 };
 Object.keys(TRAILS).forEach(k => { TRAILS[k].id = k; });
 
@@ -951,7 +972,103 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => { const t = e.target; if (t.dataset && t.dataset.d === 'start' && draft) renderEditor(); });
 
-function renderAll() { renderHeader(); renderRecipes(); renderPlan(); renderPlayers(); renderToday(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
+/* ---------- milestone postcards (photos from Wikipedia) ---------- */
+const photoCache = lsGet('levelup_photos', {});
+async function wikiSummary(t) {
+  const r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(t.replace(/ /g, '_')));
+  if (!r.ok) return null; const j = await r.json();
+  if (j.type === 'disambiguation' || !(j.originalimage || j.thumbnail)) return null;
+  const o = j.originalimage, th = j.thumbnail;
+  const src = o && o.width <= 1400 ? o.source : th ? th.source.replace(/\/\d+px-/, '/1000px-') : o.source;
+  return {src, text: j.extract || '', url: j.content_urls ? j.content_urls.desktop.page : 'https://en.wikipedia.org/wiki/' + encodeURIComponent(t), title: j.title};
+}
+async function wikiSearch(q) {
+  const r = await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=4&prop=pageimages|extracts|info&inprop=url&piprop=thumbnail&pithumbsize=1000&exintro=1&explaintext=1&exsentences=2&gsrsearch=' + encodeURIComponent(q));
+  if (!r.ok) return null; const j = await r.json();
+  const p = Object.values((j.query || {}).pages || {}).sort((a, b) => a.index - b.index).find(x => x.thumbnail);
+  return p ? {src: p.thumbnail.source, text: p.extract || '', url: p.fullurl, title: p.title} : null;
+}
+function photoFor(trail, stop) {
+  const key = trail.id + ':' + stop.n;
+  if (photoCache[key]) return Promise.resolve(photoCache[key]);
+  if (photoFor.busy[key]) return photoFor.busy[key];
+  const job = (async () => {
+    let p = null;
+    try { if (stop.w) p = await wikiSummary(stop.w); } catch (e) {}
+    try { if (!p) p = await wikiSearch(`${stop.n} ${trail.name.replace(/^The /, '')}`); } catch (e) {}
+    try { if (!p && trail.wiki) { p = await wikiSummary(trail.wiki); if (p) p.general = true; } } catch (e) {}
+    if (p) { photoCache[key] = p; lsSet('levelup_photos', photoCache); }
+    return p;
+  })();
+  photoFor.busy[key] = job; return job;
+}
+photoFor.busy = {};
+
+// which landmarks each person has reached
+const reached = pid => { const km = kmFor(totalXP(pid)); return TRAIL.stops.map((s, i) => i === 0 ? km > 0 : km >= s.km - 1e-9); };
+// celebrated on this phone (so each phone gets its own "unlocked" moment)
+const seenK = () => 'levelup_seen_' + WEEK;
+let seen = null, pcQueue = [], pcOpen = null, cardsSig = '';
+const T0 = Date.now();
+function checkMilestones() {
+  seen = lsGet(seenK(), {});
+  if (!seen._init) {
+    // first look at this week on this phone: wait until data has loaded, then file away
+    // anything already reached so old milestones don't all pop up at once
+    if (!docRef && Date.now() - T0 < 4000) { setTimeout(() => renderAll(), 4100 - (Date.now() - T0)); return; }
+    PEOPLE.forEach(p => reached(p.id).forEach((ok, i) => { if (ok) seen[p.id + '_' + i] = 1; }));
+    seen._init = 1; lsSet(seenK(), seen); return;
+  }
+  PEOPLE.forEach(p => reached(p.id).forEach((ok, i) => {
+    const k = p.id + '_' + i;
+    if (ok && !seen[k] && !pcQueue.some(q => q.k === k) && !(pcOpen && pcOpen.k === k)) pcQueue.push({k, pid: p.id, i});
+  }));
+  if (!pcOpen && pcQueue.length) showPostcard(pcQueue.shift(), true);
+}
+function postcardHTML(i, photo, who, unlock) {
+  const st = TRAIL.stops[i], last = i === TRAIL.stops.length - 1;
+  const head = unlock ? (last ? 'Trail complete!' : i === 0 ? 'On the trail!' : 'Milestone unlocked!') : `Postcard ${i + 1} of ${TRAIL.stops.length}`;
+  const by = who.length ? who.map(p => p.name).join(' & ') + (unlock ? (last ? ' finished at ' : ' reached ') : ' · ') : '';
+  const text = photo && photo.text ? photo.text.slice(0, 260).replace(/\s+\S*$/, '') + (photo.text.length > 260 ? '…' : '') : '';
+  return `<div class="pc-photo">${photo ? `<img src="${esc(photo.src)}" alt="${esc(st.n)}">` : scene(TRAIL.id, true)}</div>
+    <div class="pc-body"><p class="pc-k">${head}</p><h2>${esc(st.n)}</h2>
+    <p class="pc-meta">${esc(by)}km ${st.km} of ${TRAIL.km} · ${st.el.toLocaleString('en-CA')} m · ${esc(TRAIL.name)}</p>
+    ${text ? `<p class="pc-t">${esc(text)}</p>` : ''}
+    ${photo ? `<p class="pc-c">${photo.general ? 'Photo of the trail. ' : ''}Photo and text: <a href="${esc(photo.url)}" target="_blank" rel="noopener">Wikipedia, ${esc(photo.title)}</a></p>` : '<p class="pc-c">Photo loads when you\'re online.</p>'}
+    <div class="row"><button class="btn go" id="pcOk">${unlock ? (pcQueue.length ? `Collect · next (${pcQueue.length})` : 'Collect postcard') : 'Close'}</button></div></div>`;
+}
+function showPostcard(item, unlock) {
+  pcOpen = item;
+  const who = unlock ? PEOPLE.filter(p => p.id === item.pid) : PEOPLE.filter(p => reached(p.id)[item.i]);
+  const box = $('pcBox'); $('pc').classList.add('on');
+  const cached = photoCache[TRAIL.id + ':' + TRAIL.stops[item.i].n];
+  box.innerHTML = postcardHTML(item.i, cached || null, who, unlock);
+  if (!cached) photoFor(TRAIL, TRAIL.stops[item.i]).then(p => { if (pcOpen === item && p) box.innerHTML = postcardHTML(item.i, p, who, unlock); });
+}
+function closePostcard() {
+  if (pcOpen && pcOpen.k) { seen = lsGet(seenK(), {}); seen[pcOpen.k] = 1; lsSet(seenK(), seen); }
+  pcOpen = null; $('pc').classList.remove('on');
+  if (pcQueue.length) setTimeout(() => showPostcard(pcQueue.shift(), true), 250);
+  cardsSig = ''; renderCards();
+}
+function renderCards() {
+  const r = PEOPLE.map(p => reached(p.id));
+  const sig = WEEK + TRAIL.id + JSON.stringify(r); if (sig === cardsSig) return; cardsSig = sig;
+  const got = TRAIL.stops.filter((s, i) => r.some(x => x[i])).length;
+  $('cards').innerHTML = `<p class="cards-h">Postcards collected: ${got} of ${TRAIL.stops.length}</p><div class="cards">` + TRAIL.stops.map((s, i) => {
+    const who = PEOPLE.filter((p, j) => r[j][i]);
+    return who.length ? `<button class="card-pc" data-pc="${i}"><span class="ph" id="ph${i}"></span><b>${esc(s.n)}</b><span class="by">${who.map(p => p.name[0]).join(' ')}</span></button>`
+      : `<div class="card-pc locked"><span class="ph"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><b>${esc(s.n)}</b><span class="by">km ${s.km}</span></div>`;
+  }).join('') + '</div>';
+  TRAIL.stops.forEach((s, i) => { if (!r.some(x => x[i])) return; const tr = TRAIL;
+    photoFor(tr, s).then(p => { const el = document.getElementById('ph' + i); if (el && p && tr === TRAIL) el.style.backgroundImage = `url("${p.src.replace(/"/g, '%22')}")`; }); });
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-pc]'); if (c) { showPostcard({i: +c.dataset.pc}, false); return; }
+  if (e.target.id === 'pcOk' || e.target.id === 'pc') closePostcard();
+});
+
+function renderAll() { renderHeader(); renderRecipes(); renderPlan(); renderPlayers(); renderCards(); checkMilestones(); renderToday(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
 
 /* ---------- tabs ---------- */
 const TABS = ['today','menu','recipes','groceries','prep','review','plan'];
