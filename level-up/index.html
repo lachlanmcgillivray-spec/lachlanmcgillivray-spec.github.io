@@ -32,9 +32,42 @@ button,input,textarea,select{font:inherit}
 .chip.ok{background:rgba(42,157,143,.35);color:#fff}
 h1{font-size:clamp(40px,9vw,60px);line-height:1;margin:18px 0 4px;letter-spacing:.02em}
 h1 span{color:var(--lemon)}
-.sub{color:#cfe0f5;font-size:18px;margin:0 0 18px}
+.sub{color:#e6eef8;font-size:18px;margin:0 0 12px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.hero{position:absolute;left:0;right:0;top:0;height:560px;z-index:0;overflow:hidden;pointer-events:none}
+.hero svg{width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.08) 30%,rgba(0,0,0,0) 50%,var(--navy) 96%)}
+.head{position:relative;z-index:1}
+main{position:relative;z-index:1}
+h1{text-shadow:0 2px 12px rgba(0,0,0,.45)}
+.weeks{display:flex;gap:6px;overflow-x:auto;margin:0 0 14px;padding-bottom:2px}
+.weeks button,.weeks a{flex:none;border:0;border-radius:14px;padding:7px 12px;min-height:44px;background:rgba(0,0,0,.35);color:#fff;font:inherit;font-weight:bold;font-size:14px;cursor:pointer;text-decoration:none;line-height:1.15;display:flex;flex-direction:column;justify-content:center}
+.weeks small{font-weight:normal;font-size:12px;opacity:.85}
+.weeks button.on{background:var(--lemon);color:var(--ink)}
+.weeks .plus{background:rgba(255,255,255,.18)}
+.wk{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--soft);border-radius:18px;padding:10px;margin:8px 0}
+.thumb{height:72px;border-radius:12px;overflow:hidden}.thumb svg{width:100%;height:100%;display:block}
+.wk .info small{display:block;color:var(--muted);font-size:14px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.wk .btn,.editor .btn,.lib .btn{background:#fff;box-shadow:inset 0 0 0 2px var(--line)}
+.btn.go,.editor .btn.go{background:var(--teal);color:#fff;box-shadow:none}.editor .btn.warn{background:var(--red);color:#fff}
+.editor{background:var(--soft);border-radius:20px;padding:16px;margin:14px 0}
+.editor h3{margin-top:0}
+.editor input,.editor select,.editor textarea{background:#fff}
+.tprev{position:relative;height:110px;border-radius:14px;overflow:hidden;margin:4px 0 10px}
+.tprev svg{width:100%;height:100%;display:block}
+.tprev span{position:absolute;left:12px;bottom:10px;color:#fff;font-size:14px;text-shadow:0 1px 6px rgba(0,0,0,.7)}.tprev b{display:block;font-size:18px}
+.mgrid{display:grid;gap:8px;margin:8px 0}
+.mday{display:grid;grid-template-columns:110px repeat(4,minmax(0,1fr));gap:8px;align-items:end;background:#fff;border-radius:14px;padding:10px}
+.mday label span{display:block;font-size:12px;color:var(--muted);font-weight:bold}
+.mday select,.mday input{min-height:44px;padding:8px;font-size:16px;width:100%;border:2px solid var(--line);border-radius:10px;color:var(--ink)}
+.mday b{align-self:center}
+.lib{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.lib small{display:block;color:var(--muted);font-size:13px}
+.mine{font-size:12px;background:var(--lemon);border-radius:8px;padding:1px 6px;font-weight:bold}
+.cnt{font-size:14px;color:var(--muted);font-weight:normal}
+#libList h3{margin-top:18px}
 .players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.pl{background:var(--navy2);border-radius:20px;padding:14px 16px;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.pl{background:rgba(8,14,30,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:20px;padding:14px 16px;box-shadow:0 6px 0 rgba(0,0,0,.25)}
 .pl b{font-size:20px}
 .pl .lv{float:right;font-size:13px;color:var(--lemon);font-weight:bold;padding-top:4px}
 .bar{height:14px;border-radius:8px;background:rgba(255,255,255,.14);margin:10px 0 6px;overflow:hidden}
@@ -113,7 +146,7 @@ select{width:100%;font-size:16px;padding:10px 12px;border:2px solid var(--line);
 .perfect{background:var(--lemon);color:var(--ink);border-radius:12px;padding:8px 12px;font-weight:bold;margin:4px 0 8px}
 .days button .st{display:block;font-size:12px;color:#c58a00;height:14px;line-height:14px}
 .days button.on .st{color:var(--lemon)}
-.trail{margin-top:6px;background:linear-gradient(#26426a,#1d3557);border-radius:22px;padding:14px 14px 10px;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.trail{margin-top:12px;background:rgba(8,14,30,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:22px;padding:14px 14px 10px;box-shadow:0 6px 0 rgba(0,0,0,.25)}
 .trail h2{font-size:22px;margin:0;color:#fff}.trail p{margin:2px 0 0;color:#cfe0f5;font-size:14px}
 .tfig{position:relative;height:230px;margin-top:6px}.tfig svg{position:absolute;inset:0;width:100%;height:100%}
 .where{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
@@ -161,6 +194,8 @@ input:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:3px soli
 footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid var(--line);padding-top:14px}
 @media(max-width:700px){.meals{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){
+  .wk{grid-template-columns:90px minmax(0,1fr)}.wk .acts{grid-column:1/-1}
+  .mday{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.mday b{grid-column:1/-1}
   .where{grid-template-columns:minmax(0,1fr)}.tfig{height:200px}
   .duo{grid-template-columns:minmax(0,1fr)}
   .pl{padding:12px}.pl b{font-size:18px}.pl .lv{float:none;display:block;padding:0}
@@ -178,13 +213,15 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
-<div class="wrap">
+<div class="hero" id="hero"></div>
+<div class="wrap head">
   <div class="top">
     <a class="home" href="../">&#127968; Hub</a>
     <span class="chip" id="sync">Connecting…</span>
   </div>
   <h1>LEVEL <span>UP</span></h1>
-  <p class="sub">Week 1 · The First Step · Mon Nov 30 – Sun Dec 6</p>
+  <p class="sub" id="weekSub"></p>
+  <div class="weeks" id="weeks"></div>
   <div class="players" id="players"></div>
   <div class="trail">
     <h2 id="trailName"></h2><p id="trailSub"></p>
@@ -193,7 +230,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
   </div>
   <nav id="nav">
     <a href="#today">Today</a><a href="#menu">Menu</a><a href="#recipes">Recipes</a>
-    <a href="#groceries">Groceries</a><a href="#prep">Prep</a><a href="#review">Review</a>
+    <a href="#groceries">Groceries</a><a href="#prep">Prep</a><a href="#review">Review</a><a href="#plan">Plan</a>
   </nav>
 </div>
 
@@ -231,7 +268,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
   <h2>Grocery checklist</h2>
   <p class="lead">Rounded estimates for the whole week, snacks included. Check the pantry first. Ticks are shared, so whoever's at the store can see what's left.</p>
   <div id="gExtra"></div>
-  <h3>Original plan</h3>
+  <h3>Shopping list</h3>
   <div class="prog"><div class="bar"><i id="gBar"></i></div><b id="gCount"></b></div>
   <div class="grid2" id="groceryList"></div>
   <div class="row"><button class="btn" id="gClear">Clear all ticks</button><span id="gConfirm"></span></div>
@@ -244,7 +281,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
 </section>
 
 <section id="s-review">
-  <h2>Weekly review · Sun Dec 6</h2>
+  <h2 id="reviewTitle">Weekly review</h2>
   <p class="lead">XP fills in from the daily missions. Everything else saves as you type.</p>
   <div class="duo" id="reviewPeople"></div>
   <h3>Family notes</h3>
@@ -253,13 +290,24 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
 </section>
 
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Swap a meal"><div class="panel" id="panel"></div></div>
-<footer>A practical starting point, not a calorie-restricted diet. Missed a day? Restart at the next meal, not next Monday.</footer>
+<section id="s-plan">
+  <h2>Plan your weeks</h2>
+  <p class="lead">Build weeks ahead from the recipe library and pick a great walk for each. A saved week switches on by itself on its Monday, with its menu, grocery list, prep and trail all loaded together.</p>
+  <p class="key" id="planNote"></p>
+  <div id="weekList"></div>
+  <div id="editor"></div>
+  <h2 style="margin-top:28px">Recipe library</h2>
+  <p class="lead">Everything you can pick from when planning. Add your own, or copy one of ours and change it.</p>
+  <div id="libForm"></div>
+  <div id="libList"></div>
+</section>
+
+<footer>A practical starting point, not a calorie-restricted diet. Missed a day? Restart at the next meal, not next Monday. Trail distances come from park and route guides; the height profiles are approximate.</footer>
 </div></main>
 
 <script>
 {
-const WEEK = 'week1';
-const START = new Date(2026, 10, 30); // Mon Nov 30 2026
+let WEEK = 'week1', START = new Date(2026, 10, 30), TRAIL, MENU, R, GROCERIES, PREP, todayIdx = -1, sel = 0;
 const PEOPLE = [{id:'lachlan', name:'Lachlan'}, {id:'ashley', name:'Ashley'}];
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
 const DAYNAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -285,27 +333,106 @@ const ICONS = {
   crown:{c:'#14213d', s:'<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5Z"/>'}
 };
 const svgI = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k].s}</svg>`;
-// This week's great walk. Distances from NZ DOC; the elevation profile is approximate.
-const TRAIL = {
-  name: 'The Milford Track', where: 'Fiordland, New Zealand · 53.5 km', km: 53.5, finishXP: 700,
-  stops: [
-    {km: 0, el: 200, n: 'Glade Wharf', s: 'Start'},
-    {km: 5, el: 200, n: 'Clinton Hut', s: 'Clinton'},
-    {km: 13, el: 330, n: 'Hirere Falls'},
-    {km: 22.5, el: 600, n: 'Mintaro Hut', s: 'Mintaro'},
-    {km: 26, el: 1154, n: 'Mackinnon Pass', s: 'Pass'},
-    {km: 31, el: 500, n: 'Sutherland Falls'},
-    {km: 35.5, el: 150, n: 'Dumpling Hut', s: 'Dumpling'},
-    {km: 45, el: 60, n: 'Giant Gate Falls'},
-    {km: 53.5, el: 0, n: 'Sandfly Point', s: 'Finish'}
-  ]
+// Great walks. Each week picks one. Distances from park and route guides; elevation profiles are approximate.
+const FINISH_XP = 700;
+const TRAILS = {
+  milford: {name: 'The Milford Track', where: 'Fiordland, New Zealand', km: 53.5, snow: true,
+    theme: {deep: '#1d3557', mid: '#26426a', mtn: '#4f7cac'},
+    stops: [
+      {km: 0, el: 200, n: 'Glade Wharf', s: 'Start'}, {km: 5, el: 200, n: 'Clinton Hut', s: 'Clinton'}, {km: 13, el: 330, n: 'Hirere Falls'},
+      {km: 22.5, el: 600, n: 'Mintaro Hut', s: 'Mintaro'}, {km: 26, el: 1154, n: 'Mackinnon Pass', s: 'Pass'}, {km: 31, el: 500, n: 'Sutherland Falls'},
+      {km: 35.5, el: 150, n: 'Dumpling Hut', s: 'Dumpling'}, {km: 45, el: 60, n: 'Giant Gate Falls'}, {km: 53.5, el: 0, n: 'Sandfly Point', s: 'Finish'}]},
+  inca: {name: 'The Inca Trail', where: 'Andes, Peru', km: 42, snow: false,
+    theme: {deep: '#3d2645', mid: '#56365f', mtn: '#b0736e'},
+    stops: [
+      {km: 0, el: 2700, n: 'KM 82', s: 'Start'}, {km: 6, el: 2750, n: 'Patallacta'}, {km: 12, el: 3000, n: 'Wayllabamba', s: 'Wayllabamba'},
+      {km: 19, el: 4215, n: "Dead Woman's Pass", s: 'Pass'}, {km: 21, el: 3600, n: 'Pacaymayo'}, {km: 25, el: 3950, n: 'Runkurakay Pass'},
+      {km: 32, el: 3650, n: 'Phuyupatamarca'}, {km: 38, el: 2650, n: 'Wiñay Wayna', s: 'Wiñay Wayna'}, {km: 41, el: 2720, n: 'Sun Gate'},
+      {km: 42, el: 2430, n: 'Machu Picchu', s: 'Finish'}]},
+  camino: {name: 'Camino de Santiago', where: 'Sarria to Santiago de Compostela, Spain', km: 116, snow: false,
+    theme: {deep: '#1f3b2f', mid: '#2c5241', mtn: '#6d9f6a'},
+    stops: [
+      {km: 0, el: 450, n: 'Sarria', s: 'Sarria'}, {km: 22, el: 350, n: 'Portomarín', s: 'Portomarín'}, {km: 47, el: 565, n: 'Palas de Rei', s: 'Palas'},
+      {km: 61, el: 455, n: 'Melide'}, {km: 76, el: 390, n: 'Arzúa', s: 'Arzúa'}, {km: 96, el: 270, n: 'O Pedrouzo', s: 'Pedrouzo'},
+      {km: 111, el: 370, n: 'Monte do Gozo'}, {km: 116, el: 260, n: 'Santiago', s: 'Santiago'}]},
+  wct: {name: 'The West Coast Trail', where: 'Vancouver Island, Canada', km: 75, snow: false,
+    theme: {deep: '#17323d', mid: '#22485a', mtn: '#3f8188'},
+    stops: [
+      {km: 0, el: 10, n: 'Pachena Bay', s: 'Pachena'}, {km: 9.5, el: 60, n: 'Pachena Lighthouse'}, {km: 12, el: 5, n: 'Michigan Creek', s: 'Michigan'},
+      {km: 25, el: 10, n: 'Tsusiat Falls', s: 'Tsusiat'}, {km: 32.2, el: 0, n: 'Nitinaht Narrows', s: 'Nitinaht'}, {km: 44, el: 30, n: 'Carmanah Lighthouse', s: 'Carmanah'},
+      {km: 53, el: 5, n: 'Walbran Creek'}, {km: 57.7, el: 90, n: 'Cullite Cove'}, {km: 62.2, el: 5, n: 'Camper Bay', s: 'Camper'},
+      {km: 70, el: 10, n: 'Thrasher Cove'}, {km: 75, el: 0, n: 'Gordon River', s: 'Finish'}]},
+  whw: {name: 'The West Highland Way', where: 'Milngavie to Fort William, Scotland', km: 154, snow: false,
+    theme: {deep: '#2b2540', mid: '#3c3459', mtn: '#8a7bb0'},
+    stops: [
+      {km: 0, el: 50, n: 'Milngavie', s: 'Start'}, {km: 19, el: 70, n: 'Drymen'}, {km: 31, el: 361, n: 'Conic Hill'}, {km: 33, el: 10, n: 'Balmaha'},
+      {km: 44, el: 20, n: 'Rowardennan', s: 'Rowardennan'}, {km: 66.5, el: 20, n: 'Inverarnan'}, {km: 86, el: 250, n: 'Tyndrum', s: 'Tyndrum'},
+      {km: 97, el: 180, n: 'Bridge of Orchy'}, {km: 116, el: 250, n: 'Kingshouse', s: 'Kingshouse'}, {km: 120, el: 550, n: "Devil's Staircase"},
+      {km: 130, el: 10, n: 'Kinlochleven'}, {km: 154, el: 20, n: 'Fort William', s: 'Finish'}]}
 };
+Object.keys(TRAILS).forEach(k => { TRAILS[k].id = k; });
+
+/* ---------- background scenes, one per trail ---------- */
+function scene(id, small) {
+  const g = (n, a, b) => `<linearGradient id="${n}-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+  const P = (pts, f, o) => `<polygon points="${pts}" fill="${f}"${o ? ` opacity="${o}"` : ''}/>`;
+  const trees = (x0, x1, base, h, f) => { let s = '', i = 0; for (let x = x0; x < x1; x += 30) { const t = h * (0.7 + ((i++ * 37) % 10) / 22); s += P(`${x - 16},${base} ${x},${base - t} ${x + 16},${base}`, f); } return s; };
+  let d = '', b = '';
+  if (id === 'inca') {
+    d = g('sky', '#4a2c55', '#f0a35e');
+    b = `<rect width="1200" height="460" fill="url(#sky-inca)"/><circle cx="880" cy="250" r="70" fill="#ffd27d" opacity=".9"/>`
+      + P('0,260 120,170 220,230 340,120 450,210 560,150 680,230 800,140 900,200 1020,110 1120,190 1200,150 1200,350 0,350', '#8a5d7d')
+      + P('322,140 340,120 360,142 348,136 334,146', '#f4eadf') + P('1002,130 1020,110 1040,132 1028,126 1012,136', '#f4eadf')
+      + P('380,350 450,300 560,300 620,330', '#4d6b45') + P('560,350 640,335 700,190 728,165 758,195 800,335 900,350', '#3e5b3c');
+    for (let j = 0; j < 7; j++) b += `<rect x="0" y="${330 + j * 18}" width="${560 - j * 46}" height="14" fill="${j % 2 ? '#6f9a58' : '#5f8a4c'}"/>`;
+    b += P('0,430 300,395 600,415 900,385 1200,405 1200,460 0,460', '#2e3b2a');
+  } else if (id === 'camino') {
+    d = g('sky', '#6aa5c9', '#f6e3a8');
+    b = `<rect width="1200" height="460" fill="url(#sky-camino)"/><circle cx="300" cy="230" r="52" fill="#fff3c4"/>`
+      + P('0,300 150,262 300,282 450,242 600,272 750,236 900,266 1050,242 1200,262 1200,460 0,460', '#8db87f')
+      + `<g fill="#3d5a4a"><rect x="1000" y="172" width="26" height="92"/><rect x="1056" y="172" width="26" height="92"/><rect x="1026" y="202" width="30" height="62"/></g>`
+      + P('1000,172 1013,132 1026,172', '#3d5a4a') + P('1056,172 1069,132 1082,172', '#3d5a4a')
+      + P('0,352 200,312 400,342 600,302 800,337 1000,307 1200,332 1200,460 0,460', '#5c9460')
+      + `<path d="M140 460 Q 420 400 600 372 T 1000 320" fill="none" stroke="#f1dd8a" stroke-width="7" stroke-linecap="round" opacity=".9"/>`
+      + P('0,412 250,382 500,407 750,377 1000,402 1200,387 1200,460 0,460', '#2f6b45')
+      + [90, 160, 700, 780, 1120].map((x, i) => `<circle cx="${x}" cy="${395 - i % 2 * 12}" r="${18 + i % 3 * 5}" fill="#245a3a"/>`).join('');
+  } else if (id === 'wct') {
+    d = g('sky', '#4f6d7a', '#c7d5d8');
+    b = `<rect width="1200" height="460" fill="url(#sky-wct)"/><rect y="300" width="1200" height="160" fill="#2f5f73"/>`
+      + [320, 345, 372].map(y => `<path d="M420 ${y} q 30 -6 60 0 t 60 0 t 60 0" stroke="#8fb3bf" stroke-width="2" fill="none" opacity=".6"/>`).join('')
+      + P('760,302 775,240 800,232 815,302', '#233f45') + P('860,302 870,265 890,262 898,302', '#233f45')
+      + P('940,302 980,252 1080,232 1200,222 1200,302', '#1f3a3a')
+      + `<rect x="1072" y="182" width="14" height="52" fill="#f1f1f1"/><rect x="1068" y="172" width="22" height="12" fill="#c1121f"/><circle cx="1079" cy="166" r="6" fill="#ffe9a3"/>`
+      + `<rect x="0" y="300" width="430" height="60" fill="#163a33"/>` + trees(-10, 440, 305, 150, '#163a33') + trees(10, 400, 360, 110, '#0f2d28')
+      + P('0,425 400,405 800,420 1200,410 1200,460 0,460', '#b9a77f');
+  } else if (id === 'whw') {
+    d = g('sky', '#3e355e', '#e0a99a');
+    b = `<rect width="1200" height="460" fill="url(#sky-whw)"/>`
+      + P('0,280 200,230 380,260 560,212 760,250 940,222 1200,252 1200,370 0,370', '#7b6d9c')
+      + P('640,362 760,150 790,140 900,362', '#4a3f6e') + P('760,150 790,140 830,250 782,238', '#5d5285')
+      + P('0,330 250,302 500,340 750,312 1000,336 1200,316 1200,400 0,400', '#8a5f9e')
+      + `<rect y="378" width="1200" height="34" fill="#6b7fae" opacity=".85"/>`
+      + P('0,422 300,397 600,417 900,394 1200,412 1200,460 0,460', '#2b2540');
+  } else { // milford
+    d = g('sky', '#31577f', '#9cc5e3');
+    b = `<rect width="1200" height="460" fill="url(#sky-milford)"/>`
+      + P('0,250 90,150 170,210 260,110 340,190 430,90 520,200 600,140 700,60 790,170 880,120 960,190 1050,100 1130,170 1200,130 1200,332 0,332', '#6f8fb0')
+      + P('415,108 430,90 447,110 437,104 425,112', '#f1f6fb') + P('680,85 700,60 722,88 708,80 694,90', '#f1f6fb') + P('1035,118 1050,100 1066,120 1054,114 1043,122', '#f1f6fb')
+      + P('380,332 520,232 650,252 780,222 900,332', '#3c6a82')
+      + P('0,170 60,140 150,200 240,332 0,332', '#2c5468') + P('1200,150 1110,160 1020,232 960,332 1200,332', '#2c5468')
+      + `<path d="M1062 190 C 1056 250 1046 290 1040 332" stroke="#eef6fb" stroke-width="4" fill="none" opacity=".85"/>`
+      + `<rect y="330" width="1200" height="130" fill="#23486a"/>` + [350, 372, 396].map(y => `<line x1="${300 + y % 7 * 30}" x2="${520 + y % 5 * 40}" y1="${y}" y2="${y}" stroke="#7aa3c4" stroke-width="2" opacity=".5"/>`).join('')
+      + trees(-10, 330, 420, 70, '#173b3a') + trees(850, 1220, 425, 60, '#173b3a');
+  }
+  return `<svg viewBox="0 0 1200 460" preserveAspectRatio="${small ? 'xMidYMid slice' : 'xMidYMax slice'}" aria-hidden="true"><defs>${d}</defs>${b}</svg>`;
+}
+
 // Meal log penalties (change these to make it stricter or gentler)
 const PENALTY = {off: [5, 5, 5, 5], junk: [20, 20, 20, 10]}; // breakfast, lunch, dinner, snack
 const LOGS = [{v:'on', t:'✓', a:'Ate the plan'}, {v:'off', t:'≈', a:'Off plan'}, {v:'junk', t:'✗', a:'Junk or fast food'}];
 
 // [breakfast, lunch, dinner, snack] as recipe ids or plain text
-const MENU = [
+const MENU1 = [
   ['oats-blue','l-mon','d-mon','Apple & almonds'],
   ['oats-blue','l-tue','d-tue','Carrots & hummus'],
   ['muffins','l-wed','d-wed','Orange & walnuts'],
@@ -314,7 +441,7 @@ const MENU = [
   ['oats-apple','l-sat','d-sat','Clementines & almonds'],
   ['muffins','l-sun','d-sun','Apple & nut butter']
 ];
-const R = {
+const BASE_R = {
   'oats-blue':{g:'Breakfasts',n:'Blueberry overnight oats',m:'8 servings · Mon–Tue',i:['400 g rolled oats','800 ml fortified unsweetened soy milk','80 g chia seeds','400 g blueberries','Cinnamon; maple syrup optional'],p:'Mix everything, divide among eight containers and refrigerate overnight. Serve cold or gently warmed. Kids may want smaller servings.'},
   'muffins':{g:'Breakfasts',n:'Spinach & pepper egg muffins',m:'12 muffins · Wed, Thu, Sun',i:['12 eggs','150 g chopped spinach','2 diced bell peppers','Herbs, pepper, a little oil for greasing'],p:'Whisk, portion into greased muffin tins and bake at 350°F (175°C) for 18–22 minutes, until set. Serve with wholegrain toast and fruit. Two per adult and one per child means a batch covers two breakfasts, so make a double batch (24) or add eggs and toast on Sunday. Keeps 3–4 days in the fridge, or freeze portions. On Sunday, serve with wholegrain toast.'},
   'oats-apple':{g:'Breakfasts',n:'Apple-cinnamon overnight oats',m:'8 servings · Fri–Sat',i:['400 g rolled oats','800 ml fortified unsweetened soy milk','80 g chia seeds','4 diced apples','100 g chopped walnuts','Cinnamon'],p:'Combine, portion and refrigerate overnight. Make Thursday evening so they stay fresh.'},
@@ -344,7 +471,7 @@ const R = {
 };
 const SNACKS = ['Apple & almonds','Carrots & hummus','Orange & walnuts','Pear & pumpkin seeds','Berries & dairy-free yogurt','Clementines & almonds','Apple & nut butter','Veg sticks & hummus','Banana & nut butter','Handful of almonds & a clementine','Roasted chickpeas','Cucumber, tomato & olives'];
 const SLOTS = ['Breakfast','Lunch','Dinner','Snack'], SLOTGROUP = ['Breakfasts','Lunches','Dinners'];
-const GROCERIES = {
+const GROC1 = {
   'Produce':['Potatoes — 1.6 kg','Green beans — 600 g','Broccoli — 600 g','Baby spinach — 500 g','Lettuce / salad greens — 600 g','Cucumbers — 7 medium','Cherry and regular tomatoes — 2.5 kg','Bell peppers — 6','Zucchini — 2','Carrots — 1 kg','Celery — 1 bunch','Onions — 4','Garlic — 3 bulbs','Lemons — 12','Fresh parsley — 3 bunches','Blueberries / mixed berries — 700 g','Apples — 12','Oranges / clementines — 8–10','Pears — 4'],
   'Meat, fish & eggs':['Bone-in chicken thighs — 1.2 kg','Boneless chicken — 1.8 kg raw','Salmon — 650 g','Cod — 650 g','Ground turkey — 700 g','Canned light tuna — 2 cans','Eggs — 24','Prepared falafel — 12 small'],
   'Grains & bread':['Rolled oats — 800 g','Quinoa, dry — 650 g','Wholegrain pasta — 650 g','Wholewheat couscous — 250 g','Wholegrain pitas — 12','Wholegrain wraps — 4','Wholegrain sourdough / bread — 2 loaves'],
@@ -352,33 +479,63 @@ const GROCERIES = {
   'Dairy-free, nuts & seeds':['Fortified unsweetened soy milk — 2 L','Unsweetened dairy-free yogurt — 750 g','Chia seeds — 160 g','Walnuts — 200 g','Almonds — 250 g','Pumpkin seeds — 150 g','Natural nut butter — 1 jar'],
   'Herbs & seasonings':['Dried oregano','Smoked paprika','Ground cumin','Cinnamon','Salt and black pepper','Maple syrup (optional)','Chilli flakes (optional)','Anchovies (optional)']
 };
-const PREP = [
+const PREP1 = [
   {t:'Sunday, Nov 29 · Main prep', m:'About 75–100 minutes with tasks overlapping', s:['Wash and dry lettuce, spinach and other veg; store separately','Make eight blueberry overnight-oat portions for Mon and Tue','Bake 24 egg muffins to cover all three egg-muffin mornings; freeze the later ones','Cook 400 g dry quinoa for Wed and Sun lunches; refrigerate Wednesday\'s, freeze Sunday\'s','Cook the chicken for Monday\'s lunch; cook Thursday\'s later or freeze it promptly','Mix lemon-olive oil dressing; portion nuts and seeds for snacks','Freeze fish and any meat not used in the next 1–2 days; thaw in the fridge']},
   {t:'Thursday, Dec 3 · Mini prep', m:'About 20 minutes', s:['Make eight apple-cinnamon overnight-oat portions for Fri and Sat','Move Sunday\'s egg muffins to the fridge to thaw','Check produce and refresh delicate salad greens','Plan Sunday\'s cod thaw']}
 ];
 
 /* ---------- state + sync ---------- */
-let S = {}, fs = null, docRef = null;
-const LS = 'levelup_' + WEEK;
-try { S = JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch (e) { S = {}; }
+// Two kinds of Firestore doc in the "levelup" collection:
+//   levelup/setup   = recipe library + planned weeks (shared)
+//   levelup/<week>  = that week's ticks, swaps, logs and review
+let S = {}, SETUP = {}, fs = null, authed = false, docRef = null, setupRef = null, unsubWeek = null, pending = {};
+const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : d; } catch (e) { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const LSK = () => 'levelup_' + WEEK;
+SETUP = lsGet('levelup_setup', {});
+let pendingSetup = lsGet('levelup_setup_pending', {});
 const get = p => p.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : undefined), S);
 function nest(p, v) { const o = {}; let c = o; const ks = p.split('.'); ks.slice(0, -1).forEach(k => { c = c[k] = {}; }); c[ks[ks.length - 1]] = v; return o; }
-function setLocal(p, v) { let c = S; const ks = p.split('.'); ks.slice(0, -1).forEach(k => { if (typeof c[k] !== 'object' || !c[k]) c[k] = {}; c = c[k]; }); c[ks[ks.length - 1]] = v; }
-function cache() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {} }
-let pending = {};
-try { pending = JSON.parse(localStorage.getItem(LS + '_pending') || '{}') || {}; } catch (e) { pending = {}; }
-function savePending() { try { localStorage.setItem(LS + '_pending', JSON.stringify(pending)); } catch (e) {} }
+function setIn(obj, p, v) { let c = obj; const ks = p.split('.'); ks.slice(0, -1).forEach(k => { if (typeof c[k] !== 'object' || !c[k]) c[k] = {}; c = c[k]; }); c[ks[ks.length - 1]] = v; }
+function setLocal(p, v) { setIn(S, p, v); }
+function cache() { lsSet(LSK(), S); }
+function loadWeekLocal() { S = lsGet(LSK(), {}); pending = lsGet(LSK() + '_pending', {}); }
+function savePending() { lsSet(LSK() + '_pending', pending); }
 function write(p, v) {
   if (docRef) docRef.set(nest(p, v), {merge: true}).catch(err => offline(err));
   else { pending = deepMerge(pending, nest(p, v)); savePending(); }
 }
 function put(p, v) { setLocal(p, v); cache(); renderAll(); write(p, v); }
+function putSetup(p, v) {
+  setIn(SETUP, p, v); lsSet('levelup_setup', SETUP);
+  if (setupRef) setupRef.set(nest(p, v), {merge: true}).catch(err => offline(err));
+  else { pendingSetup = deepMerge(pendingSetup, nest(p, v)); lsSet('levelup_setup_pending', pendingSetup); }
+  setupChanged();
+}
 const chip = document.getElementById('sync');
 function online() { chip.textContent = 'Synced'; chip.className = 'chip ok'; }
 function offline(err) {
-  docRef = null; chip.className = 'chip';
+  docRef = null; setupRef = null; chip.className = 'chip';
   chip.textContent = 'Saved on this phone only';
   chip.title = err ? String(err.message || err) : '';
+}
+function openWeekDoc() {
+  if (!fs || !authed) return;
+  if (unsubWeek) { unsubWeek(); unsubWeek = null; }
+  docRef = null;
+  const id = WEEK, ref = fs.collection('levelup').doc(id);
+  let first = true;
+  unsubWeek = ref.onSnapshot(snap => {
+    if (WEEK !== id) return;
+    const remote = snap.exists ? snap.data() : {};
+    if (first) {
+      first = false; docRef = ref;
+      // push only what was changed on this phone while sync was down
+      if (Object.keys(pending).length) { ref.set(pending, {merge: true}).catch(offline); S = deepMerge(remote, pending); pending = {}; savePending(); }
+      else S = remote;
+    } else { S = remote; }
+    cache(); online(); renderAll();
+  }, err => offline(err));
 }
 function startSync() {
   if (!window.firebase) return offline('Firebase did not load');
@@ -390,35 +547,91 @@ function startSync() {
       appId: "1:253916851846:web:802a20e97e429bc3fc2b07"
     }, 'levelup');
     const auth = app.auth(); fs = app.firestore();
-    const timer = setTimeout(() => offline('Timed out'), 10000);
+    const timer = setTimeout(() => { if (!setupRef) offline('Timed out'); }, 10000);
     auth.signInAnonymously().then(() => {
-      const ref = fs.collection('levelup').doc(WEEK);
+      authed = true;
+      const ref = fs.collection('levelup').doc('setup');
       let first = true;
       ref.onSnapshot(snap => {
         clearTimeout(timer);
         const remote = snap.exists ? snap.data() : {};
         if (first) {
-          first = false; docRef = ref;
-          // push only what was changed on this phone while sync was down
-          if (Object.keys(pending).length) { ref.set(pending, {merge: true}).catch(offline); S = deepMerge(remote, pending); pending = {}; savePending(); }
-          else S = remote;
-        } else { S = remote; }
-        cache(); online(); renderAll();
+          first = false; setupRef = ref;
+          if (Object.keys(pendingSetup).length) { ref.set(pendingSetup, {merge: true}).catch(offline); SETUP = deepMerge(remote, pendingSetup); pendingSetup = {}; lsSet('levelup_setup_pending', {}); }
+          else SETUP = remote;
+        } else SETUP = remote;
+        lsSet('levelup_setup', SETUP); online(); setupChanged();
       }, err => { clearTimeout(timer); offline(err); });
+      openWeekDoc();
     }).catch(err => { clearTimeout(timer); offline(err); });
   } catch (e) { offline(e); }
 }
 function deepMerge(a, b) {
   const o = Object.assign({}, a);
-  for (const k in b) o[k] = (b[k] && typeof b[k] === 'object' && a[k] && typeof a[k] === 'object') ? deepMerge(a[k], b[k]) : b[k];
+  for (const k in b) o[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object' && !Array.isArray(a[k])) ? deepMerge(a[k], b[k]) : b[k];
   return o;
+}
+
+/* ---------- weeks ---------- */
+const WEEK1 = {id: 'week1', name: 'Week 1 · The First Step', start: '2026-11-30', trail: 'milford', builtin: true};
+const pd = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, m - 1, d); };
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const monday = d => addDays(d, -((d.getDay() + 6) % 7));
+const lines = t => String(t || '').split('\n').map(x => x.trim()).filter(Boolean);
+function ownRecipes() { const o = {}, r = SETUP.recipes || {}; for (const k in r) if (r[k] && r[k].n) o[k] = Object.assign({own: 1}, r[k]); return o; }
+const allWeeks = () => [WEEK1].concat(Object.values(SETUP.weeks || {}).filter(w => w && w.start && w.id && w.id !== 'week1')).sort((a, b) => a.start < b.start ? -1 : 1);
+function currentWeekId() {
+  const t = new Date(), ws = allWeeks();
+  const cur = ws.find(w => t >= pd(w.start) && t < addDays(pd(w.start), 7)); if (cur) return cur.id;
+  const up = ws.find(w => pd(w.start) > t); return up ? up.id : ws[ws.length - 1].id;
+}
+const menuOf = w => w.builtin ? Object.fromEntries(DAYS.map((d, i) => [d, MENU1[i].slice()])) : (w.menu || {});
+let pinned = false, lastApplied = '', WEEKOBJ = WEEK1;
+function calcToday() { const n = new Date(); const i = Math.floor((new Date(n.getFullYear(), n.getMonth(), n.getDate()) - START) / 864e5); return i >= 0 && i < 7 ? i : -1; }
+function buildGroceries(w) {
+  const g = {}, used = {};
+  DAYS.forEach((d, i) => [0, 1, 2].forEach(k => { const v = MENU[i][k]; if (R[v]) (used[v] = used[v] || []).push(fmt(dateOf(i), {weekday: 'short'})); }));
+  Object.keys(used).forEach(id => { g[`${R[id].n} (${used[id].join(', ')})`] = R[id].i.slice(); });
+  const sn = [...new Set(MENU.map(r => r[3]).filter(Boolean))]; if (sn.length) g['Snacks'] = sn;
+  if ((w.extras || []).length) g['Extras'] = w.extras.slice();
+  return g;
+}
+function applyWeek() {
+  const w = allWeeks().find(x => x.id === WEEK) || WEEK1; WEEK = w.id; WEEKOBJ = w;
+  START = pd(w.start); TRAIL = TRAILS[w.trail] || TRAILS.milford;
+  R = Object.assign({}, BASE_R, ownRecipes());
+  if (w.builtin) { MENU = MENU1; GROCERIES = GROC1; PREP = PREP1; }
+  else {
+    const m = w.menu || {};
+    MENU = DAYS.map(d => (Array.isArray(m[d]) ? m[d] : []).concat(['', '', '', '']).slice(0, 4).map(v => v || ''));
+    GROCERIES = buildGroceries(w);
+    PREP = (w.prep || []).length ? [{t: 'Prep list', m: 'From your week plan', s: w.prep}] : [];
+  }
+  todayIdx = calcToday();
+  if (lastApplied !== w.id) { sel = todayIdx >= 0 ? todayIdx : 0; lastApplied = w.id; }
+  const th = TRAIL.theme, root = document.documentElement.style;
+  root.setProperty('--navy', th.deep); root.setProperty('--navy2', th.mid);
+  const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.setAttribute('content', th.deep);
+  $('hero').innerHTML = scene(TRAIL.id);
+}
+function setupChanged() {
+  const was = WEEK;
+  if (!pinned || !allWeeks().find(w => w.id === WEEK)) { WEEK = currentWeekId(); pinned = false; }
+  if (WEEK !== was) { loadWeekLocal(); openWeekDoc(); }
+  applyWeek(); renderAll();
+}
+function selectWeek(id) {
+  if (id === WEEK) return;
+  WEEK = id; pinned = id !== currentWeekId(); loadWeekLocal(); applyWeek(); openWeekDoc(); renderAll();
+  window.scrollTo(0, 0);
 }
 
 /* ---------- swaps + dislikes ---------- */
 const choiceP = (pid, d, k) => `choice.${pid}.${d}.${k}`;
 const customP = (pid, d, k) => `custom.${pid}.${d}.${k}`;
 function eff(pid, i, k) { const c = get(choiceP(pid, DAYS[i], k)); return c || MENU[i][k]; }
-function label(pid, i, k) { const v = eff(pid, i, k); return v === 'custom' ? (get(customP(pid, DAYS[i], k)) || 'Something else') : (R[v] ? R[v].n : v); }
+function label(pid, i, k) { const v = eff(pid, i, k); return v === 'custom' ? (get(customP(pid, DAYS[i], k)) || 'Something else') : R[v] ? R[v].n : !v ? 'Not planned yet' : /^u[a-z0-9]+$/.test(v) ? 'Removed recipe' : v; }
 function terms(pid) { return String(get(`prefs.${pid}.dislikes`) || '').toLowerCase().split(/[,\n;]+/).map(t => t.trim()).filter(t => t.length > 2); }
 function hits(pid, v, text) {
   const hay = (v === 'custom' ? text : R[v] ? R[v].n + ' ' + R[v].i.join(' ') : v).toLowerCase().replace(/olive oil/g, 'oil');
@@ -445,8 +658,8 @@ const clean = (pid, d) => [0, 1, 2, 3].every(k => !PENALTY[logOf(pid, d, k)]);
 const perfect = (pid, d) => MISSIONS.every(m => done(pid, d, m.id)) && clean(pid, d);
 const dayXP = (pid, d) => MISSIONS.reduce((t, m) => t + (done(pid, d, m.id) ? m.xp : 0), 0) + (perfect(pid, d) ? PERFECT_XP : 0) + penalty(pid, d);
 // trail progress: finishXP of points = the whole trail
-const kmFor = xp => Math.max(0, Math.min(TRAIL.km, xp / TRAIL.finishXP * TRAIL.km));
-function finishedOn(pid) { let t = walksDone(pid) >= 5 ? BOSS_XP : 0; for (let i = 0; i < 7; i++) { t += dayXP(pid, DAYS[i]); if (t >= TRAIL.finishXP) return i; } return -1; }
+const kmFor = xp => Math.max(0, Math.min(TRAIL.km, xp / FINISH_XP * TRAIL.km));
+function finishedOn(pid) { let t = walksDone(pid) >= 5 ? BOSS_XP : 0; for (let i = 0; i < 7; i++) { t += dayXP(pid, DAYS[i]); if (t >= FINISH_XP) return i; } return -1; }
 const foodXP = pid => DAYS.reduce((t, d) => t + ['meals','plants','drinks'].reduce((s, id) => s + (done(pid, d, id) ? MISSIONS.find(m => m.id === id).xp : 0), 0) + penalty(pid, d), 0);
 const lost = pid => -DAYS.reduce((t, d) => t + penalty(pid, d), 0);
 const walksDone = pid => +get(`walks.${pid}`) || 0;
@@ -458,34 +671,33 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dateOf = i => new Date(START.getFullYear(), START.getMonth(), START.getDate() + i);
 const fmt = (d, o) => d.toLocaleDateString('en-CA', o);
-const todayIdx = (() => { const n = new Date(); const i = Math.floor((new Date(n.getFullYear(), n.getMonth(), n.getDate()) - START) / 864e5); return i >= 0 && i < 7 ? i : -1; })();
-let sel = todayIdx >= 0 ? todayIdx : 0;
 
 function renderTrail() {
   $('trailName').textContent = TRAIL.name;
-  $('trailSub').textContent = `${TRAIL.where} · ${TRAIL.finishXP} XP reaches the end. More points, faster arrival.`;
+  $('trailSub').textContent = `${TRAIL.where} · ${TRAIL.km} km · ${FINISH_XP} XP reaches the end. More points, faster arrival.`;
   $('where').innerHTML = PEOPLE.map(p => { const x = totalXP(p.id), km = kmFor(x), f = finishedOn(p.id);
     const passed = TRAIL.stops.filter(s => s.km <= km + 1e-9).pop(), next = TRAIL.stops.find(s => s.km > km + 1e-9);
-    return `<div><b>${p.name}</b> · ${km.toFixed(1)} km<br>${f >= 0 ? `Reached ${TRAIL.stops[TRAIL.stops.length - 1].n} on ${DAYNAMES[f]}! 🎉` : `At ${esc(passed.n)}. Next: ${esc(next.n)} in ${(next.km - km).toFixed(1)} km (${Math.ceil((next.km - km) / TRAIL.km * TRAIL.finishXP)} XP)`}</div>`; }).join('');
+    return `<div><b>${p.name}</b> · ${km.toFixed(1)} km<br>${f >= 0 ? `Reached ${TRAIL.stops[TRAIL.stops.length - 1].n} on ${DAYNAMES[f]}! 🎉` : `At ${esc(passed.n)}. Next: ${esc(next.n)} in ${(next.km - km).toFixed(1)} km (${Math.ceil((next.km - km) / TRAIL.km * FINISH_XP)} XP)`}</div>`; }).join('');
   drawTrail();
 }
 function drawTrail() {
   const svg = $('trailSvg'), W = svg.clientWidth, H = svg.clientHeight; if (!W) return;
-  const narrow = W < 520, pl = 14, pr = 14, top = 34, base = H - (narrow ? 50 : 40);
-  const X = km => pl + km / TRAIL.km * (W - pl - pr), Y = el => base - el / 1250 * (base - top);
+  const narrow = W < 520, pl = 14, pr = 14, top = 34, base = H - (narrow ? 50 : 56);
+  const els = TRAIL.stops.map(s => s.el), hiE = Math.max(...els), loE = Math.max(0, Math.min(...els) - (hiE - Math.min(...els)) * 0.25), peak = TRAIL.stops.find(s => s.el === hiE);
+  const X = km => pl + km / TRAIL.km * (W - pl - pr), Y = el => base - (el - loE) / ((hiE - loE) * 1.08 || 1) * (base - top);
   const pts = TRAIL.stops.map(s => [X(s.km), Y(s.el)]);
   const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
   const elAt = km => { const st = TRAIL.stops; for (let i = 1; i < st.length; i++) if (km <= st[i].km) { const a = st[i - 1], b = st[i], t = (km - a.km) / (b.km - a.km); return a.el + t * (b.el - a.el); } return 0; };
-  let out = `<defs><linearGradient id="mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f7cac"/><stop offset="1" stop-color="#1d3557"/></linearGradient></defs>`;
+  let out = `<defs><linearGradient id="mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${TRAIL.theme.mtn}"/><stop offset="1" stop-color="${TRAIL.theme.deep}"/></linearGradient></defs>`;
   out += `<path d="${line} L${X(TRAIL.km)} ${base} L${X(0)} ${base} Z" fill="url(#mtn)" opacity=".9"/>`;
-  out += `<path d="M${X(24.2)} ${Y(820)} L${X(26)} ${Y(1154)} L${X(27.8)} ${Y(870)} Z" fill="#fff" opacity=".85"/>`; // snow on the pass
+  if (TRAIL.snow) { const sp = TRAIL.km * 0.034, dr = (hiE - loE) * 0.3; out += `<path d="M${X(peak.km - sp)} ${Y(hiE - dr)} L${X(peak.km)} ${Y(hiE)} L${X(peak.km + sp)} ${Y(hiE - dr * 0.85)} Z" fill="#fff" opacity=".85"/>`; }
   out += `<path d="${line}" fill="none" stroke="#cfe0f5" stroke-width="2" stroke-dasharray="5 5"/>`;
   out += `<line x1="${pl}" x2="${W - pr}" y1="${base}" y2="${base}" stroke="rgba(255,255,255,.25)"/>`;
   TRAIL.stops.forEach((s, i) => { const x = X(s.km), y = Y(s.el), key = !!s.s;
     out += `<circle cx="${x}" cy="${y}" r="${key ? 4.5 : 3}" fill="${key ? '#f4d35e' : '#cfe0f5'}"/>`;
-    if (key || !narrow) { const lab = narrow ? s.s : s.n, row = narrow ? TRAIL.stops.filter(t => t.s).indexOf(s) % 2 : i % 2, anc = i === 0 ? 'start' : i === TRAIL.stops.length - 1 ? 'end' : 'middle';
+    if (key || !narrow) { const lab = narrow ? s.s : s.n, row = narrow ? TRAIL.stops.filter(t => t.s).indexOf(s) % 2 : i % 3, anc = i === 0 ? 'start' : i === TRAIL.stops.length - 1 ? 'end' : 'middle';
       out += `<line x1="${x}" x2="${x}" y1="${base}" y2="${base + 5 + row * 14}" stroke="rgba(255,255,255,.3)"/><text x="${x}" y="${base + 16 + row * 14}" fill="${key ? '#fff' : '#cfe0f5'}" font-size="${narrow ? 11 : 12}" text-anchor="${anc}" font-weight="${key ? 'bold' : 'normal'}">${esc(lab)}</text>`; } });
-  out += `<text x="${X(26)}" y="${Y(1154) - 8}" fill="#fff" font-size="11" text-anchor="middle">1,154 m</text>`;
+  out += `<text x="${X(peak.km)}" y="${Y(hiE) - 8}" fill="#fff" font-size="11" text-anchor="middle">${hiE.toLocaleString('en-CA')} m</text>`;
   const pos = PEOPLE.map(p => { const km = kmFor(totalXP(p.id)); return {p, x: X(km), y: Y(elAt(km))}; });
   const close = Math.abs(pos[0].x - pos[1].x) < 26;
   pos.forEach((o, i) => { const lift = close ? (i ? 34 : 14) : 14, cy = o.y - lift;
@@ -558,10 +770,12 @@ function renderGroceries() {
   $('groceryList').innerHTML = Object.keys(GROCERIES).map((g, gi) => `<div class="grp"><h3>${g}</h3>${GROCERIES[g].map((it, ii) => { const p = `groc.g${gi}_${ii}`; const on = !!get(p); total++; if (on) done++;
     return `<button class="tog small ${on ? 'on' : ''}" data-path="${p}" aria-pressed="${on}"><span class="box"></span><span class="t">${esc(it)}</span></button>`; }).join('')}</div>`).join('');
   $('gCount').textContent = `${done} of ${total}`;
-  $('gBar').style.width = (done / total * 100) + '%';
+  $('gBar').style.width = (total ? done / total * 100 : 0) + '%';
+  if (!total) $('groceryList').innerHTML = '<p class="lead">Nothing to buy yet. Plan some meals for this week in the Plan tab.</p>';
 }
 function renderPrep() {
-  $('prepList').innerHTML = PREP.map((b, bi) => `<h3>${b.t}</h3><p class="lead" style="margin-bottom:4px">${b.m}</p>${b.s.map((s, si) => { const p = `prep.b${bi}_${si}`; const on = !!get(p);
+  $('prepList').innerHTML = PREP.length ? '' : '<p class="lead">No prep steps for this week. Add some when you edit the week in Plan.</p>';
+  if (PREP.length) $('prepList').innerHTML = PREP.map((b, bi) => `<h3>${b.t}</h3><p class="lead" style="margin-bottom:4px">${b.m}</p>${b.s.map((s, si) => { const p = `prep.b${bi}_${si}`; const on = !!get(p);
     return `<button class="tog small ${on ? 'on' : ''}" data-path="${p}" aria-pressed="${on}"><span class="box"></span><span class="t">${esc(s)}</span></button>`; }).join('')}`).join('');
 }
 function scale(path) { const v = +get(path) || 0; return `<div class="scale">${[1,2,3,4,5].map(n => `<button data-set="${path}" data-v="${n}" class="${n === v ? 'on' : ''}">${n}</button>`).join('')}</div>`; }
@@ -598,10 +812,149 @@ function renderSheet() {
 }
 function openSheet(k) { sheetSlot = k; renderSheet(); $('sheet').classList.add('on'); }
 function closeSheet() { sheetSlot = -1; $('sheet').classList.remove('on'); }
-function renderAll() { renderPlayers(); renderToday(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
+/* ---------- header: week chips ---------- */
+function renderHeader() {
+  const end = dateOf(6), f = d => fmt(d, {month: 'short', day: 'numeric'});
+  $('weekSub').textContent = `${WEEKOBJ.name} · ${f(START)} – ${f(end)}`;
+  const cur = currentWeekId();
+  $('weeks').innerHTML = allWeeks().map(w => `<button data-week="${w.id}" class="${w.id === WEEK ? 'on' : ''}">${esc(w.name.split('·')[0].trim())}<small>${w.id === cur ? 'This week' : fmt(pd(w.start), {month: 'short', day: 'numeric'})}</small></button>`).join('')
+    + `<a href="#plan" class="plus">+ Plan</a>`;
+  $('reviewTitle').textContent = `Weekly review · ${fmt(end, {weekday: 'short', month: 'short', day: 'numeric'})}`;
+}
+
+/* ---------- plan tab: weeks ---------- */
+let draft = null, wDel = false, wMsg = '';
+function blankMenu() { return Object.fromEntries(DAYS.map(d => [d, ['', '', '', '']])); }
+function newDraft() {
+  const ws = allWeeks(), last = ws[ws.length - 1];
+  let s = addDays(pd(last.start), 7); const thisMon = monday(new Date()); if (s < thisMon) s = thisMon;
+  const used = ws.map(w => w.trail), tr = Object.keys(TRAILS).find(t => !used.includes(t)) || 'milford';
+  return {id: '', name: `Week ${ws.length + 1}`, start: iso(s), trail: tr, menu: blankMenu(), prepText: '', extrasText: ''};
+}
+function editDraft(id) {
+  const w = allWeeks().find(x => x.id === id); if (!w || w.builtin) return;
+  draft = {id: w.id, name: w.name, start: w.start, trail: w.trail, menu: JSON.parse(JSON.stringify(menuOf(w))), prepText: (w.prep || []).join('\n'), extrasText: (w.extras || []).join('\n')};
+  DAYS.forEach(d => { draft.menu[d] = (draft.menu[d] || []).concat(['', '', '', '']).slice(0, 4); });
+}
+function renderWeekList() {
+  const cur = currentWeekId(), f = d => fmt(d, {month: 'short', day: 'numeric'});
+  $('weekList').innerHTML = allWeeks().map(w => {
+    const s = pd(w.start), t = TRAILS[w.trail] || TRAILS.milford, m = menuOf(w);
+    const n = DAYS.reduce((c, d) => c + (m[d] || []).filter(Boolean).length, 0);
+    return `<div class="wk"><div class="thumb">${scene(t.id, true)}</div><div class="info"><b>${esc(w.name)}</b><small>${f(s)} – ${f(addDays(s, 6))} · ${t.name}</small><small>${n} of 28 meals planned${w.id === cur ? ' · <b>this week</b>' : ''}${w.builtin ? ' · from your Week 1 plan' : ''}</small></div>
+      <div class="acts"><button class="btn" data-week="${w.id}">Open</button>${w.builtin ? '' : `<button class="btn" data-wedit="${w.id}">Edit</button>`}</div></div>`; }).join('')
+    + (draft ? '' : `<button class="btn go" id="wNew">+ Plan a new week</button>`);
+}
+function recipeOptions(k, v) {
+  return '<option value="">Not planned</option>' + Object.keys(R).filter(id => R[id].g === SLOTGROUP[k]).sort((a, b) => R[a].n.localeCompare(R[b].n))
+    .map(id => `<option value="${id}" ${id === v ? 'selected' : ''}>${esc(R[id].n)}</option>`).join('');
+}
+function renderEditor() {
+  const el = $('editor'); if (!draft) { el.innerHTML = ''; return; }
+  const t = TRAILS[draft.trail];
+  const rows = DAYS.map((d, i) => `<div class="mday"><b>${fmt(addDays(pd(draft.start), i), {weekday: 'short', month: 'short', day: 'numeric'})}</b>
+    ${[0, 1, 2].map(k => `<label><span>${SLOTS[k]}</span><select data-d="menu.${d}.${k}">${recipeOptions(k, draft.menu[d][k])}</select></label>`).join('')}
+    <label><span>Snack</span><input type="text" list="snackList" data-d="menu.${d}.3" value="${esc(draft.menu[d][3])}"></label></div>`).join('');
+  el.innerHTML = `<div class="editor"><h3>${draft.id ? 'Edit week' : 'New week'}</h3>
+    <div class="duo"><label class="f"><span>Name or theme</span><input type="text" data-d="name" value="${esc(draft.name)}"></label>
+    <label class="f"><span>Starts on (we'll snap it to the Monday)</span><input type="date" data-d="start" value="${draft.start}"></label></div>
+    <label class="f"><span>This week's great walk</span><select data-d="trail">${Object.keys(TRAILS).map(k => `<option value="${k}" ${k === draft.trail ? 'selected' : ''}>${TRAILS[k].name} · ${TRAILS[k].km} km</option>`).join('')}</select></label>
+    <div class="tprev">${scene(t.id, true)}<span><b>${t.name}</b>${esc(t.where)} · ${t.km} km · ${t.stops.length} landmarks</span></div>
+    <div class="row"><select id="copyFrom" aria-label="Copy a menu"><option value="">Copy a menu from…</option>${allWeeks().filter(w => w.id !== draft.id).map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('')}</select>
+      <button class="btn" id="wFill">Fill empty slots for me</button><button class="btn" id="wClearMenu">Clear menu</button></div>
+    <datalist id="snackList">${SNACKS.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
+    <div class="mgrid">${rows}</div>
+    <div class="duo"><label class="f"><span>Prep tasks, one per line</span><textarea data-d="prepText" placeholder="Sunday: make overnight oats for Mon and Tue">${esc(draft.prepText)}</textarea></label>
+    <label class="f"><span>Extra groceries, one per line</span><textarea data-d="extrasText" placeholder="Olive oil&#10;Coffee">${esc(draft.extrasText)}</textarea></label></div>
+    <p class="key" id="wMsg">${esc(wMsg)}</p>
+    <div class="row"><button class="btn go" id="wSave">Save week</button><button class="btn" id="wCancel">Cancel</button>
+      ${draft.id ? `<button class="btn" id="wDel">Delete week</button>${wDel ? '<button class="btn warn" id="wDelYes">Yes, delete it</button>' : ''}` : ''}</div></div>`;
+}
+function saveDraft() {
+  const id = draft.id || 'w' + draft.start.replace(/-/g, '');
+  const clash = allWeeks().find(w => w.start === draft.start && w.id !== id);
+  if (clash) { wMsg = `${clash.name} already starts on that Monday. Pick another date.`; renderEditor(); return; }
+  putSetup('weeks.' + id, {id, name: draft.name.trim() || 'New week', start: draft.start, trail: draft.trail, menu: draft.menu, prep: lines(draft.prepText), extras: lines(draft.extrasText)});
+  draft = null; wDel = false; wMsg = ''; renderEditor(); renderWeekList();
+  $('planNote').textContent = 'Saved. It switches on automatically on its Monday, or tap Open to look now.';
+}
+function fillDraft() {
+  DAYS.forEach((d, i) => [0, 1, 2].forEach(k => {
+    if (draft.menu[d][k]) return;
+    const ids = Object.keys(R).filter(id => R[id].g === SLOTGROUP[k]);
+    const usedNow = DAYS.map(x => draft.menu[x][k]); const fresh = ids.filter(id => !usedNow.includes(id));
+    const pool = fresh.length ? fresh : ids; draft.menu[d][k] = pool[(i * 7 + k * 3 + pool.length) % pool.length] || '';
+  }));
+  DAYS.forEach((d, i) => { if (!draft.menu[d][3]) draft.menu[d][3] = SNACKS[(i * 5) % SNACKS.length]; });
+}
+
+/* ---------- plan tab: recipe library ---------- */
+let rdraft = null, rq = '', rDel = false;
+function renderLibForm() {
+  const el = $('libForm');
+  if (!rdraft) { el.innerHTML = `<div class="row"><button class="btn go" id="rNew">+ Add a recipe</button><input type="search" id="rq" placeholder="Search recipes or ingredients" value="${esc(rq)}" style="flex:1;min-width:200px"></div>`; return; }
+  el.innerHTML = `<div class="editor"><h3>${rdraft.id ? 'Edit recipe' : 'New recipe'}</h3>
+    <div class="duo"><label class="f"><span>Name</span><input type="text" data-rd="n" value="${esc(rdraft.n)}"></label>
+    <label class="f"><span>Meal</span><select data-rd="g">${SLOTGROUP.map(g => `<option ${g === rdraft.g ? 'selected' : ''}>${g}</option>`).join('')}</select></label></div>
+    <label class="f"><span>Serves / time (optional)</span><input type="text" data-rd="m" value="${esc(rdraft.m)}" placeholder="4 portions · 30 min"></label>
+    <div class="duo"><label class="f"><span>Ingredients, one per line (these go on the grocery list)</span><textarea data-rd="i" style="min-height:160px">${esc(rdraft.i)}</textarea></label>
+    <label class="f"><span>Method</span><textarea data-rd="p" style="min-height:160px">${esc(rdraft.p)}</textarea></label></div>
+    <p class="key" id="rMsg"></p>
+    <div class="row"><button class="btn go" id="rSave">Save recipe</button><button class="btn" id="rCancel">Cancel</button>
+      ${rdraft.id ? `<button class="btn" id="rDel">Delete</button>${rDel ? '<button class="btn warn" id="rDelYes">Yes, delete it</button>' : ''}` : ''}</div></div>`;
+}
+function renderLib() {
+  $('libList').innerHTML = SLOTGROUP.map(g => {
+    const ids = Object.keys(R).filter(id => R[id].g === g && (!rq || (R[id].n + ' ' + R[id].i.join(' ')).toLowerCase().includes(rq))).sort((a, b) => R[a].n.localeCompare(R[b].n));
+    return `<h3>${g} <small class="cnt">${ids.length}</small></h3>` + (ids.length ? ids.map(id => `<div class="lib"><div><b>${esc(R[id].n)}</b>${R[id].own ? ' <span class="mine">Ours</span>' : ''}<small>${esc(R[id].m || '')}</small></div>
+      <div class="acts">${R[id].own ? `<button class="btn" data-redit="${id}">Edit</button>` : `<button class="btn" data-rcopy="${id}">Copy & edit</button>`}</div></div>`).join('') : '<p class="key">Nothing matches.</p>');
+  }).join('');
+}
+function renderPlan() { renderWeekList(); renderLib(); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button,[data-week]'); if (!t) return;
+  const ds = t.dataset;
+  if (ds.week) { selectWeek(ds.week); location.hash = 'today'; return; }
+  if (ds.wedit) { editDraft(ds.wedit); wDel = false; wMsg = ''; renderEditor(); renderWeekList(); $('editor').scrollIntoView({block: 'start'}); return; }
+  if (t.id === 'wNew') { draft = newDraft(); wMsg = ''; renderEditor(); renderWeekList(); return; }
+  if (t.id === 'wCancel') { draft = null; renderEditor(); renderWeekList(); return; }
+  if (t.id === 'wSave') { saveDraft(); return; }
+  if (t.id === 'wFill') { fillDraft(); renderEditor(); return; }
+  if (t.id === 'wClearMenu') { draft.menu = blankMenu(); renderEditor(); return; }
+  if (t.id === 'wDel') { wDel = !wDel; renderEditor(); return; }
+  if (t.id === 'wDelYes') { const id = draft.id; draft = null; wDel = false; putSetup('weeks.' + id, null); renderEditor(); renderWeekList(); return; }
+  if (t.id === 'rNew') { rdraft = {id: '', n: '', g: 'Dinners', m: '', i: '', p: ''}; rDel = false; renderLibForm(); return; }
+  if (ds.redit || ds.rcopy) { const id = ds.redit || ds.rcopy, r = R[id];
+    rdraft = {id: ds.redit ? id : '', n: ds.rcopy ? r.n + ' (our version)' : r.n, g: r.g, m: r.m || '', i: r.i.join('\n'), p: r.p || ''}; rDel = false; renderLibForm(); $('libForm').scrollIntoView({block: 'start'}); return; }
+  if (t.id === 'rCancel') { rdraft = null; renderLibForm(); return; }
+  if (t.id === 'rSave') {
+    if (!rdraft.n.trim() || !lines(rdraft.i).length) { $('rMsg').textContent = 'Give it a name and at least one ingredient.'; return; }
+    const id = rdraft.id || 'u' + Date.now().toString(36);
+    putSetup('recipes.' + id, {g: rdraft.g, n: rdraft.n.trim(), m: rdraft.m.trim(), i: lines(rdraft.i), p: rdraft.p.trim()});
+    rdraft = null; renderLibForm(); renderLib(); return; }
+  if (t.id === 'rDel') { rDel = !rDel; renderLibForm(); return; }
+  if (t.id === 'rDelYes') { const id = rdraft.id; rdraft = null; rDel = false; putSetup('recipes.' + id, null); renderLibForm(); renderLib(); return; }
+});
+document.addEventListener('input', e => {
+  const t = e.target, ds = t.dataset || {};
+  if (t.id === 'rq') { rq = t.value.trim().toLowerCase(); renderLib(); return; }
+  if (t.id === 'copyFrom' && t.value) { const w = allWeeks().find(x => x.id === t.value); draft.menu = JSON.parse(JSON.stringify(menuOf(w))); DAYS.forEach(d => { draft.menu[d] = (draft.menu[d] || []).concat(['', '', '', '']).slice(0, 4); }); renderEditor(); return; }
+  if (ds.rd && rdraft) { rdraft[ds.rd] = t.value; return; }
+  if (ds.d && draft) {
+    const p = ds.d;
+    if (p.startsWith('menu.')) { const [, d, k] = p.split('.'); draft.menu[d][+k] = t.value; return; }
+    if (p === 'start') { if (!t.value) return; draft.start = iso(monday(pd(t.value))); if (t.type === 'date' && document.activeElement !== t) renderEditor(); return; }
+    draft[p] = t.value;
+    if (p === 'trail') renderEditor();
+  }
+});
+document.addEventListener('change', e => { const t = e.target; if (t.dataset && t.dataset.d === 'start' && draft) renderEditor(); });
+
+function renderAll() { renderHeader(); renderRecipes(); renderPlan(); renderPlayers(); renderToday(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
 
 /* ---------- tabs ---------- */
-const TABS = ['today','menu','recipes','groceries','prep','review'];
+const TABS = ['today','menu','recipes','groceries','prep','review','plan'];
 function route() {
   const h = location.hash.slice(1), t = TABS.includes(h) ? h : 'today';
   TABS.forEach(x => { $('s-' + x).classList.toggle('on', x === t); });
@@ -645,7 +998,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('focusout', e => { if (e.target.dataset && e.target.dataset.field) setTimeout(() => { if (!(document.activeElement && document.activeElement.dataset && document.activeElement.dataset.field)) renderAll(); }, 700); });
 
-route(); renderRecipes(); renderAll(); startSync();
+WEEK = currentWeekId(); loadWeekLocal(); applyWeek(); route(); renderAll(); renderLibForm(); startSync();
 }
 </script>
 </body>
