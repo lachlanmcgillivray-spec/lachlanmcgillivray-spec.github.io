@@ -66,6 +66,46 @@ h1{text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .mine{font-size:12px;background:var(--lemon);border-radius:8px;padding:1px 6px;font-weight:bold}
 .cnt{font-size:14px;color:var(--muted);font-weight:normal}
 #libList h3{margin-top:18px}
+/* kids */
+body.kidmode .players,body.kidmode .where{display:none}
+.kpick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.kpick button{border:0;border-radius:20px;padding:12px;background:var(--soft);color:var(--ink);font:inherit;cursor:pointer;display:grid;grid-template-columns:52px minmax(0,1fr);grid-template-rows:auto auto;column-gap:10px;text-align:left;align-items:center}
+.kpick i{grid-row:1/3;width:52px;height:52px;border-radius:50%;background:var(--kc);color:#fff;font-style:normal;font-weight:bold;font-size:26px;display:flex;align-items:center;justify-content:center}
+.kpick b{font-size:22px;line-height:1.1}.kpick small{color:var(--muted);font-size:13px}
+.kpick button.on{background:#fff;box-shadow:inset 0 0 0 3px var(--kc)}
+.kbar{display:flex;justify-content:space-between;align-items:baseline;font-size:20px}.kbar span{font-weight:bold;color:var(--teal);font-size:16px}
+.bar.kb{background:var(--soft);margin:6px 0 4px;height:16px}
+#s-kids h3 small{font-weight:normal;color:var(--muted);font-size:15px}
+.ktok{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ktok button,.kcrown{border:0;border-radius:20px;background:var(--soft);padding:12px 6px 10px;text-align:center;font:inherit;color:var(--muted);cursor:pointer;line-height:1.15;box-shadow:inset 0 0 0 3px transparent}
+.ktok span,.kcrown span{display:block;font-size:40px;line-height:1.1;filter:grayscale(1);opacity:.45;margin-bottom:4px}
+.ktok b,.kcrown b{display:block;font-size:15px}.ktok small,.kcrown small{font-size:12px}
+.ktok button.on{background:#e8f7f4;color:var(--ink);box-shadow:inset 0 0 0 3px var(--teal)}
+.ktok button.on span,.kcrown.on span{filter:none;opacity:1;animation:pop .35s ease-out}
+.kcrown{cursor:default}.kcrown.on{background:var(--lemon);color:var(--ink)}
+.kslot{margin:10px 0}.kh{font-weight:bold;font-size:18px;margin:0 0 6px}.kh small{font-weight:normal;color:var(--muted);font-size:14px}
+.kchoices{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px}
+.kchoices button{flex:none;width:96px;border:0;border-radius:18px;background:var(--soft);padding:10px 6px;font:inherit;font-size:13px;font-weight:bold;color:var(--ink);cursor:pointer;line-height:1.2}
+.kchoices button span{display:block;font-size:38px;margin-bottom:4px}
+.kchoices button.on{background:#fff;box-shadow:inset 0 0 0 3px var(--orange)}
+.btn.kbig{font-size:20px;padding:16px 24px;background:var(--orange);color:#fff;width:100%;max-width:420px;min-height:60px}
+.kpanel{background:#fff7e8;border-radius:20px;padding:14px}
+.krate{display:flex;gap:10px;flex-wrap:wrap}
+.krate button{flex:1;min-width:90px;border:0;border-radius:18px;background:#fff;padding:12px;font:inherit;font-weight:bold;cursor:pointer;box-shadow:inset 0 0 0 2px var(--line);color:var(--ink)}
+.krate button span{display:block;font-size:44px}
+.stamps{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.stamp{border:3px dashed var(--kc);border-radius:18px;padding:10px;text-align:center;transform:rotate(-2deg)}
+.stamp:nth-child(2n){transform:rotate(2deg)}
+.stamp span{display:block;font-size:34px}.stamp b{display:block;font-size:14px}.stamp small{color:var(--muted);font-size:12px}
+.kbadges{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.kbadge{background:var(--soft);border-radius:18px;padding:12px;text-align:center;color:var(--muted)}
+.kbadge span{display:block;font-size:36px;filter:grayscale(1);opacity:.4}
+.kbadge b{display:block;font-size:15px}.kbadge small{display:block;font-size:12px}
+.kbadge.on{background:#fff6d6;color:var(--ink)}.kbadge.on span{filter:none;opacity:1}
+.rw{margin-top:8px;border:0;border-radius:14px;padding:6px 10px;min-height:36px;font:inherit;font-size:12px;font-weight:bold;background:#fff;color:var(--ink);cursor:pointer;box-shadow:inset 0 0 0 2px var(--line)}
+.rw.on{background:var(--teal);color:#fff;box-shadow:none}
+.kidsum{background:var(--soft);border-radius:16px;padding:6px 16px 12px;margin-bottom:18px}
+@media(max-width:600px){.ktok{grid-template-columns:repeat(3,minmax(0,1fr))}.ktok span,.kcrown span{font-size:34px}.where{grid-template-columns:repeat(2,minmax(0,1fr))}.where div{font-size:13px}}
 .cards-h{margin:12px 0 6px!important;color:#fff!important;font-weight:bold;font-size:15px!important}
 .cards{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .card-pc{flex:none;width:104px;border:0;border-radius:14px;padding:0 0 8px;background:#fff;color:var(--ink);text-align:left;font:inherit;cursor:pointer;overflow:hidden;box-shadow:0 4px 0 rgba(0,0,0,.25)}
@@ -249,7 +289,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
     <div id="cards"></div>
   </div>
   <nav id="nav">
-    <a href="#today">Today</a><a href="#menu">Menu</a><a href="#recipes">Recipes</a>
+    <a href="#today">Today</a><a href="#kids">Kids</a><a href="#menu">Menu</a><a href="#recipes">Recipes</a>
     <a href="#groceries">Groceries</a><a href="#prep">Prep</a><a href="#review">Review</a><a href="#plan">Plan</a>
   </nav>
 </div>
@@ -287,6 +327,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
 <section id="s-groceries">
   <h2>Grocery checklist</h2>
   <p class="lead">Rounded estimates for the whole week, snacks included. Check the pantry first. Ticks are shared, so whoever's at the store can see what's left.</p>
+  <div id="gKids"></div>
   <div id="gExtra"></div>
   <h3>Shopping list</h3>
   <div class="prog"><div class="bar"><i id="gBar"></i></div><b id="gCount"></b></div>
@@ -311,6 +352,20 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
 
 <div id="pc" role="dialog" aria-modal="true" aria-label="Milestone"><div id="pcBox"></div></div>
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Swap a meal"><div class="panel" id="panel"></div></div>
+<section id="s-kids">
+  <h2>Food Explorers</h2>
+  <p class="lead">Ethan and Fynn pick their food, try new things and collect stamps. Their points move them along the same trail as the rest of the family.</p>
+  <div class="kpick" id="kidPick"></div>
+  <div class="days" id="kidDays"></div>
+  <div id="kidToday"></div>
+  <h3>Pick my food</h3>
+  <div id="kidFood"></div>
+  <h3>Try something new</h3>
+  <div id="kidTry"></div>
+  <div id="kidPassport"></div>
+  <div id="kidBadges"></div>
+</section>
+
 <section id="s-plan">
   <h2>Plan your weeks</h2>
   <p class="lead">Build weeks ahead from the recipe library and pick a great walk for each. A saved week switches on by itself on its Monday, with its menu, grocery list, prep and trail all loaded together.</p>
@@ -680,11 +735,12 @@ const perfect = (pid, d) => MISSIONS.every(m => done(pid, d, m.id)) && clean(pid
 const dayXP = (pid, d) => MISSIONS.reduce((t, m) => t + (done(pid, d, m.id) ? m.xp : 0), 0) + (perfect(pid, d) ? PERFECT_XP : 0) + penalty(pid, d);
 // trail progress: finishXP of points = the whole trail
 const kmFor = xp => Math.max(0, Math.min(TRAIL.km, xp / FINISH_XP * TRAIL.km));
-function finishedOn(pid) { let t = walksDone(pid) >= 5 ? BOSS_XP : 0; for (let i = 0; i < 7; i++) { t += dayXP(pid, DAYS[i]); if (t >= FINISH_XP) return i; } return -1; }
+function finishedOn(pid) { let t = walksDone(pid) >= 5 ? BOSS_XP : 0; for (let i = 0; i < 7; i++) { t += anyDayXP(pid, DAYS[i]); if (t >= FINISH_XP) return i; } return -1; }
 const foodXP = pid => DAYS.reduce((t, d) => t + ['meals','plants','drinks'].reduce((s, id) => s + (done(pid, d, id) ? MISSIONS.find(m => m.id === id).xp : 0), 0) + penalty(pid, d), 0);
 const lost = pid => -DAYS.reduce((t, d) => t + penalty(pid, d), 0);
 const walksDone = pid => +get(`walks.${pid}`) || 0;
-const totalXP = pid => DAYS.reduce((t, d) => t + dayXP(pid, d), 0) + (walksDone(pid) >= 5 ? BOSS_XP : 0);
+const anyDayXP = (pid, d) => isKid(pid) ? kidDayXP(pid, d) : dayXP(pid, d);
+const totalXP = pid => DAYS.reduce((t, d) => t + anyDayXP(pid, d), 0) + (walksDone(pid) >= 5 ? BOSS_XP : 0);
 const level = xp => xp >= 850 ? 'Level 5' : xp >= 650 ? 'Level 4' : xp >= 400 ? 'Level 3' : xp >= 175 ? 'Level 2' : 'Level 1';
 
 /* ---------- view ---------- */
@@ -696,9 +752,9 @@ const fmt = (d, o) => d.toLocaleDateString('en-CA', o);
 function renderTrail() {
   $('trailName').textContent = TRAIL.name;
   $('trailSub').textContent = `${TRAIL.where} · ${TRAIL.km} km · ${FINISH_XP} XP reaches the end. More points, faster arrival.`;
-  $('where').innerHTML = PEOPLE.map(p => { const x = totalXP(p.id), km = kmFor(x), f = finishedOn(p.id);
+  $('where').innerHTML = FAMILY.map(p => { const x = totalXP(p.id), km = kmFor(x), f = finishedOn(p.id);
     const passed = TRAIL.stops.filter(s => s.km <= km + 1e-9).pop(), next = TRAIL.stops.find(s => s.km > km + 1e-9);
-    return `<div><b>${p.name}</b> · ${km.toFixed(1)} km<br>${f >= 0 ? `Reached ${TRAIL.stops[TRAIL.stops.length - 1].n} on ${DAYNAMES[f]}! 🎉` : `At ${esc(passed.n)}. Next: ${esc(next.n)} in ${(next.km - km).toFixed(1)} km (${Math.ceil((next.km - km) / TRAIL.km * FINISH_XP)} XP)`}</div>`; }).join('');
+    return `<div><b style="color:${p.c}">●</b> <b>${p.name}</b> · ${km.toFixed(1)} km<br>${f >= 0 ? `Reached ${TRAIL.stops[TRAIL.stops.length - 1].n} on ${DAYNAMES[f]}! 🎉` : `At ${esc(passed.n)}. Next: ${esc(next.n)} in ${(next.km - km).toFixed(1)} km (${Math.ceil((next.km - km) / TRAIL.km * FINISH_XP)} XP)`}</div>`; }).join('');
   drawTrail();
 }
 function drawTrail() {
@@ -719,10 +775,12 @@ function drawTrail() {
     if (key || !narrow) { const lab = narrow ? s.s : s.n, row = narrow ? TRAIL.stops.filter(t => t.s).indexOf(s) % 2 : i % 3, anc = i === 0 ? 'start' : i === TRAIL.stops.length - 1 ? 'end' : 'middle';
       out += `<line x1="${x}" x2="${x}" y1="${base}" y2="${base + 5 + row * 14}" stroke="rgba(255,255,255,.3)"/><text x="${x}" y="${base + 16 + row * 14}" fill="${key ? '#fff' : '#cfe0f5'}" font-size="${narrow ? 11 : 12}" text-anchor="${anc}" font-weight="${key ? 'bold' : 'normal'}">${esc(lab)}</text>`; } });
   out += `<text x="${X(peak.km)}" y="${Y(hiE) - 8}" fill="#fff" font-size="11" text-anchor="middle">${hiE.toLocaleString('en-CA')} m</text>`;
-  const pos = PEOPLE.map(p => { const km = kmFor(totalXP(p.id)); return {p, x: X(km), y: Y(elAt(km))}; });
-  const close = Math.abs(pos[0].x - pos[1].x) < 26;
-  pos.forEach((o, i) => { const lift = close ? (i ? 34 : 14) : 14, cy = o.y - lift;
-    out += `<line x1="${o.x}" x2="${o.x}" y1="${o.y}" y2="${cy + 11}" stroke="${i ? '#e76f51' : '#f4d35e'}" stroke-width="2"/><circle cx="${o.x}" cy="${cy}" r="11" fill="${i ? '#e76f51' : '#f4d35e'}" stroke="#1d3557" stroke-width="2"/><text x="${o.x}" y="${cy + 4}" font-size="12" font-weight="bold" text-anchor="middle" fill="#14213d">${o.p.name[0]}</text>`; });
+  const pos = FAMILY.map(p => { const km = kmFor(totalXP(p.id)); return {p, x: X(km), y: Y(elAt(km))}; });
+  // stack markers that would overlap
+  const placed = [];
+  pos.slice().sort((a, b) => a.x - b.x).forEach(o => { const n = placed.filter(q => Math.abs(q.x - o.x) < 24).length; o.lift = 14 + n * 24; placed.push(o); });
+  pos.slice().reverse().forEach(o => { const cy = o.y - o.lift;
+    out += `<line x1="${o.x}" x2="${o.x}" y1="${o.y}" y2="${cy + 11}" stroke="${o.p.c}" stroke-width="2"/><circle cx="${o.x}" cy="${cy}" r="11" fill="${o.p.c}" stroke="#1d3557" stroke-width="2"/><text x="${o.x}" y="${cy + 4}" font-size="12" font-weight="bold" text-anchor="middle" fill="#14213d">${o.p.name[0]}</text>`; });
   svg.innerHTML = out;
 }
 const trailRO = new ResizeObserver(drawTrail); trailRO.observe($('trailSvg'));
@@ -1016,10 +1074,10 @@ function checkMilestones() {
     // first look at this week on this phone: wait until data has loaded, then file away
     // anything already reached so old milestones don't all pop up at once
     if (!docRef && Date.now() - T0 < 4000) { setTimeout(() => renderAll(), 4100 - (Date.now() - T0)); return; }
-    PEOPLE.forEach(p => reached(p.id).forEach((ok, i) => { if (ok) seen[p.id + '_' + i] = 1; }));
+    FAMILY.forEach(p => reached(p.id).forEach((ok, i) => { if (ok) seen[p.id + '_' + i] = 1; }));
     seen._init = 1; lsSet(seenK(), seen); return;
   }
-  PEOPLE.forEach(p => reached(p.id).forEach((ok, i) => {
+  FAMILY.forEach(p => reached(p.id).forEach((ok, i) => {
     const k = p.id + '_' + i;
     if (ok && !seen[k] && !pcQueue.some(q => q.k === k) && !(pcOpen && pcOpen.k === k)) pcQueue.push({k, pid: p.id, i});
   }));
@@ -1039,7 +1097,7 @@ function postcardHTML(i, photo, who, unlock) {
 }
 function showPostcard(item, unlock) {
   pcOpen = item;
-  const who = unlock ? PEOPLE.filter(p => p.id === item.pid) : PEOPLE.filter(p => reached(p.id)[item.i]);
+  const who = unlock ? FAMILY.filter(p => p.id === item.pid) : FAMILY.filter(p => reached(p.id)[item.i]);
   const box = $('pcBox'); $('pc').classList.add('on');
   const cached = photoCache[TRAIL.id + ':' + TRAIL.stops[item.i].n];
   box.innerHTML = postcardHTML(item.i, cached || null, who, unlock);
@@ -1052,11 +1110,11 @@ function closePostcard() {
   cardsSig = ''; renderCards();
 }
 function renderCards() {
-  const r = PEOPLE.map(p => reached(p.id));
+  const r = FAMILY.map(p => reached(p.id));
   const sig = WEEK + TRAIL.id + JSON.stringify(r); if (sig === cardsSig) return; cardsSig = sig;
   const got = TRAIL.stops.filter((s, i) => r.some(x => x[i])).length;
   $('cards').innerHTML = `<p class="cards-h">Postcards collected: ${got} of ${TRAIL.stops.length}</p><div class="cards">` + TRAIL.stops.map((s, i) => {
-    const who = PEOPLE.filter((p, j) => r[j][i]);
+    const who = FAMILY.filter((p, j) => r[j][i]);
     return who.length ? `<button class="card-pc" data-pc="${i}"><span class="ph" id="ph${i}"></span><b>${esc(s.n)}</b><span class="by">${who.map(p => p.name[0]).join(' ')}</span></button>`
       : `<div class="card-pc locked"><span class="ph"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><b>${esc(s.n)}</b><span class="by">km ${s.km}</span></div>`;
   }).join('') + '</div>';
@@ -1068,13 +1126,121 @@ document.addEventListener('click', e => {
   if (e.target.id === 'pcOk' || e.target.id === 'pc') closePostcard();
 });
 
-function renderAll() { renderHeader(); renderRecipes(); renderPlan(); renderPlayers(); renderCards(); checkMilestones(); renderToday(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
+/* ---------- Food Explorers: Ethan & Fynn ---------- */
+const KIDS = [{id: 'ethan', name: 'Ethan', age: 9, c: '#2a9d8f'}, {id: 'fynn', name: 'Fynn', age: 6, c: '#ff8fab'}];
+const FAMILY = [{id: 'lachlan', name: 'Lachlan', c: '#f4d35e'}, {id: 'ashley', name: 'Ashley', c: '#e76f51'}].concat(KIDS);
+const isKid = id => KIDS.some(k => k.id === id);
+const KMISSIONS = [
+  {id: 'tried', e: '😋', n: 'Brave bite', h: 'Try a new food (or one you’re not sure about)', xp: 25, auto: true},
+  {id: 'fruit', e: '🍎', n: 'Fruit', h: 'Eat a fruit', xp: 15},
+  {id: 'veg', e: '🥦', n: 'Veggie', h: 'Eat a veggie', xp: 15},
+  {id: 'water', e: '💧', n: 'Water', h: 'Drink water', xp: 10},
+  {id: 'chef', e: '👩‍🍳', n: 'Chef’s helper', h: 'Help make a meal', xp: 15},
+  {id: 'play', e: '⚽', n: 'Active play', h: 'Run, bike or play outside', xp: 20}
+];
+const KID_MENU = {
+  b: {t: 'Breakfast', o: [['Overnight oats', '🥣'], ['Egg muffin', '🧁'], ['Eggs on toast', '🍳'], ['Yogurt & berries', '🫐'], ['Banana toast', '🍌']]},
+  l: {t: 'Lunch', o: [['Chicken pita', '🥙'], ['Hummus wrap', '🌯'], ['Pasta salad', '🍝'], ['Tuna sandwich', '🥪'], ['Snack plate', '🫒']]},
+  v: {t: 'Dinner veggie', o: [['Cucumber', '🥒'], ['Carrots', '🥕'], ['Broccoli', '🥦'], ['Peas', '🫛'], ['Corn', '🌽'], ['Peppers', '🫑']]},
+  s: {t: 'Snack', o: [['Apple', '🍎'], ['Clementine', '🍊'], ['Grapes', '🍇'], ['Carrots & hummus', '🥕'], ['Popcorn', '🍿'], ['Crackers', '🍘']]}
+};
+const TRY_FOODS = [['Hummus', '🫘'], ['Chickpeas', '🫘'], ['Cucumber', '🥒'], ['Cherry tomato', '🍅'], ['Olive', '🫒'], ['Red pepper', '🫑'], ['Quinoa', '🌾'], ['Couscous', '🌾'],
+  ['Salmon', '🐟'], ['Cod', '🐟'], ['Lentils', '🥣'], ['Falafel', '🧆'], ['Pita', '🫓'], ['Spinach', '🥬'], ['Broccoli', '🥦'], ['Green beans', '🫛'], ['Zucchini', '🥒'],
+  ['Blueberries', '🫐'], ['Pear', '🍐'], ['Walnuts', '🌰'], ['Pumpkin seeds', '🎃'], ['Turkey kofta', '🍢'], ['Avocado', '🥑'], ['Mushroom', '🍄']];
+const RATES = [['yum', '😋', 'Yum!'], ['ok', '😐', 'It’s OK'], ['no', '🙅', 'Not yet']];
+const KBADGES = [
+  {id: 'first', e: '🥄', n: 'First Bite', h: 'Try 1 new food'},
+  {id: 'brave', e: '🧭', n: 'Brave Explorer', h: 'Try 5 foods this week'},
+  {id: 'rainbow', e: '🌈', n: 'Rainbow Week', h: 'Fruit and veggie on 5 days'},
+  {id: 'chef', e: '👩‍🍳', n: 'Little Chef', h: 'Help cook 3 times'},
+  {id: 'water', e: '💧', n: 'Water Champ', h: 'Water on 5 days'},
+  {id: 'perfect', e: '⭐', n: 'Perfect Day', h: 'Collect all 6 in one day'},
+  {id: 'finish', e: '🏁', n: 'Trail Finisher', h: 'Reach the end of the trail'}
+];
+const fkey = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'food';
+const triesOn = (kid, d) => Object.keys(get(`ktry.${kid}.${d}`) || {}).filter(k => get(`ktry.${kid}.${d}.${k}`));
+const kdone = (kid, d, id) => id === 'tried' ? triesOn(kid, d).length > 0 : !!get(`kxp.${kid}.${d}.${id}`);
+const kperfect = (kid, d) => KMISSIONS.every(m => kdone(kid, d, m.id));
+const kidDayXP = (kid, d) => KMISSIONS.reduce((t, m) => t + (kdone(kid, d, m.id) ? m.xp : 0), 0) + (kperfect(kid, d) ? PERFECT_XP : 0);
+const weekTries = kid => DAYS.reduce((t, d) => t + triesOn(kid, d).length, 0);
+function kbadge(kid, id) {
+  const days = f => DAYS.filter(f).length;
+  if (id === 'first') return weekTries(kid) >= 1;
+  if (id === 'brave') return weekTries(kid) >= 5;
+  if (id === 'rainbow') return days(d => kdone(kid, d, 'fruit') && kdone(kid, d, 'veg')) >= 5;
+  if (id === 'chef') return days(d => kdone(kid, d, 'chef')) >= 3;
+  if (id === 'water') return days(d => kdone(kid, d, 'water')) >= 5;
+  if (id === 'perfect') return days(d => kperfect(kid, d)) >= 1;
+  if (id === 'finish') return finishedOn(kid) >= 0;
+}
+const passport = kid => Object.entries((SETUP.passport || {})[kid] || {}).filter(([k, v]) => v && v.f);
+let KID = lsGet('levelup_kid', {id: 'ethan'}).id, tryOpen = false, tryFood = null;
+
+function renderKids() {
+  const kid = KIDS.find(k => k.id === KID) || KIDS[0], d = DAYS[sel], x = totalXP(kid.id), dx = kidDayXP(kid.id, d);
+  $('kidPick').innerHTML = KIDS.map(k => `<button data-kid="${k.id}" class="${k.id === kid.id ? 'on' : ''}" style="--kc:${k.c}"><i>${k.name[0]}</i><b>${k.name}</b><small>${totalXP(k.id)} XP · ${kmFor(totalXP(k.id)).toFixed(1)} km</small></button>`).join('');
+  $('kidDays').innerHTML = DAYS.map((dd, i) => `<button data-day="${i}" class="${i === sel ? 'on' : ''} ${i === todayIdx ? 'today' : ''}">${fmt(dateOf(i), {weekday: 'short'})}<small>${fmt(dateOf(i), {month: 'short', day: 'numeric'})}</small><span class="st">${kperfect(kid.id, dd) ? '★' : ''}</span></button>`).join('');
+  const got = KMISSIONS.filter(m => kdone(kid.id, d, m.id)).length, pf = kperfect(kid.id, d);
+  $('kidToday').innerHTML = `<div class="kbar"><b>${kid.name}’s ${DAYNAMES[sel]}</b><span>${dx} / ${100 + PERFECT_XP} XP</span></div>
+    <div class="bar kb"><i style="width:${Math.min(100, dx / (100 + PERFECT_XP) * 100)}%;background:${kid.c}"></i></div>
+    <h3>Collect them all! <small>${got} of 6</small></h3>
+    <div class="ktok">${KMISSIONS.map(m => { const on = kdone(kid.id, d, m.id);
+      return `<button class="${on ? 'on' : ''}" ${m.auto ? 'data-trynow="1"' : `data-path="kxp.${kid.id}.${d}.${m.id}"`} aria-pressed="${on}"><span>${m.e}</span><b>${m.n}</b><small>${m.auto && !on ? 'Tap to try!' : '+' + m.xp}</small></button>`; }).join('')}
+      <div class="kcrown ${pf ? 'on' : ''}"><span>👑</span><b>${pf ? 'Perfect day!' : 'Perfect day'}</b><small>+${PERFECT_XP}</small></div></div>`;
+  // food picks
+  const dinner = MENU[sel] && R[MENU[sel][2]] ? R[MENU[sel][2]].n : 'Family dinner';
+  $('kidFood').innerHTML = ['b', 'l', 'v', 's'].map(slot => { const cur = get(`kpick.${kid.id}.${d}.${slot}`) || '';
+    return `<div class="kslot"><p class="kh">${KID_MENU[slot].t}${slot === 'v' ? ` <small>with ${esc(dinner)}</small>` : ''}</p><div class="kchoices">${KID_MENU[slot].o.map(([n, e]) =>
+      `<button data-kpick="kpick.${kid.id}.${d}.${slot}" data-v="${esc(n)}" class="${cur === n ? 'on' : ''}" aria-pressed="${cur === n}"><span>${e}</span>${esc(n)}</button>`).join('')}</div></div>`; }).join('');
+  // passport
+  const pp = passport(kid.id).sort((a, b) => (b[1].d || '').localeCompare(a[1].d || ''));
+  const today = triesOn(kid.id, d);
+  $('kidTry').innerHTML = tryOpen ? (tryFood ? `<div class="kpanel"><p class="kh">How was the ${esc(tryFood.n)}? ${tryFood.e}</p><div class="krate">${RATES.map(([v, e, t]) => `<button data-rate="${v}"><span>${e}</span>${t}</button>`).join('')}</div>
+        <p class="key">Every try earns a stamp, even “Not yet”. Brave bites count!</p><button class="btn" id="tryBack">Back</button></div>`
+      : `<div class="kpanel"><p class="kh">What did you try?</p><div class="kchoices">${TRY_FOODS.map(([n, e]) => `<button data-tryfood="${esc(n)}" data-e="${e}"><span>${e}</span>${esc(n)}</button>`).join('')}</div>
+        <div class="row"><input type="text" id="tryOther" placeholder="Something else…" style="flex:1;min-width:160px"><button class="btn go" id="tryOtherGo">Next</button><button class="btn" id="tryCancel">Cancel</button></div></div>`)
+    : `<button class="btn kbig" id="tryOpen">😋 I tried something new!</button>${today.length ? `<p class="key">Today: ${today.map(k => { const p = ((SETUP.passport || {})[kid.id] || {})[k]; const r = RATES.find(x => x[0] === get(`ktry.${kid.id}.${d}.${k}`)); return esc(p ? p.f : k) + ' ' + (r ? r[1] : ''); }).join(' · ')}</p>` : ''}`;
+  $('kidPassport').innerHTML = `<h3>${kid.name}’s Taste Passport <small>${pp.length} stamp${pp.length === 1 ? '' : 's'}</small></h3>` + (pp.length ? `<div class="stamps">${pp.map(([k, v]) => { const r = RATES.find(x => x[0] === v.r);
+      return `<div class="stamp" style="--kc:${kid.c}"><span>${v.e || '🍽️'}</span><b>${esc(v.f)}</b><small>${r ? r[1] + ' ' : ''}tried ${v.t || 1}×</small></div>`; }).join('')}</div>` : '<p class="key">No stamps yet. Try a new food to get your first one!</p>');
+  // badges + chore chart
+  $('kidBadges').innerHTML = `<h3>Badges this week</h3><div class="kbadges">${KBADGES.map(b => { const on = kbadge(kid.id, b.id), rw = get(`kreward.${kid.id}.${b.id}`);
+      return `<div class="kbadge ${on ? 'on' : ''}"><span>${b.e}</span><b>${b.n}</b><small>${b.h}</small>${on ? `<button class="rw ${rw ? 'on' : ''}" data-path="kreward.${kid.id}.${b.id}">${rw ? '✓ On chore chart' : 'Add to chore chart'}</button>` : ''}</div>`; }).join('')}</div>
+    <p class="key">Grown-ups: each badge earns a reward on ${kid.name}’s chore chart. Tap “Add to chore chart” once you’ve added it.</p>`;
+}
+function logTry(rate) {
+  const kid = KID, d = DAYS[sel], k = fkey(tryFood.n), already = get(`ktry.${kid}.${d}.${k}`);
+  const p = ((SETUP.passport || {})[kid] || {})[k] || {};
+  put(`ktry.${kid}.${d}.${k}`, rate);
+  putSetup(`passport.${kid}.${k}`, {f: tryFood.n, e: tryFood.e, t: (p.t || 0) + (already ? 0 : 1), r: rate, d: p.d || iso(dateOf(sel))});
+  tryOpen = false; tryFood = null; renderKids();
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t || !t.closest('#s-kids')) return;
+  const ds = t.dataset;
+  if (ds.kid) { KID = ds.kid; lsSet('levelup_kid', {id: KID}); tryOpen = false; tryFood = null; renderKids(); return; }
+  if (ds.kpick) { put(ds.kpick, get(ds.kpick) === ds.v ? '' : ds.v); return; }
+  if (t.id === 'tryOpen' || ds.trynow) { tryOpen = true; tryFood = null; renderKids(); $('kidTry').scrollIntoView({block: 'center', behavior: 'smooth'}); return; }
+  if (t.id === 'tryCancel') { tryOpen = false; renderKids(); return; }
+  if (t.id === 'tryBack') { tryFood = null; renderKids(); return; }
+  if (ds.tryfood) { tryFood = {n: ds.tryfood, e: ds.e}; renderKids(); return; }
+  if (t.id === 'tryOtherGo') { const v = $('tryOther').value.trim(); if (v) { tryFood = {n: v.slice(0, 40), e: '🍽️'}; renderKids(); } return; }
+  if (ds.rate) { logTry(ds.rate); return; }
+});
+
+function renderKidGroceries() {
+  const c = {};
+  KIDS.forEach(k => DAYS.forEach(d => ['b', 'l', 'v', 's'].forEach(sl => { const v = get(`kpick.${k.id}.${d}.${sl}`); if (v) c[v] = (c[v] || 0) + 1; })));
+  const ks = Object.keys(c);
+  $('gKids').innerHTML = ks.length ? `<div class="kidsum"><h3>For Ethan and Fynn’s picks</h3><p style="margin:0">${ks.map(k => `${esc(k)} ×${c[k]}`).join(' · ')}</p></div>` : '';
+}
+function renderAll() { renderHeader(); renderRecipes(); renderPlan(); renderPlayers(); renderCards(); checkMilestones(); renderToday(); renderKids(); renderKidGroceries(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
 
 /* ---------- tabs ---------- */
-const TABS = ['today','menu','recipes','groceries','prep','review','plan'];
+const TABS = ['today','kids','menu','recipes','groceries','prep','review','plan'];
 function route() {
   const h = location.hash.slice(1), t = TABS.includes(h) ? h : 'today';
   TABS.forEach(x => { $('s-' + x).classList.toggle('on', x === t); });
+  document.body.classList.toggle('kidmode', t === 'kids'); if (typeof drawTrail === 'function') setTimeout(drawTrail, 0);
   document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + t));
 }
 window.addEventListener('hashchange', route);
@@ -1095,7 +1261,7 @@ document.addEventListener('click', e => {
     const d = $('r-' + id); if (d) { d.open = true; setTimeout(() => d.scrollIntoView({block:'start', behavior:'smooth'}), 30); }
     e.preventDefault(); return;
   }
-  if (t.dataset.day) { sel = +t.dataset.day; renderToday(); return; }
+  if (t.dataset.day) { sel = +t.dataset.day; renderToday(); renderKids(); return; }
   if (t.dataset.walk) { const n = +t.dataset.n; put(`walks.${t.dataset.walk}`, walksDone(t.dataset.walk) === n ? n - 1 : n); return; }
   if (t.dataset.set) { put(t.dataset.set, +get(t.dataset.set) === +t.dataset.v ? 0 : +t.dataset.v); return; }
   if (t.dataset.path) { put(t.dataset.path, !get(t.dataset.path)); return; }
