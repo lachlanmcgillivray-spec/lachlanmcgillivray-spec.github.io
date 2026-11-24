@@ -35,7 +35,14 @@ h1 span{color:var(--lemon)}
 .sub{color:#e6eef8;font-size:18px;margin:0 0 12px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
 .hero{position:absolute;left:0;right:0;top:0;height:560px;z-index:0;overflow:hidden;pointer-events:none}
 .hero svg{width:100%;height:100%;display:block}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.08) 30%,rgba(0,0,0,0) 50%,var(--navy) 96%)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.18) 32%,rgba(0,0,0,.12) 55%,var(--navy) 97%)}
+.hphoto{position:absolute;inset:-2%;background:center 45%/cover no-repeat;opacity:0;transition:opacity .9s ease}
+.hphoto.on{opacity:1;animation:kb 40s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.1) translate(-1.5%,-1%)}}
+.thumb,.tprev{position:relative}
+.tp{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;transition:opacity .4s}.tp.on{opacity:1}
+.tprev span{z-index:1}
+@media(prefers-reduced-motion:reduce){.hphoto.on{animation:none}}
 .head{position:relative;z-index:1}
 main{position:relative;z-index:1}
 h1{text-shadow:0 2px 12px rgba(0,0,0,.45)}
@@ -76,6 +83,9 @@ h1{text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .chipx{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:14px;padding:4px 4px 4px 10px;margin:3px;box-shadow:inset 0 0 0 2px var(--line);font-size:14px;font-weight:bold}
 .chipx .x{width:32px;height:32px;font-size:13px}
 .kchoices.edit button{opacity:.6}
+.mrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:#fff;border-radius:14px;padding:8px;margin:6px 0}
+.mrow input,.mrow select{min-height:44px;padding:8px;font-size:16px;border:2px solid var(--line);border-radius:10px;color:var(--ink);background:#fff}
+.mrow input[type=text]{flex:1;min-width:130px}.mrow input.emo{width:60px;text-align:center}.mrow .pts{display:flex;align-items:center;gap:4px;font-size:14px;white-space:nowrap}.mrow .pts input{width:72px}
 .edited{font-size:12px;background:#e3eefc;border-radius:8px;padding:1px 6px;font-weight:bold}
 /* kids */
 body.kidmode .players,body.kidmode .where{display:none}
@@ -391,7 +401,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
   <div id="libList"></div>
 </section>
 
-<footer>A practical starting point, not a calorie-restricted diet. Missed a day? Restart at the next meal, not next Monday. Trail distances come from park and route guides; the height profiles are approximate.</footer>
+<footer>A practical starting point, not a calorie-restricted diet. Missed a day? Restart at the next meal, not next Monday. Trail distances come from park and route guides; the height profiles are approximate. <span id="heroCredit"></span></footer>
 </div></main>
 
 <script>
@@ -678,7 +688,7 @@ function currentWeekId() {
   const up = ws.find(w => pd(w.start) > t); return up ? up.id : ws[ws.length - 1].id;
 }
 const menuOf = w => (w.builtin || (w.base1 && !w.menu)) ? Object.fromEntries(DAYS.map((d, i) => [d, MENU1[i].slice()])) : (w.menu || {});
-let pinned = false, lastApplied = '', WEEKOBJ = WEEK1;
+let pinned = false, lastApplied = '', WEEKOBJ = WEEK1, heroFor = '';
 function calcToday() { const n = new Date(); const i = Math.floor((new Date(n.getFullYear(), n.getMonth(), n.getDate()) - START) / 864e5); return i >= 0 && i < 7 ? i : -1; }
 function buildGroceries(w) {
   const g = {}, used = {};
@@ -710,7 +720,7 @@ function applyWeek() {
   const th = TRAIL.theme, root = document.documentElement.style;
   root.setProperty('--navy', th.deep); root.setProperty('--navy2', th.mid);
   const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.setAttribute('content', th.deep);
-  $('hero').innerHTML = scene(TRAIL.id);
+  if (heroFor !== TRAIL.id) { heroFor = TRAIL.id; setHero(); }
 }
 function setupChanged() {
   const was = WEEK;
@@ -974,7 +984,7 @@ function renderWeekList() {
   $('weekList').innerHTML = allWeeks().map(w => {
     const s = pd(w.start), t = TRAILS[w.trail] || TRAILS.milford, m = menuOf(w);
     const n = DAYS.reduce((c, d) => c + (m[d] || []).filter(Boolean).length, 0);
-    return `<div class="wk"><div class="thumb">${scene(t.id, true)}</div><div class="info"><b>${esc(w.name)}</b><small>${f(s)} – ${f(addDays(s, 6))} · ${t.name}</small><small>${n} of 28 meals planned${w.id === cur ? ' · <b>this week</b>' : ''}${w.builtin ? ' · from your Week 1 plan' : w.base1 ? ' · edited' : ''}</small></div>
+    return `<div class="wk"><div class="thumb">${scene(t.id, true)}<i class="tp" data-ht="${t.id}"></i></div><div class="info"><b>${esc(w.name)}</b><small>${f(s)} – ${f(addDays(s, 6))} · ${t.name}</small><small>${n} of 28 meals planned${w.id === cur ? ' · <b>this week</b>' : ''}${w.builtin ? ' · from your Week 1 plan' : w.base1 ? ' · edited' : ''}</small></div>
       <div class="acts"><button class="btn" data-week="${w.id}">Open</button><button class="btn" data-wedit="${w.id}">✏️ Edit</button></div></div>`; }).join('')
     + (draft ? '' : `<button class="btn go" id="wNew">+ Plan a new week</button>`);
 }
@@ -992,7 +1002,7 @@ function renderEditor() {
     <div class="duo"><label class="f"><span>Name or theme</span><input type="text" data-d="name" value="${esc(draft.name)}"></label>
     <label class="f"><span>Starts on (we'll snap it to the Monday)</span><input type="date" data-d="start" value="${draft.start}"></label></div>
     <label class="f"><span>This week's great walk</span><select data-d="trail">${Object.keys(TRAILS).map(k => `<option value="${k}" ${k === draft.trail ? 'selected' : ''}>${TRAILS[k].name} · ${TRAILS[k].km} km</option>`).join('')}</select></label>
-    <div class="tprev">${scene(t.id, true)}<span><b>${t.name}</b>${esc(t.where)} · ${t.km} km · ${t.stops.length} landmarks</span></div>
+    <div class="tprev">${scene(t.id, true)}<i class="tp" data-ht="${t.id}"></i><span><b>${t.name}</b>${esc(t.where)} · ${t.km} km · ${t.stops.length} landmarks</span></div>
     <div class="row"><select id="copyFrom" aria-label="Copy a menu"><option value="">Copy a menu from…</option>${allWeeks().filter(w => w.id !== draft.id).map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('')}</select>
       <button class="btn" id="wFill">Fill empty slots for me</button><button class="btn" id="wClearMenu">Clear menu</button></div>
     <datalist id="snackList">${SNACKS.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
@@ -1043,7 +1053,8 @@ function renderLib() {
       <div class="acts"><button class="btn" data-redit="${id}">✏️ Edit</button></div></div>`).join('') : '<p class="key">Nothing matches.</p>');
   }).join('') + (hiddenRecipes().length ? `<div class="removed"><b>Removed recipes</b><br>${hiddenRecipes().filter(k => BASE_R[k]).map(k => `<button class="btn edit" data-rrestore="${k}">↩ ${esc(BASE_R[k].n)}</button>`).join('')}</div>` : '');
 }
-function renderPlan() { renderWeekList(); renderLib(); }
+function renderPlan() { renderWeekList(); renderLib(); fillThumbs(); }
+const renderEditorBase = renderEditor; renderEditor = function () { renderEditorBase(); fillThumbs(); };
 
 document.addEventListener('click', e => {
   const t = e.target.closest('button,[data-week]'); if (!t) return;
@@ -1089,13 +1100,63 @@ document.addEventListener('change', e => { const t = e.target; if (t.dataset && 
 
 /* ---------- milestone postcards (photos from Wikipedia) ---------- */
 const photoCache = lsGet('levelup_photos', {});
+// Background photo for each walk: first good landscape photo from these Wikipedia articles
+const HERO = {
+  milford: ['Milford Sound', 'Mitre Peak', 'Milford Track'],
+  inca: ['Machu Picchu', 'Inca Trail to Machu Picchu'],
+  camino: ['Camino Francés', 'Santiago de Compostela Cathedral', 'Portomarín', 'Camino de Santiago'],
+  wct: ['Pacific Rim National Park Reserve', 'Carmanah Point Lighthouse', 'West Coast Trail'],
+  whw: ['Buachaille Etive Mòr', 'Glen Coe', 'West Highland Way']
+};
+function heroPhoto(tid) {
+  const key = 'hero:' + tid;
+  if (photoCache[key]) return Promise.resolve(photoCache[key]);
+  if (photoFor.busy[key]) return photoFor.busy[key];
+  const job = (async () => {
+    let best = null;
+    for (const t of HERO[tid] || []) {
+      try {
+        const w = await wikiPage(t); if (!w) continue; const {p, o, th} = w;
+        if (/\.(svg|png|gif|tiff?)$/i.test(o.source) || /map|logo|flag|coat_of_arms|locator|sign/i.test(o.source)) continue;
+        const src = o.width > 1800 && th ? th.source : o.source;
+        const j = {title: p.title, content_urls: {desktop: {page: p.fullurl}}};
+        const c = {src, title: j.title, url: j.content_urls ? j.content_urls.desktop.page : 'https://en.wikipedia.org/wiki/' + encodeURIComponent(t)};
+        if (o.width >= o.height * 1.15) { best = c; break; }   // landscape: use it
+        if (!best) best = c;                                   // portrait: keep as a fallback
+      } catch (e) {}
+    }
+    if (best) { photoCache[key] = best; lsSet('levelup_photos', photoCache); }
+    return best;
+  })();
+  photoFor.busy = photoFor.busy || {}; photoFor.busy[key] = job; return job;
+}
+function setHero() {
+  const tid = TRAIL.id;
+  $('hero').innerHTML = scene(tid) + '<div class="hphoto" id="hphoto"></div>';
+  $('heroCredit').innerHTML = '';
+  heroPhoto(tid).then(p => {
+    if (!p || TRAIL.id !== tid) return;
+    const img = new Image();
+    img.onload = () => { const el = $('hphoto'); if (!el || TRAIL.id !== tid) return; el.style.backgroundImage = `url("${p.src.replace(/"/g, '%22')}")`; el.classList.add('on'); };
+    img.src = p.src;
+    $('heroCredit').innerHTML = `Background photo: <a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}, Wikipedia</a>.`;
+  });
+}
+function fillThumbs() {
+  document.querySelectorAll('.tp[data-ht]:not(.on)').forEach(el => heroPhoto(el.dataset.ht).then(p => {
+    if (!p) return; const img = new Image(); img.onload = () => { el.style.backgroundImage = `url("${p.src.replace(/"/g, '%22')}")`; el.classList.add('on'); }; img.src = p.src; }));
+}
+// One article: lead photo (free licence only), short intro and link. Uses Wikipedia's main API.
+async function wikiPage(t) {
+  const r = await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&redirects=1&prop=pageimages|extracts|info&inprop=url&piprop=original|thumbnail&pithumbsize=1800&exintro=1&explaintext=1&exsentences=3&titles=' + encodeURIComponent(t));
+  if (!r.ok) return null; const j = await r.json(); const p = ((j.query || {}).pages || [])[0];
+  if (!p || p.missing || !(p.original || p.thumbnail)) return null;
+  return {p, o: p.original || p.thumbnail, th: p.thumbnail};
+}
 async function wikiSummary(t) {
-  const r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(t.replace(/ /g, '_')));
-  if (!r.ok) return null; const j = await r.json();
-  if (j.type === 'disambiguation' || !(j.originalimage || j.thumbnail)) return null;
-  const o = j.originalimage, th = j.thumbnail;
-  const src = o && o.width <= 1400 ? o.source : th ? th.source.replace(/\/\d+px-/, '/1000px-') : o.source;
-  return {src, text: j.extract || '', url: j.content_urls ? j.content_urls.desktop.page : 'https://en.wikipedia.org/wiki/' + encodeURIComponent(t), title: j.title};
+  const w = await wikiPage(t); if (!w) return null; const {p, o, th} = w;
+  const src = o.width > 1400 && th ? th.source.replace(/\/\d+px-/, '/1000px-') : o.source;
+  return {src, text: p.extract || '', url: p.fullurl || 'https://en.wikipedia.org/wiki/' + encodeURIComponent(t), title: p.title};
 }
 async function wikiSearch(q) {
   const r = await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=4&prop=pageimages|extracts|info&inprop=url&piprop=thumbnail&pithumbsize=1000&exintro=1&explaintext=1&exsentences=2&gsrsearch=' + encodeURIComponent(q));
@@ -1206,29 +1267,36 @@ const TRY_FOODS = [['Hummus', '🫘'], ['Chickpeas', '🫘'], ['Cucumber', '🥒
   ['Blueberries', '🫐'], ['Pear', '🍐'], ['Walnuts', '🌰'], ['Pumpkin seeds', '🎃'], ['Turkey kofta', '🍢'], ['Avocado', '🥑'], ['Mushroom', '🍄']];
 const RATES = [['yum', '😋', 'Yum!'], ['ok', '😐', 'It’s OK'], ['no', '🙅', 'Not yet']];
 const KBADGES = [
-  {id: 'first', e: '🥄', n: 'First Bite', h: 'Try 1 new food'},
-  {id: 'brave', e: '🧭', n: 'Brave Explorer', h: 'Try 5 foods this week'},
-  {id: 'rainbow', e: '🌈', n: 'Rainbow Week', h: 'Fruit and veggie on 5 days'},
-  {id: 'chef', e: '👩‍🍳', n: 'Little Chef', h: 'Help cook 3 times'},
-  {id: 'water', e: '💧', n: 'Water Champ', h: 'Water on 5 days'},
-  {id: 'perfect', e: '⭐', n: 'Perfect Day', h: 'Collect all 6 in one day'},
-  {id: 'finish', e: '🏁', n: 'Trail Finisher', h: 'Reach the end of the trail'}
+  {id: 'first', e: '🥄', n: 'First Bite', type: 'tries', target: 1},
+  {id: 'brave', e: '🧭', n: 'Brave Explorer', type: 'tries', target: 5},
+  {id: 'rainbow', e: '🌈', n: 'Rainbow Week', type: 'rainbow', target: 5},
+  {id: 'chef', e: '👩‍🍳', n: 'Little Chef', type: 'days', mission: 'chef', target: 3},
+  {id: 'water', e: '💧', n: 'Water Champ', type: 'days', mission: 'water', target: 5},
+  {id: 'perfect', e: '⭐', n: 'Perfect Day', type: 'perfect', target: 1},
+  {id: 'finish', e: '🏁', n: 'Trail Finisher', type: 'finish'}
 ];
+const BTYPES = {tries: 'Foods tried this week', days: 'Days with an icon', rainbow: 'Days with fruit and veggie', perfect: 'Perfect days', finish: 'Finish the trail'};
+const kMissions = () => Array.isArray(SETUP.kmissions) && SETUP.kmissions.length ? SETUP.kmissions : KMISSIONS;
+const kBadges = () => Array.isArray(SETUP.kbadges) ? SETUP.kbadges : KBADGES;
+const kMaxDay = () => kMissions().reduce((t, m) => t + (+m.xp || 0), 0) + PERFECT_XP;
+function badgeHint(b) {
+  const t = +b.target || 1, s = t === 1 ? '' : 's', m = kMissions().find(x => x.id === b.mission);
+  return b.type === 'tries' ? `Try ${t} food${s} this week` : b.type === 'rainbow' ? `Fruit and veggie on ${t} day${s}` : b.type === 'perfect' ? `${t} perfect day${s}` : b.type === 'finish' ? 'Reach the end of the trail' : `${m ? m.n : 'An icon'} on ${t} day${s}`;
+}
 const fkey = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'food';
 const triesOn = (kid, d) => Object.keys(get(`ktry.${kid}.${d}`) || {}).filter(k => get(`ktry.${kid}.${d}.${k}`));
 const kdone = (kid, d, id) => id === 'tried' ? triesOn(kid, d).length > 0 : !!get(`kxp.${kid}.${d}.${id}`);
-const kperfect = (kid, d) => KMISSIONS.every(m => kdone(kid, d, m.id));
-const kidDayXP = (kid, d) => KMISSIONS.reduce((t, m) => t + (kdone(kid, d, m.id) ? m.xp : 0), 0) + (kperfect(kid, d) ? PERFECT_XP : 0);
+const kperfect = (kid, d) => kMissions().every(m => kdone(kid, d, m.id));
+const kidDayXP = (kid, d) => kMissions().reduce((t, m) => t + (kdone(kid, d, m.id) ? (+m.xp || 0) : 0), 0) + (kperfect(kid, d) ? PERFECT_XP : 0);
 const weekTries = kid => DAYS.reduce((t, d) => t + triesOn(kid, d).length, 0);
-function kbadge(kid, id) {
-  const days = f => DAYS.filter(f).length;
-  if (id === 'first') return weekTries(kid) >= 1;
-  if (id === 'brave') return weekTries(kid) >= 5;
-  if (id === 'rainbow') return days(d => kdone(kid, d, 'fruit') && kdone(kid, d, 'veg')) >= 5;
-  if (id === 'chef') return days(d => kdone(kid, d, 'chef')) >= 3;
-  if (id === 'water') return days(d => kdone(kid, d, 'water')) >= 5;
-  if (id === 'perfect') return days(d => kperfect(kid, d)) >= 1;
-  if (id === 'finish') return finishedOn(kid) >= 0;
+function kbadge(kid, b) {
+  const days = f => DAYS.filter(f).length, t = +b.target || 1;
+  if (b.type === 'tries') return weekTries(kid) >= t;
+  if (b.type === 'rainbow') return days(d => kdone(kid, d, 'fruit') && kdone(kid, d, 'veg')) >= t;
+  if (b.type === 'days') return days(d => kdone(kid, d, b.mission)) >= t;
+  if (b.type === 'perfect') return days(d => kperfect(kid, d)) >= t;
+  if (b.type === 'finish') return finishedOn(kid) >= 0;
+  return false;
 }
 const passport = kid => Object.entries((SETUP.passport || {})[kid] || {}).filter(([k, v]) => v && v.f);
 let KID = lsGet('levelup_kid', {id: 'ethan'}).id, tryOpen = false, tryFood = null, kEdit = false;
@@ -1240,15 +1308,16 @@ function optEditor(slot) {
     <div class="addrow"><input class="emo" type="text" id="ke_${slot}" placeholder="🍽️" maxlength="8" aria-label="Emoji"><input type="text" id="kn_${slot}" placeholder="Add a choice" maxlength="40"><button class="btn go" data-kopt-add="${slot}">Add</button>${(SETUP.kidmenu || {})[slot] ? `<button class="btn edit" data-kopt-reset="${slot}">Reset to starter list</button>` : ''}</div></div>`;
 }
 
-function renderKids() {
+function renderKids(force) {
+  const ae = document.activeElement; if (!force && ae && ae.matches && ae.matches('#s-kids .editor input, #s-kids .editor select, #s-kids .addrow input')) return; // don't redraw under someone typing
   const kid = KIDS.find(k => k.id === KID) || KIDS[0], d = DAYS[sel], x = totalXP(kid.id), dx = kidDayXP(kid.id, d);
   $('kidPick').innerHTML = KIDS.map(k => `<button data-kid="${k.id}" class="${k.id === kid.id ? 'on' : ''}" style="--kc:${k.c}"><i>${k.name[0]}</i><b>${k.name}</b><small>${totalXP(k.id)} XP · ${kmFor(totalXP(k.id)).toFixed(1)} km</small></button>`).join('');
   $('kidDays').innerHTML = DAYS.map((dd, i) => `<button data-day="${i}" class="${i === sel ? 'on' : ''} ${i === todayIdx ? 'today' : ''}">${fmt(dateOf(i), {weekday: 'short'})}<small>${fmt(dateOf(i), {month: 'short', day: 'numeric'})}</small><span class="st">${kperfect(kid.id, dd) ? '★' : ''}</span></button>`).join('');
-  const got = KMISSIONS.filter(m => kdone(kid.id, d, m.id)).length, pf = kperfect(kid.id, d);
-  $('kidToday').innerHTML = `<div class="kbar"><b>${kid.name}’s ${DAYNAMES[sel]}</b><span>${dx} / ${100 + PERFECT_XP} XP</span></div>
-    <div class="bar kb"><i style="width:${Math.min(100, dx / (100 + PERFECT_XP) * 100)}%;background:${kid.c}"></i></div>
-    <h3>Collect them all! <small>${got} of 6</small></h3>
-    <div class="ktok">${KMISSIONS.map(m => { const on = kdone(kid.id, d, m.id);
+  const KM = kMissions(), got = KM.filter(m => kdone(kid.id, d, m.id)).length, pf = kperfect(kid.id, d), MX = kMaxDay();
+  $('kidToday').innerHTML = `<div class="kbar"><b>${kid.name}’s ${DAYNAMES[sel]}</b><span>${dx} / ${MX} XP</span></div>
+    <div class="bar kb"><i style="width:${Math.min(100, dx / (MX || 1) * 100)}%;background:${kid.c}"></i></div>
+    ${kEdit ? missionEditor() : ''}<h3>Collect them all! <small>${got} of ${KM.length}</small></h3>
+    <div class="ktok">${KM.map(m => { const on = kdone(kid.id, d, m.id);
       return `<button class="${on ? 'on' : ''}" ${m.auto ? 'data-trynow="1"' : `data-path="kxp.${kid.id}.${d}.${m.id}"`} aria-pressed="${on}"><span>${m.e}</span><b>${m.n}</b><small>${m.auto && !on ? 'Tap to try!' : '+' + m.xp}</small></button>`; }).join('')}
       <div class="kcrown ${pf ? 'on' : ''}"><span>👑</span><b>${pf ? 'Perfect day!' : 'Perfect day'}</b><small>+${PERFECT_XP}</small></div></div>`;
   // food picks
@@ -1270,10 +1339,46 @@ function renderKids() {
   $('kidPassport').innerHTML = `<h3>${kid.name}’s Taste Passport <small>${pp.length} stamp${pp.length === 1 ? '' : 's'}</small></h3>` + (pp.length ? `<div class="stamps">${pp.map(([k, v]) => { const r = RATES.find(x => x[0] === v.r);
       return `<div class="stamp" style="--kc:${kid.c}"><span>${v.e || '🍽️'}</span><b>${esc(v.f)}</b><small>${r ? r[1] + ' ' : ''}tried ${v.t || 1}×</small>${kEdit ? `<br><button class="x" data-stampdel="${k}" aria-label="Remove ${esc(v.f)} stamp">✕</button>` : ''}</div>`; }).join('')}</div>` : '<p class="key">No stamps yet. Try a new food to get your first one!</p>');
   // badges + chore chart
-  $('kidBadges').innerHTML = `<h3>Badges this week</h3><div class="kbadges">${KBADGES.map(b => { const on = kbadge(kid.id, b.id), rw = get(`kreward.${kid.id}.${b.id}`);
-      return `<div class="kbadge ${on ? 'on' : ''}"><span>${b.e}</span><b>${b.n}</b><small>${b.h}</small>${on ? `<button class="rw ${rw ? 'on' : ''}" data-path="kreward.${kid.id}.${b.id}">${rw ? '✓ On chore chart' : 'Add to chore chart'}</button>` : ''}</div>`; }).join('')}</div>
+  $('kidBadges').innerHTML = `<h3>Badges this week</h3>${kEdit ? badgeEditor() : ''}<div class="kbadges">${kBadges().map(b => { const on = kbadge(kid.id, b), rw = get(`kreward.${kid.id}.${b.id}`);
+      return `<div class="kbadge ${on ? 'on' : ''}"><span>${esc(b.e)}</span><b>${esc(b.n)}</b><small>${esc(badgeHint(b))}</small>${on ? `<button class="rw ${rw ? 'on' : ''}" data-path="kreward.${kid.id}.${b.id}">${rw ? '✓ On chore chart' : 'Add to chore chart'}</button>` : ''}</div>`; }).join('')}</div>
     <p class="key">Grown-ups: each badge earns a reward on ${kid.name}’s chore chart. Tap “Add to chore chart” once you’ve added it.</p>`;
 }
+let kmDraft = null, kbDraft = null;
+function missionEditor() {
+  if (!kmDraft) kmDraft = JSON.parse(JSON.stringify(kMissions()));
+  return `<div class="editor"><h3>Edit the daily icons</h3><p class="key">Change the picture, name, description or points. Remove any, or add your own. The first starter icon (Brave bite) ticks itself when a new food is logged, whatever you rename it.</p>
+    ${kmDraft.map((m, i) => `<div class="mrow"><input class="emo" data-km="${i}.e" value="${esc(m.e)}" maxlength="8" aria-label="Emoji"><input type="text" data-km="${i}.n" value="${esc(m.n)}" aria-label="Name" maxlength="30"><input type="text" data-km="${i}.h" value="${esc(m.h || '')}" placeholder="What to do" aria-label="Description" maxlength="80"><label class="pts"><input type="number" inputmode="numeric" min="0" max="100" data-km="${i}.xp" value="${+m.xp || 0}" aria-label="Points"> pts</label><button class="x" data-kmdel="${i}" aria-label="Remove ${esc(m.n)}">✕</button></div>`).join('')}
+    <p class="key" id="kmMsg"></p><div class="row"><button class="btn" id="kmAdd">+ Add an icon</button><button class="btn go" id="kmSave">Save icons</button>${SETUP.kmissions ? '<button class="btn" id="kmReset">Reset to starter icons</button>' : ''}</div></div>`;
+}
+function badgeEditor() {
+  if (!kbDraft) kbDraft = JSON.parse(JSON.stringify(kBadges()));
+  const KM = kMissions();
+  return `<div class="editor"><h3>Edit the badges</h3><p class="key">Each badge can be won once a week. Change what it takes, rename it, remove it or add new ones.</p>
+    ${kbDraft.map((b, i) => `<div class="mrow"><input class="emo" data-kb="${i}.e" value="${esc(b.e)}" maxlength="8" aria-label="Emoji"><input type="text" data-kb="${i}.n" value="${esc(b.n)}" aria-label="Badge name" maxlength="30">
+      <select data-kb="${i}.type" aria-label="What it takes">${Object.keys(BTYPES).map(k => `<option value="${k}" ${k === b.type ? 'selected' : ''}>${BTYPES[k]}</option>`).join('')}</select>
+      ${b.type === 'days' ? `<select data-kb="${i}.mission" aria-label="Which icon">${KM.map(m => `<option value="${m.id}" ${m.id === b.mission ? 'selected' : ''}>${esc(m.e + ' ' + m.n)}</option>`).join('')}</select>` : ''}
+      ${b.type === 'finish' ? '' : `<label class="pts"><input type="number" inputmode="numeric" min="1" max="${b.type === 'tries' ? 50 : 7}" data-kb="${i}.target" value="${+b.target || 1}" aria-label="How many"> ${b.type === 'tries' ? 'foods' : 'days'}</label>`}
+      <button class="x" data-kbdel="${i}" aria-label="Remove ${esc(b.n)}">✕</button></div>`).join('')}
+    <div class="row"><button class="btn" id="kbAdd">+ Add a badge</button><button class="btn go" id="kbSave">Save badges</button>${SETUP.kbadges ? '<button class="btn" id="kbReset">Reset to starter badges</button>' : ''}</div></div>`;
+}
+document.addEventListener('input', e => {
+  const ds = e.target.dataset || {}, v = e.target.value;
+  if (ds.km && kmDraft) { const [i, f] = ds.km.split('.'); kmDraft[+i][f] = f === 'xp' ? Math.max(0, Math.min(100, +v || 0)) : v; return; }
+  if (ds.kb && kbDraft) { const [i, f] = ds.kb.split('.'); const b = kbDraft[+i]; b[f] = f === 'target' ? Math.max(1, +v || 1) : v;
+    if (f === 'type') { if (v === 'days' && !b.mission) b.mission = kMissions()[0].id; if (v !== 'finish' && !b.target) b.target = 1; renderKids(true); } }
+});
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t || !t.closest('#s-kids')) return; const ds = t.dataset;
+  if (t.id === 'kmAdd') { kmDraft.push({id: 'm' + Date.now().toString(36), e: '⭐', n: 'New icon', h: '', xp: 10}); renderKids(); return; }
+  if (ds.kmdel) { kmDraft.splice(+ds.kmdel, 1); renderKids(); return; }
+  if (t.id === 'kmSave') { const a = kmDraft.filter(m => String(m.n).trim()); if (!a.length) { $('kmMsg').textContent = 'Keep at least one icon.'; return; }
+    putSetup('kmissions', a.map(m => ({id: m.id, e: String(m.e || '⭐').trim(), n: String(m.n).trim(), h: String(m.h || '').trim(), xp: +m.xp || 0, auto: m.id === 'tried' || undefined})).map(m => (m.auto === undefined && delete m.auto, m))); kmDraft = null; return; }
+  if (t.id === 'kmReset') { putSetup('kmissions', null); kmDraft = null; return; }
+  if (t.id === 'kbAdd') { kbDraft.push({id: 'b' + Date.now().toString(36), e: '🏅', n: 'New badge', type: 'days', mission: kMissions()[0].id, target: 3}); renderKids(); return; }
+  if (ds.kbdel) { kbDraft.splice(+ds.kbdel, 1); renderKids(); return; }
+  if (t.id === 'kbSave') { putSetup('kbadges', kbDraft.filter(b => String(b.n).trim()).map(b => { const o = {id: b.id, e: String(b.e || '🏅').trim(), n: String(b.n).trim(), type: b.type}; if (b.type === 'days') o.mission = b.mission; if (b.type !== 'finish') o.target = +b.target || 1; return o; })); kbDraft = null; return; }
+  if (t.id === 'kbReset') { putSetup('kbadges', null); kbDraft = null; return; }
+});
 function logTry(rate) {
   const kid = KID, d = DAYS[sel], k = fkey(tryFood.n), already = get(`ktry.${kid}.${d}.${k}`);
   const p = ((SETUP.passport || {})[kid] || {})[k] || {};
@@ -1284,7 +1389,7 @@ function logTry(rate) {
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t || !t.closest('#s-kids')) return;
   const ds = t.dataset;
-  if (t.id === 'kEdit') { kEdit = !kEdit; tryOpen = false; renderKids(); return; }
+  if (t.id === 'kEdit') { kEdit = !kEdit; tryOpen = false; kmDraft = null; kbDraft = null; renderKids(); return; }
   if (ds.koptDel) { const a = kidOpts(ds.koptDel).slice(); a.splice(+ds.i, 1); saveKidOpts(ds.koptDel, a); return; }
   if (ds.koptAdd) { const sl = ds.koptAdd, n = $('kn_' + sl).value.trim(), e2 = $('ke_' + sl).value.trim() || '🍽️'; if (!n) return; saveKidOpts(sl, kidOpts(sl).concat([[n.slice(0, 40), e2]])); return; }
   if (ds.koptReset) { putSetup('kidmenu.' + ds.koptReset, null); return; }
