@@ -133,6 +133,7 @@ body.kidmode .players,body.kidmode .where{display:none}
 .rw{margin-top:8px;border:0;border-radius:14px;padding:6px 10px;min-height:36px;font:inherit;font-size:12px;font-weight:bold;background:#fff;color:var(--ink);cursor:pointer;box-shadow:inset 0 0 0 2px var(--line)}
 .rw.on{background:var(--teal);color:#fff;box-shadow:none}
 .rw.take{background:#fde2e0;color:var(--red);box-shadow:none}
+.ptday{background:#fff;border-radius:14px;padding:8px 10px;margin:6px 0}.ptday b{display:block;margin-bottom:4px}
 .ovr{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center}.ovr small{flex-basis:100%}
 .kidsum{background:var(--soft);border-radius:16px;padding:6px 16px 12px;margin-bottom:18px}
 @media(max-width:600px){.ktok{grid-template-columns:repeat(3,minmax(0,1fr))}.ktok span,.kcrown span{font-size:34px}.where{grid-template-columns:repeat(2,minmax(0,1fr))}.where div{font-size:13px}}
@@ -1384,11 +1385,22 @@ function renderKids(force) {
   $('kidPassport').innerHTML = `<h3>${kid.name}’s Taste Passport <small>${pp.length} stamp${pp.length === 1 ? '' : 's'}</small></h3>` + (pp.length ? `<div class="stamps">${pp.map(([k, v]) => { const r = RATES.find(x => x[0] === v.r);
       return `<div class="stamp" style="--kc:${kid.c}"><span>${v.e || '🍽️'}</span><b>${esc(v.f)}</b><small>${r ? r[1] + ' ' : ''}tried ${v.t || 1}×</small>${kEdit ? `<br><button class="x" data-stampdel="${k}" aria-label="Remove ${esc(v.f)} stamp">✕</button>` : ''}</div>`; }).join('')}</div>` : '<p class="key">No stamps yet. Try a new food to get your first one!</p>');
   // badges + chore chart
-  $('kidBadges').innerHTML = `<h3>Badges this week</h3>${kEdit ? badgeEditor() : ''}<div class="kbadges">${kBadges().map(b => { const on = kbadge(kid.id, b), rw = get(`kreward.${kid.id}.${b.id}`);
+  $('kidBadges').innerHTML = `${kEdit ? pointsBreakdown(kid) : ''}<h3>Badges this week</h3>${kEdit ? badgeEditor() : ''}<div class="kbadges">${kBadges().map(b => { const on = kbadge(kid.id, b), rw = get(`kreward.${kid.id}.${b.id}`);
       return `<div class="kbadge ${on ? 'on' : ''}"><span>${esc(b.e)}</span><b>${esc(b.n)}</b><small>${esc(badgeHint(b))}</small>${on ? `<button class="rw ${rw ? 'on' : ''}" data-path="kreward.${kid.id}.${b.id}">${rw ? '✓ On chore chart' : 'Add to chore chart'}</button>` : ''}${kEdit ? badgeOverride(kid.id, b, on) : ''}</div>`; }).join('')}</div>
     <p class="key">Grown-ups: each badge earns a reward on ${kid.name}’s chore chart. Tap “Add to chore chart” once you’ve added it.</p>`;
 }
 let kmDraft = null, kbDraft = null;
+function pointsBreakdown(kid) {
+  const KM = kMissions();
+  const rows = DAYS.map((d, i) => {
+    const items = KM.filter(m => kdone(kid.id, d, m.id)).map(m => `<span class="chipx">${esc(m.e)} ${esc(m.n)} +${+m.xp || 0}<button class="x" data-unpt="${d}.${m.id}" aria-label="Remove ${esc(m.n)} on ${DAYNAMES[i]}">✕</button></span>`);
+    if (kperfect(kid.id, d)) items.push(`<span class="chipx">👑 Perfect day +${PERFECT_XP} <small style="font-weight:normal;padding-right:8px">(goes if any icon is removed)</small></span>`);
+    return items.length ? `<div class="ptday"><b>${fmt(dateOf(i), {weekday: 'short', month: 'short', day: 'numeric'})}: ${kidDayXP(kid.id, d)} XP</b><div>${items.join('')}</div></div>` : '';
+  }).join('');
+  return `<div class="editor"><h3>Where ${kid.name}’s points came from <small>${totalXP(kid.id)} XP this week</small></h3>
+    <p class="key">Points come from the daily icons, not from badges. Tap ✕ to remove an icon that was ticked by mistake. Removing a ${esc((KM.find(m => m.id === 'tried') || {n: 'Brave bite'}).n)} also undoes that day’s food tries and their passport stamps.</p>
+    ${rows || '<p class="key">No points yet this week.</p>'}</div>`;
+}
 function badgeOverride(kid, b, on) {
   const o = get(`kbadgeset.${kid}.${b.id}`) || '', earned = kbadgeEarned(kid, b);
   const note = o === 'off' ? '<small>Taken back</small>' : o === 'on' && !earned ? '<small>Given by a grown-up</small>' : '';
@@ -1420,6 +1432,10 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t || !t.closest('#s-kids')) return; const ds = t.dataset;
+  if (ds.unpt) { const [d, id] = ds.unpt.split('.');
+    if (id === 'tried') { triesOn(KID, d).forEach(k => { const p = ((SETUP.passport || {})[KID] || {})[k]; put(`ktry.${KID}.${d}.${k}`, ''); if (p) putSetup(`passport.${KID}.${k}`, (p.t || 1) <= 1 ? null : Object.assign({}, p, {t: p.t - 1})); }); }
+    else put(`kxp.${KID}.${d}.${id}`, false);
+    return; }
   if (ds.kbset) { const p = `kbadgeset.${KID}.${ds.kbset}`; put(p, ds.v === 'off' ? 'off' : ds.v === 'on' ? 'on' : ''); if (ds.v === 'off') put(`kreward.${KID}.${ds.kbset}`, false); return; }
   if (t.id === 'kmAdd') { kmDraft.push({id: 'm' + Date.now().toString(36), e: '⭐', n: 'New icon', h: '', xp: 10}); renderKids(); return; }
   if (ds.kmdel) { kmDraft.splice(+ds.kmdel, 1); renderKids(); return; }
