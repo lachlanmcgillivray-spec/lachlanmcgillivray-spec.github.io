@@ -33,9 +33,9 @@ button,input,textarea,select{font:inherit}
 h1{font-size:clamp(40px,9vw,60px);line-height:1;margin:18px 0 4px;letter-spacing:.02em}
 h1 span{color:var(--lemon)}
 .sub{color:#e6eef8;font-size:18px;margin:0 0 12px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
-.hero{position:absolute;left:0;right:0;top:0;height:560px;z-index:0;overflow:hidden;pointer-events:none}
+.hero{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:var(--navy)}
 .hero svg{width:100%;height:100%;display:block}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.18) 32%,rgba(0,0,0,.12) 55%,var(--navy) 97%)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.2) 35%,rgba(0,0,0,.3) 70%,rgba(0,0,0,.45))}
 .hphoto{position:absolute;inset:-2%;background:center 45%/cover no-repeat;opacity:0;transition:opacity .9s ease}
 .hphoto.on{opacity:1;animation:kb 40s ease-in-out infinite alternate}
 @keyframes kb{from{transform:scale(1)}to{transform:scale(1.1) translate(-1.5%,-1%)}}
@@ -44,7 +44,14 @@ h1 span{color:var(--lemon)}
 .tprev span{z-index:1}
 @media(prefers-reduced-motion:reduce){.hphoto.on{animation:none}}
 .head{position:relative;z-index:1}
-main{position:relative;z-index:1}
+main{position:relative;z-index:1;max-width:1040px;margin-left:auto;margin-right:auto;box-shadow:0 -6px 30px rgba(0,0,0,.25)}
+nav{background:rgba(8,14,30,.55)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:0 0 18px 18px}
+.kcal{margin-top:8px;border-top:1px solid var(--line);padding-top:4px}.kcal .f{margin:6px 0 2px}.kcal input{max-width:200px}
+.src{font-size:12px;font-weight:bold;background:#e3f6f1;color:var(--teal);border-radius:8px;padding:2px 8px}
+.sync-help{margin:16px 0}.sync-help ol,.sync-help ul{margin:6px 0 10px;padding-left:22px}.sync-help li{margin:4px 0}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:#fff;border-radius:10px;padding:10px;overflow-wrap:anywhere}
+#toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,140%);z-index:40;background:var(--ink);color:#fff;padding:12px 18px;border-radius:16px;font-weight:bold;max-width:92vw;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:transform .3s}
+#toast.on{transform:translate(-50%,0)}
 h1{text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .weeks{display:flex;gap:6px;overflow-x:auto;margin:0 0 14px;padding-bottom:2px}
 .weeks button,.weeks a{flex:none;border:0;border-radius:14px;padding:7px 12px;min-height:44px;background:rgba(0,0,0,.35);color:#fff;font:inherit;font-weight:bold;font-size:14px;cursor:pointer;text-decoration:none;line-height:1.15;display:flex;flex-direction:column;justify-content:center}
@@ -367,11 +374,28 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
   <h2 id="reviewTitle">Weekly review</h2>
   <p class="lead">XP fills in from the daily missions. Everything else saves as you type.</p>
   <div class="duo" id="reviewPeople"></div>
+  <details class="sync-help"><summary>Send calories from MyFitnessPal automatically (iPhone)</summary>
+    <p>There's no direct MyFitnessPal or BitePal connection, but MyFitnessPal can share your calories with Apple Health, and an iPhone Shortcut can pass Apple Health's daily total to this page.</p>
+    <ol>
+      <li>In MyFitnessPal, connect Apple Health and allow it to write nutrition (dietary energy). Check Apple Health shows your calories under Nutrition.</li>
+      <li>In the Shortcuts app, make a new shortcut with these actions:
+        <ul><li><b>Find Health Samples</b>: Type is <i>Dietary Energy</i>, Start Date is <i>Today</i></li>
+        <li><b>Calculate Statistics</b>: <i>Sum</i> of Health Samples</li>
+        <li><b>Round Number</b>: to Ones Place</li>
+        <li><b>URL</b>: your link below, with the rounded number in place of 0000</li>
+        <li><b>Open URLs</b></li></ul></li>
+      <li>Optional: in Shortcuts → Automation, add a daily one at 9 pm that runs it and set it to run immediately.</li>
+    </ol>
+    <p>Your links (each of you makes your own shortcut):</p>
+    <p class="code" id="calLinks"></p>
+    <p class="key">Running the shortcut opens this page and fills in that day's calories, marked "From Apple Health". You can still type or change the number by hand on the Today tab.</p>
+  </details>
   <h3>Family notes</h3>
   <div id="reviewFamily"></div>
   <div class="note"><b>Portion guide for adults:</b> roughly half a plate of vegetables or fruit, a quarter protein, a quarter whole grains or starchy veg, with olive oil. Adjust for hunger and activity. Kids eat to their own needs; no adult targets for them.</div>
 </section>
 
+<div id="toast" role="status"></div>
 <div id="pc" role="dialog" aria-modal="true" aria-label="Milestone"><div id="pcBox"></div></div>
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Swap a meal"><div class="panel" id="panel"></div></div>
 <section id="s-kids">
@@ -694,9 +718,15 @@ function buildGroceries(w) {
   const g = {}, used = {};
   DAYS.forEach((d, i) => [0, 1, 2].forEach(k => { const v = MENU[i][k]; if (R[v]) (used[v] = used[v] || []).push(fmt(dateOf(i), {weekday: 'short'})); }));
   Object.keys(used).forEach(id => { g[`${R[id].n} (${used[id].join(', ')})`] = R[id].i.slice(); });
+  const own = ownMeals(); if (own.length) g['Our own meals (add what you need)'] = own;
   const sn = [...new Set(MENU.map(r => r[3]).filter(Boolean))]; if (sn.length) g['Snacks'] = sn;
   if ((w.extras || []).length) g['Extras'] = w.extras.slice();
   return g;
+}
+function ownMeals() {
+  const o = [];
+  DAYS.forEach((d, i) => [0, 1, 2].forEach(k => { const v = MENU[i][k]; if (v && !R[v] && !BASE_R[v] && !/^u[a-z0-9]+$/.test(v)) o.push(`${v} (${fmt(dateOf(i), {weekday: 'short'})} ${SLOTS[k].toLowerCase()})`); }));
+  return o;
 }
 function applyWeek() {
   const w = allWeeks().find(x => x.id === WEEK) || WEEK1; WEEK = w.id; WEEKOBJ = w;
@@ -706,7 +736,7 @@ function applyWeek() {
   else if (w.base1) {
     const m = w.menu || {};
     MENU = DAYS.map((d, i) => (Array.isArray(m[d]) ? m[d] : MENU1[i]).concat(['', '', '', '']).slice(0, 4).map(v => v || ''));
-    GROCERIES = Object.assign({}, GROC1, (w.extras || []).length ? {'Extras': w.extras.slice()} : {});
+    GROCERIES = Object.assign({}, GROC1, ownMeals().length ? {'Our own meals (add what you need)': ownMeals()} : {}, (w.extras || []).length ? {'Extras': w.extras.slice()} : {});
     PREP = PREP1.concat((w.prep || []).length ? [{t: 'Our extra prep', m: 'Added when we edited Week 1', s: w.prep}] : []);
   }
   else {
@@ -830,7 +860,7 @@ function renderToday() {
     return `<button class="meal c${k}" data-slot="${k}"><small>${lab}</small>${body}${fl}<u>Recipe / swap</u></button>`; }).join('');
   const d = DAYS[sel];
   const a = document.activeElement;
-  if (a && a.dataset && a.dataset.field && a.dataset.field.startsWith('lognote')) return; // don't redraw under someone typing
+  if (a && a.dataset && a.dataset.field && /^(lognote|kcal)/.test(a.dataset.field)) return; // don't redraw under someone typing
   $('missions').innerHTML = PEOPLE.map(p => { const x = dayXP(p.id, d);
     const meals = SLOTS.map((lab, k) => { const l = logOf(p.id, d, k), pen = PENALTY[l] ? PENALTY[l][k] : 0;
       return `<div class="lg"><div class="nm"><small>${lab}</small>${esc(label(p.id, sel, k))}${pen ? ` <span class="pen">−${pen}</span>` : ''}</div>
@@ -844,6 +874,7 @@ function renderToday() {
       <p class="sub2">Collect them all · ${got} of ${MISSIONS.length}</p><div class="gems">${gems}</div>
       ${pf ? `<div class="perfect">Perfect day! +${PERFECT_XP} bonus XP</div>` : got === MISSIONS.length && !clean(p.id, d) ? `<p class="key">All icons collected, but an off-plan meal blocks the perfect-day bonus.</p>` : `<p class="key">Med meals collects itself after two ✓ meals below. Tap the others as you do them.</p>`}
       <p class="sub2">What I ate</p><p class="key">✓ ate the plan (or my swap) · ≈ off plan −5 · ✗ junk or fast food −20 (snack −10)</p>${meals}
+      <div class="kcal">${field(`kcal.${p.id}.${d}`, 'Calories today (optional)', 'number')}${get(`kcalsrc.${p.id}.${d}`) === 'health' ? '<span class="src">From Apple Health</span>' : ''}</div>
     </div>`; }).join('');
   $('walks').innerHTML = PEOPLE.map(p => { const n = walksDone(p.id);
     return `<div class="walks"><b>${p.name}</b>${[1,2,3,4,5].map(k => `<button class="walk ${k <= n ? 'on' : ''}" data-walk="${p.id}" data-n="${k}" aria-label="Walk ${k}">${k}</button>`).join('')}${n >= 5 ? ' <span>+150 XP!</span>' : ''}</div>`; }).join('');
@@ -926,12 +957,17 @@ function field(path, label, type) {
   const v = get(path) == null ? '' : get(path);
   return `<label class="f"><span>${label}</span>${type === 'area' ? `<textarea data-field="${path}">${esc(v)}</textarea>` : `<input type="${type || 'text'}" inputmode="${type === 'number' ? 'decimal' : 'text'}" data-field="${path}" value="${esc(v)}">`}</label>`;
 }
+function kcalSummary(pid) {
+  const v = DAYS.map(d => +get(`kcal.${pid}.${d}`) || 0).filter(x => x > 0);
+  return v.length ? `${Math.round(v.reduce((a, b) => a + b, 0) / v.length).toLocaleString('en-CA')} a day on average (${v.length} day${v.length === 1 ? '' : 's'} logged)` : 'none logged';
+}
 function renderReview() {
   const a = document.activeElement; if (a && a.dataset && a.dataset.field) return; // don't redraw under someone typing
   $('reviewPeople').innerHTML = PEOPLE.map(p => { const r = `review.${p.id}.`;
     return `<div class="card"><h3>${p.name}</h3>
       <div class="row"><div><small>Food XP</small><div class="stat">${foodXP(p.id)} / 350</div></div><div><small>Total XP</small><div class="stat">${totalXP(p.id)} / ${MAX_XP}</div></div></div>
       <p style="margin:0">Perfect days: <b>${DAYS.filter(d => perfect(p.id, d)).length} of 7</b> · Trail: <b>${kmFor(totalXP(p.id)).toFixed(1)} of ${TRAIL.km} km</b></p>
+      <p style="margin:0">Calories: <b>${kcalSummary(p.id)}</b></p>
       <p style="margin:0">Lost to off-plan food: <b>${lost(p.id)} XP</b></p>
       <p style="margin:0">Boss battle: <b>${walksDone(p.id) >= 5 ? 'complete ✓' : walksDone(p.id) + ' of 5 walks'}</b></p>
       ${field(r + 'walkMin', 'Walking minutes (goal 75)', 'number')}
@@ -988,15 +1024,16 @@ function renderWeekList() {
       <div class="acts"><button class="btn" data-week="${w.id}">Open</button><button class="btn" data-wedit="${w.id}">✏️ Edit</button></div></div>`; }).join('')
     + (draft ? '' : `<button class="btn go" id="wNew">+ Plan a new week</button>`);
 }
-function recipeOptions(k, v) {
-  return '<option value="">Not planned</option>' + Object.keys(R).filter(id => R[id].g === SLOTGROUP[k]).sort((a, b) => R[a].n.localeCompare(R[b].n))
+function recipeOptions(k, v, own) {
+  return '<option value="">Not planned</option>' + `<option value="__own" ${own ? 'selected' : ''}>✏️ Type our own…</option>` + Object.keys(R).filter(id => R[id].g === SLOTGROUP[k]).sort((a, b) => R[a].n.localeCompare(R[b].n))
     .map(id => `<option value="${id}" ${id === v ? 'selected' : ''}>${esc(R[id].n)}</option>`).join('');
 }
 function renderEditor() {
   const el = $('editor'); if (!draft) { el.innerHTML = ''; return; }
   const t = TRAILS[draft.trail];
   const rows = DAYS.map((d, i) => `<div class="mday"><b>${fmt(addDays(pd(draft.start), i), {weekday: 'short', month: 'short', day: 'numeric'})}</b>
-    ${[0, 1, 2].map(k => `<label><span>${SLOTS[k]}</span><select data-d="menu.${d}.${k}">${recipeOptions(k, draft.menu[d][k])}</select></label>`).join('')}
+    ${[0, 1, 2].map(k => { const v = draft.menu[d][k], own = (v && !R[v]) || (draft.own || {})[d + k];
+      return `<label><span>${SLOTS[k]}</span><select data-d="menu.${d}.${k}" data-own="1">${recipeOptions(k, v, own)}</select>${own ? `<input type="text" data-d="menu.${d}.${k}" value="${esc(v)}" placeholder="e.g. Granola and yoghurt" style="margin-top:4px">` : ''}</label>`; }).join('')}
     <label><span>Snack</span><input type="text" list="snackList" data-d="menu.${d}.3" value="${esc(draft.menu[d][3])}"></label></div>`).join('');
   el.innerHTML = `<div class="editor"><h3>${draft.id ? 'Edit week' : 'New week'}</h3>
     <div class="duo"><label class="f"><span>Name or theme</span><input type="text" data-d="name" value="${esc(draft.name)}"></label>
@@ -1090,7 +1127,9 @@ document.addEventListener('input', e => {
   if (ds.rd && rdraft) { rdraft[ds.rd] = t.value; return; }
   if (ds.d && draft) {
     const p = ds.d;
-    if (p.startsWith('menu.')) { const [, d, k] = p.split('.'); draft.menu[d][+k] = t.value; return; }
+    if (p.startsWith('menu.')) { const [, d, k] = p.split('.');
+      if (t.dataset.own) { draft.own = draft.own || {}; if (t.value === '__own') { draft.own[d + k] = true; draft.menu[d][+k] = ''; renderEditor(); const inp = document.querySelector(`input[data-d="menu.${d}.${k}"]`); if (inp) inp.focus(); return; } delete draft.own[d + k]; draft.menu[d][+k] = t.value; if (document.querySelector(`input[data-d="menu.${d}.${k}"]`)) renderEditor(); return; }
+      draft.menu[d][+k] = t.value; return; }
     if (p === 'start') { if (!t.value) return; draft.start = iso(monday(pd(t.value))); if (t.type === 'date' && document.activeElement !== t) renderEditor(); return; }
     draft[p] = t.value;
     if (p === 'trail') renderEditor();
@@ -1413,11 +1452,29 @@ function renderKidGroceries() {
   const ks = Object.keys(c);
   $('gKids').innerHTML = ks.length ? `<div class="kidsum"><h3>For Ethan and Fynn’s picks</h3><p style="margin:0">${ks.map(k => `${esc(k)} ×${c[k]}`).join(' · ')}</p></div>` : '';
 }
-function renderAll() { renderHeader(); renderRecipes(); renderPlan(); renderPlayers(); renderCards(); checkMilestones(); renderToday(); renderKids(); renderKidGroceries(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
+function renderCalLinks() { const el = $('calLinks'); if (el) el.innerHTML = PEOPLE.map(p => `<b>${p.name}:</b> ${esc(location.origin + location.pathname)}#cal-${p.id}-0000`).join('<br>'); }
+function renderAll() { renderCalLinks(); renderHeader(); renderRecipes(); renderPlan(); renderPlayers(); renderCards(); checkMilestones(); renderToday(); renderKids(); renderKidGroceries(); renderMenu(); if (sheetSlot >= 0 && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#panel input'))) renderSheet(); renderGroceries(); renderPrep(); renderReview(); }
 
 /* ---------- tabs ---------- */
 const TABS = ['today','kids','menu','recipes','groceries','prep','review','plan'];
+function importCal(h) {
+  // #cal-<person>-<kcal>[-<yyyymmdd>]  e.g. #cal-lachlan-1850
+  const m = /^cal-(lachlan|ashley)-(\d{1,5})(?:-(\d{8}))?$/.exec(h); if (!m) return false;
+  const pid = m[1], kcal = +m[2], ds = m[3], now = new Date();
+  const day = ds ? new Date(+ds.slice(0, 4), +ds.slice(4, 6) - 1, +ds.slice(6, 8)) : new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const w = allWeeks().find(x => day >= pd(x.start) && day < addDays(pd(x.start), 7));
+  const who = PEOPLE.find(p => p.id === pid).name;
+  if (!w) { toast(`No planned week covers ${fmt(day, {month: 'short', day: 'numeric'})}, so the calories weren't saved.`); return true; }
+  if (w.id !== WEEK) selectWeek(w.id);
+  const d = DAYS[Math.round((day - pd(w.start)) / 864e5)];
+  put(`kcal.${pid}.${d}`, String(kcal)); put(`kcalsrc.${pid}.${d}`, 'health');
+  sel = DAYS.indexOf(d); renderAll();
+  toast(`Saved ${kcal.toLocaleString('en-CA')} kcal for ${who} on ${fmt(day, {weekday: 'long'})} from Apple Health.`);
+  return true;
+}
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.tm); toast.tm = setTimeout(() => t.classList.remove('on'), 5000); }
 function route() {
+  if (importCal(location.hash.slice(1))) { history.replaceState(null, '', location.pathname + '#today'); }
   const h = location.hash.slice(1), t = TABS.includes(h) ? h : 'today';
   TABS.forEach(x => { $('s-' + x).classList.toggle('on', x === t); });
   document.body.classList.toggle('kidmode', t === 'kids'); if (typeof drawTrail === 'function') setTimeout(drawTrail, 0);
