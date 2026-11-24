@@ -66,6 +66,17 @@ h1{text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .mine{font-size:12px;background:var(--lemon);border-radius:8px;padding:1px 6px;font-weight:bold}
 .cnt{font-size:14px;color:var(--muted);font-weight:normal}
 #libList h3{margin-top:18px}
+.erow{display:flex;align-items:center;gap:6px}.erow>.tog{flex:1}
+.x{flex:none;width:40px;height:40px;border-radius:12px;border:0;background:#fde2e0;color:var(--red);font:inherit;font-weight:bold;font-size:16px;cursor:pointer}
+.editbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.btn.edit{background:#fff;box-shadow:inset 0 0 0 2px var(--line)}.btn.edit.on{background:var(--ink);color:#fff;box-shadow:none}
+.addrow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.addrow input{flex:1;min-width:160px}.addrow input.emo{flex:0 0 72px;min-width:72px;text-align:center}
+.removed{background:#fff6f5;border-radius:14px;padding:8px 12px;margin:10px 0;font-size:14px}
+.removed button{margin:4px 6px 0 0}
+.chipx{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:14px;padding:4px 4px 4px 10px;margin:3px;box-shadow:inset 0 0 0 2px var(--line);font-size:14px;font-weight:bold}
+.chipx .x{width:32px;height:32px;font-size:13px}
+.kchoices.edit button{opacity:.6}
+.edited{font-size:12px;background:#e3eefc;border-radius:8px;padding:1px 6px;font-weight:bold}
 /* kids */
 body.kidmode .players,body.kidmode .where{display:none}
 .kpick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
@@ -327,6 +338,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
 <section id="s-groceries">
   <h2>Grocery checklist</h2>
   <p class="lead">Rounded estimates for the whole week, snacks included. Check the pantry first. Ticks are shared, so whoever's at the store can see what's left.</p>
+  <div id="gTools"></div>
   <div id="gKids"></div>
   <div id="gExtra"></div>
   <h3>Shopping list</h3>
@@ -355,6 +367,7 @@ footer{color:var(--muted);font-size:14px;margin-top:30px;border-top:1px solid va
 <section id="s-kids">
   <h2>Food Explorers</h2>
   <p class="lead">Ethan and Fynn pick their food, try new things and collect stamps. Their points move them along the same trail as the rest of the family.</p>
+  <div class="editbar"><button class="btn edit" id="kEdit">✏️ Grown-up edit</button><span class="key" id="kEditNote"></span></div>
   <div class="kpick" id="kidPick"></div>
   <div class="days" id="kidDays"></div>
   <div id="kidToday"></div>
@@ -655,14 +668,16 @@ const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')
 const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const monday = d => addDays(d, -((d.getDay() + 6) % 7));
 const lines = t => String(t || '').split('\n').map(x => x.trim()).filter(Boolean);
-function ownRecipes() { const o = {}, r = SETUP.recipes || {}; for (const k in r) if (r[k] && r[k].n) o[k] = Object.assign({own: 1}, r[k]); return o; }
-const allWeeks = () => [WEEK1].concat(Object.values(SETUP.weeks || {}).filter(w => w && w.start && w.id && w.id !== 'week1')).sort((a, b) => a.start < b.start ? -1 : 1);
+function ownRecipes() { const o = {}, r = SETUP.recipes || {}; for (const k in r) if (r[k] && r[k].n && !r[k].hidden) o[k] = Object.assign({own: BASE_R[k] ? 0 : 1, edited: BASE_R[k] ? 1 : 0}, r[k]); return o; }
+const hiddenRecipes = () => Object.keys(SETUP.recipes || {}).filter(k => SETUP.recipes[k] && SETUP.recipes[k].hidden);
+const week1 = () => { const o = (SETUP.weeks || {}).week1; return o && o.start ? Object.assign({}, WEEK1, o, {id: 'week1', builtin: false, base1: true}) : WEEK1; };
+const allWeeks = () => [week1()].concat(Object.values(SETUP.weeks || {}).filter(w => w && w.start && w.id && w.id !== 'week1')).sort((a, b) => a.start < b.start ? -1 : 1);
 function currentWeekId() {
   const t = new Date(), ws = allWeeks();
   const cur = ws.find(w => t >= pd(w.start) && t < addDays(pd(w.start), 7)); if (cur) return cur.id;
   const up = ws.find(w => pd(w.start) > t); return up ? up.id : ws[ws.length - 1].id;
 }
-const menuOf = w => w.builtin ? Object.fromEntries(DAYS.map((d, i) => [d, MENU1[i].slice()])) : (w.menu || {});
+const menuOf = w => (w.builtin || (w.base1 && !w.menu)) ? Object.fromEntries(DAYS.map((d, i) => [d, MENU1[i].slice()])) : (w.menu || {});
 let pinned = false, lastApplied = '', WEEKOBJ = WEEK1;
 function calcToday() { const n = new Date(); const i = Math.floor((new Date(n.getFullYear(), n.getMonth(), n.getDate()) - START) / 864e5); return i >= 0 && i < 7 ? i : -1; }
 function buildGroceries(w) {
@@ -676,8 +691,14 @@ function buildGroceries(w) {
 function applyWeek() {
   const w = allWeeks().find(x => x.id === WEEK) || WEEK1; WEEK = w.id; WEEKOBJ = w;
   START = pd(w.start); TRAIL = TRAILS[w.trail] || TRAILS.milford;
-  R = Object.assign({}, BASE_R, ownRecipes());
+  R = Object.assign({}, BASE_R, ownRecipes()); hiddenRecipes().forEach(k => { delete R[k]; });
   if (w.builtin) { MENU = MENU1; GROCERIES = GROC1; PREP = PREP1; }
+  else if (w.base1) {
+    const m = w.menu || {};
+    MENU = DAYS.map((d, i) => (Array.isArray(m[d]) ? m[d] : MENU1[i]).concat(['', '', '', '']).slice(0, 4).map(v => v || ''));
+    GROCERIES = Object.assign({}, GROC1, (w.extras || []).length ? {'Extras': w.extras.slice()} : {});
+    PREP = PREP1.concat((w.prep || []).length ? [{t: 'Our extra prep', m: 'Added when we edited Week 1', s: w.prep}] : []);
+  }
   else {
     const m = w.menu || {};
     MENU = DAYS.map(d => (Array.isArray(m[d]) ? m[d] : []).concat(['', '', '', '']).slice(0, 4).map(v => v || ''));
@@ -707,7 +728,7 @@ function selectWeek(id) {
 const choiceP = (pid, d, k) => `choice.${pid}.${d}.${k}`;
 const customP = (pid, d, k) => `custom.${pid}.${d}.${k}`;
 function eff(pid, i, k) { const c = get(choiceP(pid, DAYS[i], k)); return c || MENU[i][k]; }
-function label(pid, i, k) { const v = eff(pid, i, k); return v === 'custom' ? (get(customP(pid, DAYS[i], k)) || 'Something else') : R[v] ? R[v].n : !v ? 'Not planned yet' : /^u[a-z0-9]+$/.test(v) ? 'Removed recipe' : v; }
+function label(pid, i, k) { const v = eff(pid, i, k); return v === 'custom' ? (get(customP(pid, DAYS[i], k)) || 'Something else') : R[v] ? R[v].n : !v ? 'Not planned yet' : (BASE_R[v] || /^u[a-z0-9]+$/.test(v)) ? 'Removed recipe' : v; }
 function terms(pid) { return String(get(`prefs.${pid}.dislikes`) || '').toLowerCase().split(/[,\n;]+/).map(t => t.trim()).filter(t => t.length > 2); }
 function hits(pid, v, text) {
   const hay = (v === 'custom' ? text : R[v] ? R[v].n + ' ' + R[v].i.join(' ') : v).toLowerCase().replace(/olive oil/g, 'oil');
@@ -824,7 +845,7 @@ function renderMenu() {
 }
 function renderRecipes() {
   const open = [...document.querySelectorAll('#recipeList details[open]')].map(x => x.id);
-  $('recipeList').innerHTML = ['Breakfasts','Lunches','Dinners'].map(g => `<h3>${g}</h3>` + Object.keys(R).filter(k => R[k].g === g).map(k => `<details id="r-${k}" ${open.includes('r-' + k) ? 'open' : ''}><summary>${esc(R[k].n)}<small>${esc(R[k].m)}</small></summary><ul>${R[k].i.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p>${esc(R[k].p)}</p></details>`).join('')).join('');
+  $('recipeList').innerHTML = ['Breakfasts','Lunches','Dinners'].map(g => `<h3>${g}</h3>` + Object.keys(R).filter(k => R[k].g === g).map(k => `<details id="r-${k}" ${open.includes('r-' + k) ? 'open' : ''}><summary>${esc(R[k].n)}<small>${esc(R[k].m)}</small></summary><ul>${R[k].i.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p>${esc(R[k].p)}</p><p><button class="btn edit" data-redit="${k}">✏️ Edit or remove</button></p></details>`).join('')).join('');
 }
 function renderExtra() {
   const add = {}, out = [];
@@ -843,20 +864,53 @@ function renderExtra() {
     return `<button class="tog small ${on ? 'on' : ''}" data-path="${p}" aria-pressed="${on}"><span class="box"></span><span class="t"><b>${esc(title)}</b> (${esc(a.when.join(', '))})${items}</span></button>`; }).join('')}
     ${out.length ? `<h3>You've both swapped out</h3><p class="lead" style="margin:0">Buy less for these, or just kid portions: ${esc(out.join('; '))}.</p>` : ''}</div>`;
 }
+let gEdit = false, pEdit = false;
+function editList(items, opts) {
+  // items: [{it, k, add?}] ; opts: {tick, del, addPath, edit}
+  return items.map(x => { const p = `${opts.tick}.${x.k}`, on = !!get(p);
+    const tog = `<button class="tog small ${on ? 'on' : ''}" data-path="${p}" aria-pressed="${on}"><span class="box"></span><span class="t">${esc(x.it)}</span></button>`;
+    return opts.edit ? `<div class="erow">${tog}<button class="x" ${x.add ? `data-unadd="${opts.addPath}.${x.add}"` : `data-hide="${opts.del}.${x.k}"`} aria-label="Remove ${esc(x.it)}">✕</button></div>` : tog; }).join('');
+}
+function removedBox(list, delPath) {
+  return list.length ? `<div class="removed"><b>Removed</b> (tap to bring back)<br>${list.map(x => `<button class="btn edit" data-unhide="${delPath}.${x.k}">↩ ${esc(x.it)}</button>`).join('')}</div>` : '';
+}
 function renderGroceries() {
   renderExtra();
-  let total = 0, done = 0;
-  $('groceryList').innerHTML = Object.keys(GROCERIES).map((g, gi) => `<div class="grp"><h3>${g}</h3>${GROCERIES[g].map((it, ii) => { const p = `groc.g${gi}_${ii}`; const on = !!get(p); total++; if (on) done++;
-    return `<button class="tog small ${on ? 'on' : ''}" data-path="${p}" aria-pressed="${on}"><span class="box"></span><span class="t">${esc(it)}</span></button>`; }).join('')}</div>`).join('');
+  const del = get('gdel') || {}, add = get('gadd') || {};
+  const cats = Object.keys(GROCERIES).map((g, gi) => ({g, items: GROCERIES[g].map((it, ii) => ({it, k: `g${gi}_${ii}`}))}));
+  const added = Object.keys(add).filter(k => add[k]).map(k => ({it: add[k], k: 'a_' + k, add: k}));
+  if (added.length) cats.push({g: 'Added by us', items: added});
+  let total = 0, done = 0; const gone = [];
+  $('groceryList').innerHTML = cats.map(c => { const vis = c.items.filter(x => { if (del[x.k]) { gone.push(x); return false; } total++; if (get('groc.' + x.k)) done++; return true; });
+    return vis.length ? `<div class="grp"><h3>${esc(c.g)}</h3>${editList(vis, {tick: 'groc', del: 'gdel', addPath: 'gadd', edit: gEdit})}</div>` : ''; }).join('');
+  $('gTools').innerHTML = `<div class="editbar"><button class="btn edit ${gEdit ? 'on' : ''}" id="gEdit">${gEdit ? '✓ Done editing' : '✏️ Edit list'}</button></div>`
+    + (gEdit ? `<div class="addrow"><input type="text" id="gAddText" placeholder="Add an item, e.g. Coffee"><button class="btn go" id="gAddGo">Add</button></div>${removedBox(gone, 'gdel')}` : '');
   $('gCount').textContent = `${done} of ${total}`;
   $('gBar').style.width = (total ? done / total * 100 : 0) + '%';
-  if (!total) $('groceryList').innerHTML = '<p class="lead">Nothing to buy yet. Plan some meals for this week in the Plan tab.</p>';
+  if (!total && !gEdit) $('groceryList').innerHTML = '<p class="lead">Nothing to buy yet. Plan some meals for this week in the Plan tab, or tap ✏️ Edit list to add items.</p>';
 }
 function renderPrep() {
-  $('prepList').innerHTML = PREP.length ? '' : '<p class="lead">No prep steps for this week. Add some when you edit the week in Plan.</p>';
-  if (PREP.length) $('prepList').innerHTML = PREP.map((b, bi) => `<h3>${b.t}</h3><p class="lead" style="margin-bottom:4px">${b.m}</p>${b.s.map((s, si) => { const p = `prep.b${bi}_${si}`; const on = !!get(p);
-    return `<button class="tog small ${on ? 'on' : ''}" data-path="${p}" aria-pressed="${on}"><span class="box"></span><span class="t">${esc(s)}</span></button>`; }).join('')}`).join('');
+  const del = get('pdel') || {}, add = get('padd') || {}, gone = [];
+  const blocks = PREP.map((b, bi) => ({t: b.t, m: b.m, items: b.s.map((it, si) => ({it, k: `b${bi}_${si}`}))}));
+  const added = Object.keys(add).filter(k => add[k]).map(k => ({it: add[k], k: 'a_' + k, add: k}));
+  if (added.length) blocks.push({t: 'Added by us', m: '', items: added});
+  const html = blocks.map(b => { const vis = b.items.filter(x => del[x.k] ? (gone.push(x), false) : true);
+    return vis.length ? `<h3>${esc(b.t)}</h3>${b.m ? `<p class="lead" style="margin-bottom:4px">${esc(b.m)}</p>` : ''}${editList(vis, {tick: 'prep', del: 'pdel', addPath: 'padd', edit: pEdit})}` : ''; }).join('');
+  $('prepList').innerHTML = `<div class="editbar"><button class="btn edit ${pEdit ? 'on' : ''}" id="pEdit">${pEdit ? '✓ Done editing' : '✏️ Edit list'}</button></div>`
+    + (pEdit ? `<div class="addrow"><input type="text" id="pAddText" placeholder="Add a prep step"><button class="btn go" id="pAddGo">Add</button></div>` : '')
+    + (html || '<p class="lead">No prep steps for this week. Tap ✏️ Edit list to add some.</p>') + (pEdit ? removedBox(gone, 'pdel') : '');
 }
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return; const ds = t.dataset;
+  if (t.id === 'gEdit') { gEdit = !gEdit; renderGroceries(); return; }
+  if (t.id === 'pEdit') { pEdit = !pEdit; renderPrep(); return; }
+  if (t.id === 'gAddGo' || t.id === 'pAddGo') { const inp = $(t.id === 'gAddGo' ? 'gAddText' : 'pAddText'), v = inp.value.trim(); if (!v) return;
+    put((t.id === 'gAddGo' ? 'gadd.' : 'padd.') + Date.now().toString(36), v.slice(0, 120)); return; }
+  if (ds.hide) { put(ds.hide, true); return; }
+  if (ds.unhide) { put(ds.unhide, false); return; }
+  if (ds.unadd) { put(ds.unadd, null); return; }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'gAddText' || e.target.id === 'pAddText')) $(e.target.id === 'gAddText' ? 'gAddGo' : 'pAddGo').click(); });
 function scale(path) { const v = +get(path) || 0; return `<div class="scale">${[1,2,3,4,5].map(n => `<button data-set="${path}" data-v="${n}" class="${n === v ? 'on' : ''}">${n}</button>`).join('')}</div>`; }
 function field(path, label, type) {
   const v = get(path) == null ? '' : get(path);
@@ -911,7 +965,7 @@ function newDraft() {
   return {id: '', name: `Week ${ws.length + 1}`, start: iso(s), trail: tr, menu: blankMenu(), prepText: '', extrasText: ''};
 }
 function editDraft(id) {
-  const w = allWeeks().find(x => x.id === id); if (!w || w.builtin) return;
+  const w = allWeeks().find(x => x.id === id); if (!w) return;
   draft = {id: w.id, name: w.name, start: w.start, trail: w.trail, menu: JSON.parse(JSON.stringify(menuOf(w))), prepText: (w.prep || []).join('\n'), extrasText: (w.extras || []).join('\n')};
   DAYS.forEach(d => { draft.menu[d] = (draft.menu[d] || []).concat(['', '', '', '']).slice(0, 4); });
 }
@@ -920,8 +974,8 @@ function renderWeekList() {
   $('weekList').innerHTML = allWeeks().map(w => {
     const s = pd(w.start), t = TRAILS[w.trail] || TRAILS.milford, m = menuOf(w);
     const n = DAYS.reduce((c, d) => c + (m[d] || []).filter(Boolean).length, 0);
-    return `<div class="wk"><div class="thumb">${scene(t.id, true)}</div><div class="info"><b>${esc(w.name)}</b><small>${f(s)} – ${f(addDays(s, 6))} · ${t.name}</small><small>${n} of 28 meals planned${w.id === cur ? ' · <b>this week</b>' : ''}${w.builtin ? ' · from your Week 1 plan' : ''}</small></div>
-      <div class="acts"><button class="btn" data-week="${w.id}">Open</button>${w.builtin ? '' : `<button class="btn" data-wedit="${w.id}">Edit</button>`}</div></div>`; }).join('')
+    return `<div class="wk"><div class="thumb">${scene(t.id, true)}</div><div class="info"><b>${esc(w.name)}</b><small>${f(s)} – ${f(addDays(s, 6))} · ${t.name}</small><small>${n} of 28 meals planned${w.id === cur ? ' · <b>this week</b>' : ''}${w.builtin ? ' · from your Week 1 plan' : w.base1 ? ' · edited' : ''}</small></div>
+      <div class="acts"><button class="btn" data-week="${w.id}">Open</button><button class="btn" data-wedit="${w.id}">✏️ Edit</button></div></div>`; }).join('')
     + (draft ? '' : `<button class="btn go" id="wNew">+ Plan a new week</button>`);
 }
 function recipeOptions(k, v) {
@@ -943,11 +997,11 @@ function renderEditor() {
       <button class="btn" id="wFill">Fill empty slots for me</button><button class="btn" id="wClearMenu">Clear menu</button></div>
     <datalist id="snackList">${SNACKS.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
     <div class="mgrid">${rows}</div>
-    <div class="duo"><label class="f"><span>Prep tasks, one per line</span><textarea data-d="prepText" placeholder="Sunday: make overnight oats for Mon and Tue">${esc(draft.prepText)}</textarea></label>
+    <div class="duo"><label class="f"><span>${draft.id === 'week1' ? 'Extra prep tasks' : 'Prep tasks'}, one per line</span><textarea data-d="prepText" placeholder="Sunday: make overnight oats for Mon and Tue">${esc(draft.prepText)}</textarea></label>
     <label class="f"><span>Extra groceries, one per line</span><textarea data-d="extrasText" placeholder="Olive oil&#10;Coffee">${esc(draft.extrasText)}</textarea></label></div>
     <p class="key" id="wMsg">${esc(wMsg)}</p>
     <div class="row"><button class="btn go" id="wSave">Save week</button><button class="btn" id="wCancel">Cancel</button>
-      ${draft.id ? `<button class="btn" id="wDel">Delete week</button>${wDel ? '<button class="btn warn" id="wDelYes">Yes, delete it</button>' : ''}` : ''}</div></div>`;
+      ${draft.id === 'week1' ? `<p class="key" style="flex-basis:100%">Week 1 keeps its original shopping list and prep steps. Your extra prep and groceries are added on, and you can remove items in Groceries and Prep with ✏️ Edit list.</p>${(SETUP.weeks || {}).week1 ? `<button class="btn" id="wDel">Reset Week 1 to the original</button>${wDel ? '<button class="btn warn" id="wDelYes">Yes, reset it</button>' : ''}` : ''}` : ''}${draft.id && draft.id !== 'week1' ? `<button class="btn" id="wDel">Delete week</button>${wDel ? '<button class="btn warn" id="wDelYes">Yes, delete it</button>' : ''}` : ''}</div></div>`;
 }
 function saveDraft() {
   const id = draft.id || 'w' + draft.start.replace(/-/g, '');
@@ -980,14 +1034,14 @@ function renderLibForm() {
     <label class="f"><span>Method</span><textarea data-rd="p" style="min-height:160px">${esc(rdraft.p)}</textarea></label></div>
     <p class="key" id="rMsg"></p>
     <div class="row"><button class="btn go" id="rSave">Save recipe</button><button class="btn" id="rCancel">Cancel</button>
-      ${rdraft.id ? `<button class="btn" id="rDel">Delete</button>${rDel ? '<button class="btn warn" id="rDelYes">Yes, delete it</button>' : ''}` : ''}</div></div>`;
+      ${rdraft.id ? `<button class="btn" id="rDel">${BASE_R[rdraft.id] ? 'Remove from library' : 'Delete'}</button>${rDel ? `<button class="btn warn" id="rDelYes">Yes, ${BASE_R[rdraft.id] ? 'remove' : 'delete'} it</button>` : ''}` : ''}${rdraft.id && BASE_R[rdraft.id] && (SETUP.recipes || {})[rdraft.id] ? '<button class="btn" id="rReset">Reset to original</button>' : ''}</div>${rdraft.id && BASE_R[rdraft.id] ? '<p class="key">Changes apply everywhere this recipe is used. Removed recipes can be brought back from the bottom of the library.</p>' : ''}</div>`;
 }
 function renderLib() {
   $('libList').innerHTML = SLOTGROUP.map(g => {
     const ids = Object.keys(R).filter(id => R[id].g === g && (!rq || (R[id].n + ' ' + R[id].i.join(' ')).toLowerCase().includes(rq))).sort((a, b) => R[a].n.localeCompare(R[b].n));
-    return `<h3>${g} <small class="cnt">${ids.length}</small></h3>` + (ids.length ? ids.map(id => `<div class="lib"><div><b>${esc(R[id].n)}</b>${R[id].own ? ' <span class="mine">Ours</span>' : ''}<small>${esc(R[id].m || '')}</small></div>
-      <div class="acts">${R[id].own ? `<button class="btn" data-redit="${id}">Edit</button>` : `<button class="btn" data-rcopy="${id}">Copy & edit</button>`}</div></div>`).join('') : '<p class="key">Nothing matches.</p>');
-  }).join('');
+    return `<h3>${g} <small class="cnt">${ids.length}</small></h3>` + (ids.length ? ids.map(id => `<div class="lib"><div><b>${esc(R[id].n)}</b>${R[id].own ? ' <span class="mine">Ours</span>' : R[id].edited ? ' <span class="edited">Edited</span>' : ''}<small>${esc(R[id].m || '')}</small></div>
+      <div class="acts"><button class="btn" data-redit="${id}">✏️ Edit</button></div></div>`).join('') : '<p class="key">Nothing matches.</p>');
+  }).join('') + (hiddenRecipes().length ? `<div class="removed"><b>Removed recipes</b><br>${hiddenRecipes().filter(k => BASE_R[k]).map(k => `<button class="btn edit" data-rrestore="${k}">↩ ${esc(BASE_R[k].n)}</button>`).join('')}</div>` : '');
 }
 function renderPlan() { renderWeekList(); renderLib(); }
 
@@ -995,6 +1049,7 @@ document.addEventListener('click', e => {
   const t = e.target.closest('button,[data-week]'); if (!t) return;
   const ds = t.dataset;
   if (ds.week) { selectWeek(ds.week); location.hash = 'today'; return; }
+  if (ds.wedit && location.hash !== '#plan') { location.hash = 'plan'; route(); }
   if (ds.wedit) { editDraft(ds.wedit); wDel = false; wMsg = ''; renderEditor(); renderWeekList(); $('editor').scrollIntoView({block: 'start'}); return; }
   if (t.id === 'wNew') { draft = newDraft(); wMsg = ''; renderEditor(); renderWeekList(); return; }
   if (t.id === 'wCancel') { draft = null; renderEditor(); renderWeekList(); return; }
@@ -1005,15 +1060,17 @@ document.addEventListener('click', e => {
   if (t.id === 'wDelYes') { const id = draft.id; draft = null; wDel = false; putSetup('weeks.' + id, null); renderEditor(); renderWeekList(); return; }
   if (t.id === 'rNew') { rdraft = {id: '', n: '', g: 'Dinners', m: '', i: '', p: ''}; rDel = false; renderLibForm(); return; }
   if (ds.redit || ds.rcopy) { const id = ds.redit || ds.rcopy, r = R[id];
-    rdraft = {id: ds.redit ? id : '', n: ds.rcopy ? r.n + ' (our version)' : r.n, g: r.g, m: r.m || '', i: r.i.join('\n'), p: r.p || ''}; rDel = false; renderLibForm(); $('libForm').scrollIntoView({block: 'start'}); return; }
+    rdraft = {id: ds.redit ? id : '', n: ds.rcopy ? r.n + ' (our version)' : r.n, g: r.g, m: r.m || '', i: r.i.join('\n'), p: r.p || ''}; rDel = false; if (location.hash !== '#plan') { location.hash = 'plan'; route(); } renderLibForm(); setTimeout(() => $('libForm').scrollIntoView({block: 'start'}), 30); return; }
+  if (ds.rrestore) { putSetup('recipes.' + ds.rrestore + '.hidden', null); return; }
+  if (t.id === 'rReset') { const id = rdraft.id; rdraft = null; putSetup('recipes.' + id, null); renderLibForm(); return; }
   if (t.id === 'rCancel') { rdraft = null; renderLibForm(); return; }
   if (t.id === 'rSave') {
     if (!rdraft.n.trim() || !lines(rdraft.i).length) { $('rMsg').textContent = 'Give it a name and at least one ingredient.'; return; }
     const id = rdraft.id || 'u' + Date.now().toString(36);
-    putSetup('recipes.' + id, {g: rdraft.g, n: rdraft.n.trim(), m: rdraft.m.trim(), i: lines(rdraft.i), p: rdraft.p.trim()});
+    putSetup('recipes.' + id, {g: rdraft.g, n: rdraft.n.trim(), m: rdraft.m.trim(), i: lines(rdraft.i), p: rdraft.p.trim(), hidden: null});
     rdraft = null; renderLibForm(); renderLib(); return; }
   if (t.id === 'rDel') { rDel = !rDel; renderLibForm(); return; }
-  if (t.id === 'rDelYes') { const id = rdraft.id; rdraft = null; rDel = false; putSetup('recipes.' + id, null); renderLibForm(); renderLib(); return; }
+  if (t.id === 'rDelYes') { const id = rdraft.id; rdraft = null; rDel = false; if (BASE_R[id]) putSetup('recipes.' + id + '.hidden', 1); else putSetup('recipes.' + id, null); renderLibForm(); renderLib(); return; }
 });
 document.addEventListener('input', e => {
   const t = e.target, ds = t.dataset || {};
@@ -1174,7 +1231,14 @@ function kbadge(kid, id) {
   if (id === 'finish') return finishedOn(kid) >= 0;
 }
 const passport = kid => Object.entries((SETUP.passport || {})[kid] || {}).filter(([k, v]) => v && v.f);
-let KID = lsGet('levelup_kid', {id: 'ethan'}).id, tryOpen = false, tryFood = null;
+let KID = lsGet('levelup_kid', {id: 'ethan'}).id, tryOpen = false, tryFood = null, kEdit = false;
+function kidOpts(slot) { const o = (SETUP.kidmenu || {})[slot]; return Array.isArray(o) ? o.filter(x => x && x.n).map(x => [x.n, x.e || '🍽️']) : (slot === 't' ? TRY_FOODS : KID_MENU[slot].o); }
+function saveKidOpts(slot, arr) { putSetup('kidmenu.' + slot, arr.map(([n, e]) => ({n, e}))); }
+const KSLOTNAME = {b: 'Breakfast', l: 'Lunch', v: 'Dinner veggie', s: 'Snack', t: 'Foods to try'};
+function optEditor(slot) {
+  return `<div class="kslot"><p class="kh">${KSLOTNAME[slot]}</p><div>${kidOpts(slot).map(([n, e], i) => `<span class="chipx">${e} ${esc(n)}<button class="x" data-kopt-del="${slot}" data-i="${i}" aria-label="Remove ${esc(n)}">✕</button></span>`).join('')}</div>
+    <div class="addrow"><input class="emo" type="text" id="ke_${slot}" placeholder="🍽️" maxlength="8" aria-label="Emoji"><input type="text" id="kn_${slot}" placeholder="Add a choice" maxlength="40"><button class="btn go" data-kopt-add="${slot}">Add</button>${(SETUP.kidmenu || {})[slot] ? `<button class="btn edit" data-kopt-reset="${slot}">Reset to starter list</button>` : ''}</div></div>`;
+}
 
 function renderKids() {
   const kid = KIDS.find(k => k.id === KID) || KIDS[0], d = DAYS[sel], x = totalXP(kid.id), dx = kidDayXP(kid.id, d);
@@ -1189,19 +1253,22 @@ function renderKids() {
       <div class="kcrown ${pf ? 'on' : ''}"><span>👑</span><b>${pf ? 'Perfect day!' : 'Perfect day'}</b><small>+${PERFECT_XP}</small></div></div>`;
   // food picks
   const dinner = MENU[sel] && R[MENU[sel][2]] ? R[MENU[sel][2]].n : 'Family dinner';
-  $('kidFood').innerHTML = ['b', 'l', 'v', 's'].map(slot => { const cur = get(`kpick.${kid.id}.${d}.${slot}`) || '';
-    return `<div class="kslot"><p class="kh">${KID_MENU[slot].t}${slot === 'v' ? ` <small>with ${esc(dinner)}</small>` : ''}</p><div class="kchoices">${KID_MENU[slot].o.map(([n, e]) =>
+  $('kEdit').className = 'btn edit' + (kEdit ? ' on' : ''); $('kEdit').textContent = kEdit ? '✓ Done editing' : '✏️ Grown-up edit';
+  $('kEditNote').textContent = kEdit ? 'Change the food choices, remove stamps or undo today’s tries. Changes apply to both boys.' : '';
+  if (kEdit) $('kidFood').innerHTML = ['b', 'l', 'v', 's', 't'].map(optEditor).join('');
+  else $('kidFood').innerHTML = ['b', 'l', 'v', 's'].map(slot => { const cur = get(`kpick.${kid.id}.${d}.${slot}`) || '';
+    return `<div class="kslot"><p class="kh">${KID_MENU[slot].t}${slot === 'v' ? ` <small>with ${esc(dinner)}</small>` : ''}</p><div class="kchoices">${kidOpts(slot).map(([n, e]) =>
       `<button data-kpick="kpick.${kid.id}.${d}.${slot}" data-v="${esc(n)}" class="${cur === n ? 'on' : ''}" aria-pressed="${cur === n}"><span>${e}</span>${esc(n)}</button>`).join('')}</div></div>`; }).join('');
   // passport
   const pp = passport(kid.id).sort((a, b) => (b[1].d || '').localeCompare(a[1].d || ''));
   const today = triesOn(kid.id, d);
   $('kidTry').innerHTML = tryOpen ? (tryFood ? `<div class="kpanel"><p class="kh">How was the ${esc(tryFood.n)}? ${tryFood.e}</p><div class="krate">${RATES.map(([v, e, t]) => `<button data-rate="${v}"><span>${e}</span>${t}</button>`).join('')}</div>
         <p class="key">Every try earns a stamp, even “Not yet”. Brave bites count!</p><button class="btn" id="tryBack">Back</button></div>`
-      : `<div class="kpanel"><p class="kh">What did you try?</p><div class="kchoices">${TRY_FOODS.map(([n, e]) => `<button data-tryfood="${esc(n)}" data-e="${e}"><span>${e}</span>${esc(n)}</button>`).join('')}</div>
+      : `<div class="kpanel"><p class="kh">What did you try?</p><div class="kchoices">${kidOpts('t').map(([n, e]) => `<button data-tryfood="${esc(n)}" data-e="${e}"><span>${e}</span>${esc(n)}</button>`).join('')}</div>
         <div class="row"><input type="text" id="tryOther" placeholder="Something else…" style="flex:1;min-width:160px"><button class="btn go" id="tryOtherGo">Next</button><button class="btn" id="tryCancel">Cancel</button></div></div>`)
-    : `<button class="btn kbig" id="tryOpen">😋 I tried something new!</button>${today.length ? `<p class="key">Today: ${today.map(k => { const p = ((SETUP.passport || {})[kid.id] || {})[k]; const r = RATES.find(x => x[0] === get(`ktry.${kid.id}.${d}.${k}`)); return esc(p ? p.f : k) + ' ' + (r ? r[1] : ''); }).join(' · ')}</p>` : ''}`;
+    : `<button class="btn kbig" id="tryOpen">😋 I tried something new!</button>${today.length ? `<p class="key">Today: ${today.map(k => { const p = ((SETUP.passport || {})[kid.id] || {})[k]; const r = RATES.find(x => x[0] === get(`ktry.${kid.id}.${d}.${k}`)); return esc(p ? p.f : k) + ' ' + (r ? r[1] : '') + (kEdit ? ` <button class="x" data-untry="${k}" aria-label="Undo this try">✕</button>` : ''); }).join(' · ')}</p>` : ''}`;
   $('kidPassport').innerHTML = `<h3>${kid.name}’s Taste Passport <small>${pp.length} stamp${pp.length === 1 ? '' : 's'}</small></h3>` + (pp.length ? `<div class="stamps">${pp.map(([k, v]) => { const r = RATES.find(x => x[0] === v.r);
-      return `<div class="stamp" style="--kc:${kid.c}"><span>${v.e || '🍽️'}</span><b>${esc(v.f)}</b><small>${r ? r[1] + ' ' : ''}tried ${v.t || 1}×</small></div>`; }).join('')}</div>` : '<p class="key">No stamps yet. Try a new food to get your first one!</p>');
+      return `<div class="stamp" style="--kc:${kid.c}"><span>${v.e || '🍽️'}</span><b>${esc(v.f)}</b><small>${r ? r[1] + ' ' : ''}tried ${v.t || 1}×</small>${kEdit ? `<br><button class="x" data-stampdel="${k}" aria-label="Remove ${esc(v.f)} stamp">✕</button>` : ''}</div>`; }).join('')}</div>` : '<p class="key">No stamps yet. Try a new food to get your first one!</p>');
   // badges + chore chart
   $('kidBadges').innerHTML = `<h3>Badges this week</h3><div class="kbadges">${KBADGES.map(b => { const on = kbadge(kid.id, b.id), rw = get(`kreward.${kid.id}.${b.id}`);
       return `<div class="kbadge ${on ? 'on' : ''}"><span>${b.e}</span><b>${b.n}</b><small>${b.h}</small>${on ? `<button class="rw ${rw ? 'on' : ''}" data-path="kreward.${kid.id}.${b.id}">${rw ? '✓ On chore chart' : 'Add to chore chart'}</button>` : ''}</div>`; }).join('')}</div>
@@ -1217,6 +1284,14 @@ function logTry(rate) {
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t || !t.closest('#s-kids')) return;
   const ds = t.dataset;
+  if (t.id === 'kEdit') { kEdit = !kEdit; tryOpen = false; renderKids(); return; }
+  if (ds.koptDel) { const a = kidOpts(ds.koptDel).slice(); a.splice(+ds.i, 1); saveKidOpts(ds.koptDel, a); return; }
+  if (ds.koptAdd) { const sl = ds.koptAdd, n = $('kn_' + sl).value.trim(), e2 = $('ke_' + sl).value.trim() || '🍽️'; if (!n) return; saveKidOpts(sl, kidOpts(sl).concat([[n.slice(0, 40), e2]])); return; }
+  if (ds.koptReset) { putSetup('kidmenu.' + ds.koptReset, null); return; }
+  if (ds.stampdel) { putSetup(`passport.${KID}.${ds.stampdel}`, null); return; }
+  if (ds.untry) { const d = DAYS[sel], k = ds.untry, p = ((SETUP.passport || {})[KID] || {})[k];
+    put(`ktry.${KID}.${d}.${k}`, '');
+    if (p) putSetup(`passport.${KID}.${k}`, (p.t || 1) <= 1 ? null : Object.assign({}, p, {t: p.t - 1})); return; }
   if (ds.kid) { KID = ds.kid; lsSet('levelup_kid', {id: KID}); tryOpen = false; tryFood = null; renderKids(); return; }
   if (ds.kpick) { put(ds.kpick, get(ds.kpick) === ds.v ? '' : ds.v); return; }
   if (t.id === 'tryOpen' || ds.trynow) { tryOpen = true; tryFood = null; renderKids(); $('kidTry').scrollIntoView({block: 'center', behavior: 'smooth'}); return; }
