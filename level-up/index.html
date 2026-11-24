@@ -132,6 +132,8 @@ body.kidmode .players,body.kidmode .where{display:none}
 .kbadge.on{background:#fff6d6;color:var(--ink)}.kbadge.on span{filter:none;opacity:1}
 .rw{margin-top:8px;border:0;border-radius:14px;padding:6px 10px;min-height:36px;font:inherit;font-size:12px;font-weight:bold;background:#fff;color:var(--ink);cursor:pointer;box-shadow:inset 0 0 0 2px var(--line)}
 .rw.on{background:var(--teal);color:#fff;box-shadow:none}
+.rw.take{background:#fde2e0;color:var(--red);box-shadow:none}
+.ovr{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center}.ovr small{flex-basis:100%}
 .kidsum{background:var(--soft);border-radius:16px;padding:6px 16px 12px;margin-bottom:18px}
 @media(max-width:600px){.ktok{grid-template-columns:repeat(3,minmax(0,1fr))}.ktok span,.kcrown span{font-size:34px}.where{grid-template-columns:repeat(2,minmax(0,1fr))}.where div{font-size:13px}}
 .cards-h{margin:12px 0 6px!important;color:#fff!important;font-weight:bold;font-size:15px!important}
@@ -1329,6 +1331,10 @@ const kperfect = (kid, d) => kMissions().every(m => kdone(kid, d, m.id));
 const kidDayXP = (kid, d) => kMissions().reduce((t, m) => t + (kdone(kid, d, m.id) ? (+m.xp || 0) : 0), 0) + (kperfect(kid, d) ? PERFECT_XP : 0);
 const weekTries = kid => DAYS.reduce((t, d) => t + triesOn(kid, d).length, 0);
 function kbadge(kid, b) {
+  const o = get(`kbadgeset.${kid}.${b.id}`); if (o === 'on') return true; if (o === 'off') return false;
+  return kbadgeEarned(kid, b);
+}
+function kbadgeEarned(kid, b) {
   const days = f => DAYS.filter(f).length, t = +b.target || 1;
   if (b.type === 'tries') return weekTries(kid) >= t;
   if (b.type === 'rainbow') return days(d => kdone(kid, d, 'fruit') && kdone(kid, d, 'veg')) >= t;
@@ -1379,10 +1385,16 @@ function renderKids(force) {
       return `<div class="stamp" style="--kc:${kid.c}"><span>${v.e || '🍽️'}</span><b>${esc(v.f)}</b><small>${r ? r[1] + ' ' : ''}tried ${v.t || 1}×</small>${kEdit ? `<br><button class="x" data-stampdel="${k}" aria-label="Remove ${esc(v.f)} stamp">✕</button>` : ''}</div>`; }).join('')}</div>` : '<p class="key">No stamps yet. Try a new food to get your first one!</p>');
   // badges + chore chart
   $('kidBadges').innerHTML = `<h3>Badges this week</h3>${kEdit ? badgeEditor() : ''}<div class="kbadges">${kBadges().map(b => { const on = kbadge(kid.id, b), rw = get(`kreward.${kid.id}.${b.id}`);
-      return `<div class="kbadge ${on ? 'on' : ''}"><span>${esc(b.e)}</span><b>${esc(b.n)}</b><small>${esc(badgeHint(b))}</small>${on ? `<button class="rw ${rw ? 'on' : ''}" data-path="kreward.${kid.id}.${b.id}">${rw ? '✓ On chore chart' : 'Add to chore chart'}</button>` : ''}</div>`; }).join('')}</div>
+      return `<div class="kbadge ${on ? 'on' : ''}"><span>${esc(b.e)}</span><b>${esc(b.n)}</b><small>${esc(badgeHint(b))}</small>${on ? `<button class="rw ${rw ? 'on' : ''}" data-path="kreward.${kid.id}.${b.id}">${rw ? '✓ On chore chart' : 'Add to chore chart'}</button>` : ''}${kEdit ? badgeOverride(kid.id, b, on) : ''}</div>`; }).join('')}</div>
     <p class="key">Grown-ups: each badge earns a reward on ${kid.name}’s chore chart. Tap “Add to chore chart” once you’ve added it.</p>`;
 }
 let kmDraft = null, kbDraft = null;
+function badgeOverride(kid, b, on) {
+  const o = get(`kbadgeset.${kid}.${b.id}`) || '', earned = kbadgeEarned(kid, b);
+  const note = o === 'off' ? '<small>Taken back</small>' : o === 'on' && !earned ? '<small>Given by a grown-up</small>' : '';
+  const btn = on ? `<button class="rw take" data-kbset="${b.id}" data-v="off">Take back</button>` : `<button class="rw" data-kbset="${b.id}" data-v="${o === 'off' ? '' : 'on'}">${o === 'off' ? 'Give it back' : 'Award it'}</button>`;
+  return `<div class="ovr">${note}${btn}${o === 'on' ? `<button class="rw" data-kbset="${b.id}" data-v="">Undo</button>` : ''}</div>`;
+}
 function missionEditor() {
   if (!kmDraft) kmDraft = JSON.parse(JSON.stringify(kMissions()));
   return `<div class="editor"><h3>Edit the daily icons</h3><p class="key">Change the picture, name, description or points. Remove any, or add your own. The first starter icon (Brave bite) ticks itself when a new food is logged, whatever you rename it.</p>
@@ -1408,6 +1420,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t || !t.closest('#s-kids')) return; const ds = t.dataset;
+  if (ds.kbset) { const p = `kbadgeset.${KID}.${ds.kbset}`; put(p, ds.v === 'off' ? 'off' : ds.v === 'on' ? 'on' : ''); if (ds.v === 'off') put(`kreward.${KID}.${ds.kbset}`, false); return; }
   if (t.id === 'kmAdd') { kmDraft.push({id: 'm' + Date.now().toString(36), e: '⭐', n: 'New icon', h: '', xp: 10}); renderKids(); return; }
   if (ds.kmdel) { kmDraft.splice(+ds.kmdel, 1); renderKids(); return; }
   if (t.id === 'kmSave') { const a = kmDraft.filter(m => String(m.n).trim()); if (!a.length) { $('kmMsg').textContent = 'Keep at least one icon.'; return; }
